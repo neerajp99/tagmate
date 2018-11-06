@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "768462231622",
+    "firebase_url": "https://adour-e0abf.firebaseio.com",
+    "project_id": "adour-e0abf",
+    "storage_bucket": "adour-e0abf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768462231622:android:ae08e05f8ca75d6c",
+        "android_client_info": {
+          "package_name": "com.adourapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2YWyHwL7Qx2BLNW0t0InYIaDdzrSDuJc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768462231622:android:671a4a83a315f65d",
+        "android_client_info": {
+          "package_name": "com.getadour.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2YWyHwL7Qx2BLNW0t0InYIaDdzrSDuJc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
