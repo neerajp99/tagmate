@@ -18,20 +18,29 @@ class Loading extends Component {
         firebase.auth().onAuthStateChanged(user => {
             this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })
+        // configure push notification capability & get deviceToken
         Notification.configure((token) => {
             console.log('token: ' + token)
             setDeviceToken(token)
         })
+
+        //listener to listen token refresh
         this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(token => {
             Notification.onTokenRefresh(token)
             setDeviceToken(token)
         })
+
+        //listener to listen for push notifications
         this.notificationListener = firebase.notifications().onNotification((notification) => {
             this.handlePushNotification(notification, false)
         })
+
+        //called when a notification is opened.
         this.notificationOpenListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
             this.handlePushNotification(notificationOpen.notification, false)
         })
+
+        // in case app was closed and opened by
         const notificationOpen = await firebase.notifications().getInitialNotification()
         if (notificationOpen) {
             // App was opened by a notification
