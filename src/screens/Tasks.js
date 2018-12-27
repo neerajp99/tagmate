@@ -49,7 +49,7 @@ class TaskScreen extends Component {
                 <View style={styles.buttonsContainer}>
                     <Button
                         title='ACCEPT' />
-                    <Button onPress={(serviceId) => 
+                    <Button onPress={() => 
                         {
                             let allTasks = [...this.state.myTasks];
                             let filteredTasks = allTasks.filter(item => item.serviceId != serviceId);
