@@ -8,18 +8,36 @@ import * as _ from 'lodash'
 {/* Function parameters should be scalable, not hardcoded like this. */
 }
 
-export const submitUserServices = (myServices) => {
+export const submitUserUpdates = (myServices, whatsapp) => {
     const {currentUser} = firebase.auth();
     return () => {
-        firebase.database().ref(`/users/${currentUser.uid}/services`)
+        var ref = firebase.database().ref(`/users/${currentUser.uid}`);
+        ref.child(`services`)
             .set(myServices)
             .then(() => {
                 console.log('firebase submitted');
                 this.props.navigation.navigate('MainStack');
             });
+        ref.child(`whatsapp`)
+            .set(whatsapp)
+            .then(() => {
+                console.log('firebase submitted');
+                this.props.navigation.navigate('MainStack');
+            });
     };
-
 }
+/*
+export const submitWhatsappNumber = (mobile) => {
+    const {currentUser} = firebase.auth();
+    return () => {
+        firebase.database().ref(`/users/${currentUser.uid}/mobile`)
+            .set(mobile)
+            .then(() => {
+                console.log('firebase submitted');
+                this.props.navigation.navigate('MainStack');
+            });
+    };
+}*/
 
 export const fetchAllServices = () => {
     return (dispatch) => {

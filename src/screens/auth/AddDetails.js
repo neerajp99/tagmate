@@ -4,7 +4,7 @@ import firebase from 'react-native-firebase';
 import {StyleSheet, Text, TextInput, View, Button} from 'react-native';
 import {CheckBox} from 'react-native-elements';
 import {connect} from 'react-redux';
-import {submitUserServices} from '../../actions';
+import {submitUserUpdates} from '../../actions';
 import * as _ from 'lodash'
 
 class AddDetails extends Component {
@@ -13,8 +13,8 @@ class AddDetails extends Component {
     }
 
     onButtonPress() {
-        const {myServices} = this.state;
-        this.props.submitUserServices(myServices);
+        const {myServices, mobile} = this.state;
+        this.props.submitUserUpdates(myServices, mobile);
     }
 
     renderServices = () => {
@@ -30,6 +30,17 @@ class AddDetails extends Component {
             )
         )
     }
+
+    renderWhatsapp = () => {
+        return (
+                <TextInput
+                  style={styles.textInput}
+                  autoCapitalize="none"
+                  onChangeText={mobile => this.setState({ mobile: mobile })}
+                />
+            )
+    }
+
     onItemPressed = (id) => {
         const {myServices} = this.state
         let newServices = []
@@ -50,6 +61,8 @@ class AddDetails extends Component {
                 <Text>What can you offer?</Text>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
                 {this.renderServices()}
+                <Text>What's your Whatsapp number?</Text>
+                {this.renderWhatsapp()}
                 <Button title="Done" onPress={this.onButtonPress.bind(this)}/>
             </View>
         )
@@ -78,4 +91,4 @@ const mapStateToProps = ({auth: {loading, error} = {}, profile: {fetching, servi
     };
 };
 
-export default connect(mapStateToProps, {submitUserServices})(AddDetails);
+export default connect(mapStateToProps, {submitUserUpdates})(AddDetails);
