@@ -30,7 +30,7 @@ class TaskScreen extends Component {
     /*
     *
     * remove an item from the list
-    * */
+    * 
 
     rejectItem = (serviceId) =>
     {
@@ -38,7 +38,7 @@ class TaskScreen extends Component {
         let filteredItems = allTasks.filter(item => item.serviceId != serviceId);
         myTasks = allTasks
     }
-
+    */
     /*
     * render an item of the list
     * */
@@ -49,7 +49,12 @@ class TaskScreen extends Component {
                 <View style={styles.buttonsContainer}>
                     <Button
                         title='ACCEPT' />
-                    <Button onPress={rejectItem(serviceId)}
+                    <Button onPress={(serviceId) => 
+                        {
+                            let allTasks = [...this.state.myTasks];
+                            let filteredTasks = allTasks.filter(item => item.serviceId != serviceId);
+                            this.setState({myTasks:filteredTasks})
+                        }}
                         title='REJECT' />
                 </View>
             </View>
