@@ -9,6 +9,7 @@ class TaskScreen extends Component {
         myTasks: [],
         fetching: false
     }
+
     componentWillMount(){
         this.getMyTasks()
     }
@@ -27,6 +28,18 @@ class TaskScreen extends Component {
     }
 
     /*
+    *
+    * remove an item from the list
+    * */
+
+    rejectItem = (serviceId) =>
+    {
+        let allTasks = [...myTasks];
+        let filteredItems = allTasks.filter(item => item.serviceId != serviceId);
+        myTasks = allTasks
+    }
+
+    /*
     * render an item of the list
     * */
     renderItem = ({item: {serviceId, id} = {}}) => {
@@ -36,13 +49,13 @@ class TaskScreen extends Component {
                 <View style={styles.buttonsContainer}>
                     <Button
                         title='ACCEPT' />
-
-                    <Button
+                    <Button onPress={rejectItem(serviceId)}
                         title='REJECT' />
                 </View>
             </View>
         )
     }
+
     render() {
         const {fetching, myTasks} = this.state
         return (
