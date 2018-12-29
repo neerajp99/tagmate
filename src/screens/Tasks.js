@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
-import {getMyTasks} from "../lib/firebaseUtils";
+import {getMyTasks, serverExists, addServer} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase'
 import { Button } from 'react-native-elements'
 
@@ -26,7 +26,18 @@ class TaskScreen extends Component {
             })
         }
     }
+/*
+    assignTask = (id) => {
+        const {currentUser: {uid} = {}} = firebase.auth()
+        if(uid)
+        {
+            if(!serverExists(id))
+            {
 
+            }
+        }
+    }
+*/
     /*
     *
     * remove an item from the list
@@ -47,15 +58,23 @@ class TaskScreen extends Component {
             <View key={id} style={styles.rowItem}>
                 <Text>{serviceId}</Text>
                 <View style={styles.buttonsContainer}>
-                    <Button
-                        title='ACCEPT' />
-                    <Button onPress={() => 
+                    <Button title='ACCEPT'  onPress={() =>
+                        {
+                            const {currentUser: {uid} = {}} = firebase.auth()
+                            if(uid)
+                            {
+                                serverExists(id).then(exists => 
+                                {
+                                    console.log(exists);
+                                })
+                            }
+                        }} />
+                    <Button title='REJECT' onPress={() => 
                         {
                             let allTasks = [...this.state.myTasks];
                             let filteredTasks = allTasks.filter(item => item.id != id);
                             this.setState({myTasks:filteredTasks})
-                        }}
-                        title='REJECT' />
+                        }} />
                 </View>
             </View>
         )

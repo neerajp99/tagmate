@@ -72,6 +72,32 @@ export const getMyServices = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+export const serverExists = (serviceId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/servicesRequests/${serviceId}/serverId`).once('value', (snapshot) => {
+            console.log(snapshot.exists()+" <-- ");
+            resolve(snapshot.exists())
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const addServer = async (uid,serviceId) => {
+    const {currentUser} = firebase.auth();
+    var serviceRef = firebase.database().ref(`/servicesRequests/${serviceId}/serverId`);
+    const valueSnapshot = await serviceRef.once('value');
+    if(valueSnapshot.exists())
+    {
+        console.log("Already exists. Returning.");
+        return;
+    }
+    serviceRef.set(uid)
+    .then(() => {
+        console.log('firebase submitted');
+        this.props.navigation.navigate('MainStack');
+    });
+}
 
 /*
 * kept firebase reference in one place
