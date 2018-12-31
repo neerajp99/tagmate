@@ -1,7 +1,7 @@
 // SignUp.js
 import React, {Component} from 'react';
 import firebase from 'react-native-firebase';
-import {StyleSheet, Text, TextInput, View, Button} from 'react-native';
+import {StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native';
 import {CheckBox} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {submitUserUpdates} from '../../actions';
@@ -63,7 +63,9 @@ class AddDetails extends Component {
                 {this.renderServices()}
                 <Text>What's your Whatsapp number?</Text>
                 {this.renderWhatsapp()}
-                <Button title="Done" onPress={this.onButtonPress.bind(this)}/>
+                <TouchableOpacity style={styles.btn} onPress={this.onButtonPress.bind(this)}>
+                  <Text style={styles.btnText}>Save Preferences</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -81,6 +83,18 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderWidth: 1,
         marginTop: 8
+    },
+    btn: {
+      height: 45,
+      borderRadius: 25,
+      backgroundColor: 'darkgrey',
+      justifyContent: 'center',
+      marginTop: 20
+    },
+    btnText: {
+      color: 'rgba(255, 255, 255, 1)',
+      fontSize: 16,
+      textAlign: 'center'
     }
 })
 
