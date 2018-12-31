@@ -58,7 +58,6 @@ class AddDetails extends Component {
         console.log('services', services)
         return (
             <View>
-                <Text>What can you offer?</Text>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
                 {this.renderServices()}
                 <Text>What's your Whatsapp number?</Text>
