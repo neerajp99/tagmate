@@ -65,8 +65,14 @@ class TaskScreen extends Component {
                             {
                                 serverExists(id).then(exists => 
                                 {
-                                    console.log(exists);
-                                })
+                                    if(!exists)
+                                    {
+                                        addServer(uid, id).then(whatsapp =>
+                                        {
+                                            this.props.navigation.navigate('Chat', { whatsapp: whatsapp });
+                                        });
+                                    }
+                                });
                             }
                         }} />
                     <Button title='REJECT' onPress={() => 

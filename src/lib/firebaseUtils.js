@@ -83,7 +83,27 @@ export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     }
 })
 
-export const addServer = async (uid,serviceId) => {
+export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
+    try {
+        const {currentUser} = firebase.auth();
+        var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
+        ref.child(`serverId`).set(userId);        
+        ref.child(`clientId`).once("value", function(snapshot) {
+            //resolve(snapshot.val());
+            console.log("Client Id: "+snapshot.val());
+            var wRef = firebase.database().ref(`/users/${snapshot.val()}/whatsapp`);
+            wRef.once("value", function(whatsapp)
+            {
+                console.log(whatsapp.val());
+                resolve(whatsapp.val());
+            })
+        });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+/*export const addServer = async (uid,serviceId) => {
     const {currentUser} = firebase.auth();
     var serviceRef = firebase.database().ref(`/servicesRequests/${serviceId}/serverId`);
     const valueSnapshot = await serviceRef.once('value');
@@ -97,7 +117,7 @@ export const addServer = async (uid,serviceId) => {
         console.log('firebase submitted');
         this.props.navigation.navigate('MainStack');
     });
-}
+}*/
 
 /*
 * kept firebase reference in one place
