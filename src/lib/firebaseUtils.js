@@ -44,7 +44,7 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                     console.log('allRequests: ', allRequests)
                     const keys = Object.keys(allRequests)
                     for (let key of keys) {
-                        if (_.includes(myServices, allRequests[key].serviceId)) {
+                        if (_.includes(myServices, allRequests[key].serviceId) && allRequests[key].clientId !== userId && typeof allRequests[key].serverId == "undefined") {
                             myTasks.push(allRequests[key])
                         }
                     }
