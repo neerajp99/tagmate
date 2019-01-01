@@ -20,6 +20,11 @@ class AddDetails extends Component {
     renderServices = () => {
         const {services} = this.props
         const {myServices} = this.state
+        console.log("My Services up next");
+        console.log(myServices);
+        console.log("Services up next");
+        console.log(services);
+
         return services.map(service => (
                 <CheckBox
                     key={service.id}

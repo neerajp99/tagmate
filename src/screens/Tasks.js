@@ -57,7 +57,6 @@ class TaskScreen extends Component {
         return (
             <View key={id} style={styles.rowItem}>
                 <Text>{serviceId}</Text>
-                <Text>{id}</Text>
                 <View style={styles.buttonsContainer}>
                     <Button title='ACCEPT'  onPress={() =>
                         {
