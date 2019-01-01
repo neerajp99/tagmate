@@ -45,7 +45,7 @@ class AddDetails extends Component {
         const {myServices} = this.state
         let newServices = []
         if(_.includes(myServices, id)) {
-            newServices = myServices.filter(item => item === id)
+            newServices = myServices.filter(item => item !== id)
         } else {
            newServices = [...myServices, id]
         }
