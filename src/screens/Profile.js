@@ -16,6 +16,7 @@ class ProfileScreen extends Component{
 
 
   render(){
+    const {currentUser: {uid} = {}} = firebase.auth()
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}
@@ -23,8 +24,7 @@ class ProfileScreen extends Component{
         <Text style={styles.titleText}>Profile</Text>
         <Text style={styles.subtitleText}>What can you offer?</Text>
         </View>
-        <AddDetails />
-
+        <AddDetails userId={uid} />
         <TouchableOpacity style={styles.btn} onPress={() => firebase.auth().signOut()}>
           <Text style={styles.btnText}> Signout </Text>
         </TouchableOpacity>

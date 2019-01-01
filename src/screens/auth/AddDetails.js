@@ -5,11 +5,17 @@ import {StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
 import {CheckBox} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {submitUserUpdates} from '../../actions';
+import {getMyServices} from '../../lib/firebaseUtils';
 import * as _ from 'lodash'
 
 class AddDetails extends Component {
-    state = {
-        myServices: []
+
+    state = { myServices: [], }
+    
+    async componentDidMount()
+    {
+        var myServicess = await getMyServices(this.props.userId);
+        this.setState({myServices: myServicess});
     }
 
     onButtonPress() {
@@ -20,11 +26,6 @@ class AddDetails extends Component {
     renderServices = () => {
         const {services} = this.props
         const {myServices} = this.state
-        console.log("My Services up next");
-        console.log(myServices);
-        console.log("Services up next");
-        console.log(services);
-
         return services.map(service => (
                 <CheckBox
                     key={service.id}
@@ -64,9 +65,9 @@ class AddDetails extends Component {
         return (
             <View>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
-                {this.renderServices()}
                 <Text>What's your Whatsapp number?</Text>
                 {this.renderWhatsapp()}
+                {this.renderServices()}
                 <TouchableOpacity style={styles.btn} onPress={this.onButtonPress.bind(this)}>
                   <Text style={styles.btnText}>Save Preferences</Text>
                 </TouchableOpacity>
