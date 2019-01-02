@@ -18,7 +18,7 @@ export const signupUser = ({email, password}) => {
       .createUserWithEmailAndPassword(email, password)
       .then(user => signupUserSuccess(dispatch, user))
       .catch( (err) => {
-        alert(err)})
+        alert(err.message)})
   };
 };
 
