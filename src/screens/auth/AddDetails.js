@@ -9,13 +9,17 @@ import {getMyServices} from '../../lib/firebaseUtils';
 import * as _ from 'lodash'
 
 class AddDetails extends Component {
+    state = {myServices: [],};
+    /*constructor(props) {
+        super(props);
+        var myServicess = getMyServices(props.userId);
+        this.setState({myServices: myServicess});
+    }*/
 
-    state = { myServices: [], }
-    
     async componentDidMount()
     {
         var myServicess = await getMyServices(this.props.userId);
-        this.setState({myServices: myServicess});
+        this.setState({myServices: myServicess,});
     }
 
     onButtonPress() {
@@ -53,7 +57,7 @@ class AddDetails extends Component {
         if(_.includes(myServices, id)) {
             newServices = myServices.filter(item => item !== id)
         } else {
-           newServices = [...myServices, id]
+            newServices = [...myServices, id]
         }
         console.log(myServices, newServices)
         this.setState({myServices: newServices})
@@ -61,7 +65,6 @@ class AddDetails extends Component {
 
     render() {
         const {services} = this.props
-        console.log('services', services)
         return (
             <View>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}

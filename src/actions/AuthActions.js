@@ -17,8 +17,8 @@ export const signupUser = ({email, password}) => {
       .auth()
       .createUserWithEmailAndPassword(email, password)
       .then(user => signupUserSuccess(dispatch, user))
-      .catch( err => {
-        alert(err.message)})
+      .catch( (err) => {
+        alert(err)})
   };
 };
 
@@ -35,7 +35,6 @@ const signupUserSuccess = (dispatch, user) => {
     type: LOGIN_USER_SUCCESS,
     payload: user
   });
-  this.props.navigation.navigate('MainStack');
 };
 
 const loginUserFail = (dispatch) => {

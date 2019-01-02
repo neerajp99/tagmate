@@ -65,7 +65,7 @@ export const getMyServices = (userId) => new Promise((resolve, reject) => {
     try {
         firebase.database().ref(`users/${userId}`).once('value', (snapshot) => {
             const user = snapshot.val() || []
-            resolve(user.services)
+            resolve(user.services || [])
         })
     } catch (e) {
         reject(e)
