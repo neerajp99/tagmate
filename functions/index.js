@@ -8,6 +8,10 @@ const _ = require('lodash');
 // initializes your application
 admin.initializeApp();
 
+exports.helloWorld = functions.https.onRequest((req, res) => {
+  res.send("Hello from a Serverless Database!");
+});
+
 exports.sendPushNotification = functions.database
     .ref('/servicesRequests/{pushId}')
     .onCreate((snapshot, context) => {
@@ -57,6 +61,45 @@ exports.sendPushNotification = functions.database
                 // Send notifications to all tokens.
                 return admin.messaging()
                     .sendToDevice(deviceTokens, payload);
+            })
+    });
+
+
+    exports.sendPushNotificationToRequester = functions.database
+    .ref('/servicesRequests/{pushId}/serverId')
+    .onCreate((snapshot, context) => {
+        const pushId = context.params.pushId;
+        if (!pushId) {
+            return console.log('missing mandatory params for sending push.')
+        }
+        let deviceTokens = []
+        const requesterIdPromise = snapshot.ref.parent.child('clientId').once('value')
+        const acceptorIdPromise = snapshot.ref.parent.child('serverId').once('value')
+        return Promise.all([requesterIdPromise, acceptorIdPromise])
+            .then(results => {
+                const clientId = results[0].val()
+                const serverId = results[1].val()
+                const clientDevicesPromise = admin.database().ref(`/users/${clientId}`).once('value')
+                const serverWhatsappPromise = admin.database().ref(`/users/${serverId}`).once('value')
+                return Promise.all([clientDevicesPromise, serverWhatsappPromise])
+                .then(finResults => 
+                {
+                    const client = finResults[0].val()
+                    const server = finResults[1].val()
+                    if(!client.hasOwnProperty('deviceTokens') || !client.deviceTokens.length) return console.log('No clients.')
+                    if(!server.hasOwnProperty('whatsapp')) return console.log('Server does not have Whatsapp.')
+                    const payload = {
+                        notification: {
+                            title: 'Your savior is here!',
+                            body: `Open to contact your request's acceptor.`
+                        },
+                        data: {
+                            notifType: 'FOUND_ACCEPTOR', // for future if we add notif for more things, this type will let us identify
+                            whatsapp: server.whatsapp
+                        }
+                    };
+                    return admin.messaging().sendToDevice(client.deviceTokens, payload);
+                })
             })
     });
 

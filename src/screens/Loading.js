@@ -56,11 +56,15 @@ class Loading extends Component {
         setTimeout(() => {
             const {authToken = ''} = this.props
             const {currentUser} = firebase.auth()
-            if (wasAppClosed && !_.isEmpty(currentUser)) {
-                const {_data: {notifType, serviceId} = {}} = notification
-                this.props.navigation.navigate('Tasks')
+            const {notifType} = notification
+            if(wasAppClosed && !_.isEmpty(currentUser)) {
+                if(notifType == 'SERVICE_REQUEST') this.props.navigation.navigate('Tasks')
+                else if(notifType == 'FOUND_ACCEPTOR') this.props.navigation.navigate('Chat', { whatsapp: notification.whatsapp })
+                //const {_data: {notifType, serviceId} = {}} = notification
             }
-            const {_data = {}} = notification
+            if(!_.isEmpty(currentUser) && notifType == 'FOUND_ACCEPTOR') this.props.navigation.navigate('Chat', { whatsapp: notification.whatsapp })
+            //const {_data = {}} = notification
+            
             //todo: handle here what to do with push Notif when app is opened.
             // handlePushNotification(_data)
         }, 1000)
