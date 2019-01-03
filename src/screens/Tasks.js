@@ -69,6 +69,9 @@ class TaskScreen extends Component {
                                     {
                                         addServer(uid, id).then(whatsapp =>
                                         {
+                                            let allTasks = [...this.state.myTasks];
+                                            let filteredTasks = allTasks.filter(item => item.id != id);
+                                            this.setState({myTasks:filteredTasks})
                                             this.props.navigation.navigate('Chat', { whatsapp: whatsapp });
                                         });
                                     }
