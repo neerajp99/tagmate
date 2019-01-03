@@ -37,21 +37,23 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                 resolve([])
                 return
             }
-            firebase.database().ref('servicesRequests')
-                .once('value', (snapshot) => {
+            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
+                firebase.database().ref(`/users/${userId}/rejectedTasks`).once('value', (snapshotb) => {
                     let myTasks = []
                     const allRequests = snapshot.val() || {}
                     console.log('allRequests: ', allRequests)
                     const keys = Object.keys(allRequests)
+                    const rejectedTasks = snapshotb.val() || {}
                     for (let key of keys) {
-                        if (_.includes(myServices, allRequests[key].serviceId) && allRequests[key].clientId !== userId && typeof allRequests[key].serverId == "undefined") {
-                            myTasks.push(allRequests[key])
-                        }
+                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].serverId == "undefined") {
+                                myTasks.push(allRequests[key])
+                            }
                     }
                     console.log('myTasks: ', myTasks)
                     resolve(myTasks)
                     return
                 })
+        })
         })
     } catch (e) {
         reject(e)
@@ -98,6 +100,14 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
                 resolve(whatsapp.val());
             })
         });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
+    try {
+        resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));
     } catch (e) {
         reject(e)
     }

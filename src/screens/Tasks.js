@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
-import {getMyTasks, serverExists, addServer} from "../lib/firebaseUtils";
+import {getMyTasks, serverExists, addServer, appendRejectedTask} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase'
 import { Button } from 'react-native-elements'
+
 
 class TaskScreen extends Component {
     state = {
@@ -24,6 +25,39 @@ class TaskScreen extends Component {
             getMyTasks(uid).then(myTasks => {
                 this.setState({myTasks, fetching: false})
             })
+        }
+    }
+
+    hideTask = (id) =>
+    {
+        let allTasks = [...this.state.myTasks];
+        let filteredTasks = allTasks.filter(item => item.id != id);
+        this.setState({myTasks:filteredTasks})
+    }
+
+    rejectTask = (id) =>
+    {
+        this.hideTask(id);
+        const {currentUser: {uid} = {}} = firebase.auth()
+        if(uid) appendRejectedTask(uid, id);
+    }
+
+    acceptTask = (id) =>
+    {
+        const {currentUser: {uid} = {}} = firebase.auth()
+        if(uid)
+        {
+            serverExists(id).then(exists => 
+            {
+                this.hideTask(id);
+                if(!exists)
+                {
+                    addServer(uid, id).then(whatsapp =>
+                    {
+                        this.props.navigation.navigate('Chat', { whatsapp: whatsapp });
+                    });
+                }
+            });
         }
     }
 /*
@@ -58,32 +92,8 @@ class TaskScreen extends Component {
             <View key={id} style={styles.rowItem}>
                 <Text>{serviceId}</Text>
                 <View style={styles.buttonsContainer}>
-                    <Button title='ACCEPT'  onPress={() =>
-                        {
-                            const {currentUser: {uid} = {}} = firebase.auth()
-                            if(uid)
-                            {
-                                serverExists(id).then(exists => 
-                                {
-                                    if(!exists)
-                                    {
-                                        addServer(uid, id).then(whatsapp =>
-                                        {
-                                            let allTasks = [...this.state.myTasks];
-                                            let filteredTasks = allTasks.filter(item => item.id != id);
-                                            this.setState({myTasks:filteredTasks})
-                                            this.props.navigation.navigate('Chat', { whatsapp: whatsapp });
-                                        });
-                                    }
-                                });
-                            }
-                        }} />
-                    <Button title='REJECT' onPress={() => 
-                        {
-                            let allTasks = [...this.state.myTasks];
-                            let filteredTasks = allTasks.filter(item => item.id != id);
-                            this.setState({myTasks:filteredTasks})
-                        }} />
+                    <Button title='ACCEPT'  onPress={() => { this.acceptTask(id) }} />
+                    <Button title='REJECT' onPress={() => { this.rejectTask(id) }} />
                 </View>
             </View>
         )
