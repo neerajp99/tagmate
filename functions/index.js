@@ -60,7 +60,7 @@ exports.sendPushNotification = functions.database
                 }
                 // Send notifications to all tokens.
                 return admin.messaging()
-                    .sendToDevice(deviceTokens, payload);
+                    .sendToDevice(_.uniq(deviceTokens), payload);
             })
     });
 
