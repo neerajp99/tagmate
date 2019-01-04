@@ -10,20 +10,18 @@ import * as _ from 'lodash'
 
 class AddDetails extends Component {
     state = {myServices: [],};
-    /*constructor(props) {
-        super(props);
-        var myServicess = getMyServices(props.userId);
-        this.setState({myServices: myServicess});
-    }*/
 
     async componentDidMount()
     {
+        // Loading services already offered:
         var myServicess = await getMyServices(this.props.userId);
         this.setState({myServices: myServicess,});
     }
 
     onButtonPress() {
         const {myServices, mobile} = this.state;
+        
+        // Validating user inputs:
         if(_.isEmpty(myServices))
         {
             alert('You have to offer at least one service.');
@@ -34,7 +32,7 @@ class AddDetails extends Component {
             alert('Please fill in a valid mobile number.');
             return;
         }
-        else this.props.submitUserUpdates(myServices, mobile);
+        else this.props.submitUserUpdates(myServices, mobile); // Finalling updating profile.
     }
 
     renderServices = () => {
@@ -65,11 +63,14 @@ class AddDetails extends Component {
         const {myServices} = this.state
         let newServices = []
         if(_.includes(myServices, id)) {
+            // If item was already checked, uncheck it.
             newServices = myServices.filter(item => item !== id)
         } else {
+            // If item was unchecked, check it.
             newServices = [...myServices, id]
         }
         console.log(myServices, newServices)
+        // Update state to reflect changes:
         this.setState({myServices: newServices})
     }
 

@@ -10,16 +10,19 @@ import { NavigationActions } from 'react-navigation';
 
 
 class App extends Component {
-    async componentDidMount() {
-		this.notificationOpenListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+    async componentDidMount()
+    {
+        // Listeners for push notifications below:
+
+
+        // When app was open
+        this.notificationOpenListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
             this.handlePushNotification(notificationOpen.notification, false)
         })
 
         // in case app was closed and opened by
         const notificationOpen = await firebase.notifications().getInitialNotification()
         if (notificationOpen) {
-            // App was opened by a notification
-            // Get the action triggered by the notification being opened
             const action = notificationOpen.action
             // Get information about the notification that was opened
             this.handlePushNotification(notificationOpen.notification, true)

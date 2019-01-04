@@ -37,7 +37,9 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                 resolve([])
                 return
             }
+            // Fetching all tasks
             firebase.database().ref('servicesRequests').once('value', (snapshot) => {
+                // Fetching all tasks rejected by user {userId}
                 firebase.database().ref(`/users/${userId}/rejectedTasks`).once('value', (snapshotb) => {
                     let myTasks = []
                     const allRequests = snapshot.val() || {}
@@ -45,9 +47,11 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                     const keys = Object.keys(allRequests)
                     const rejectedTasks = snapshotb.val() || {}
                     for (let key of keys) {
+                    // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
                         if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].serverId == "undefined") {
                                 myTasks.push(allRequests[key])
                             }
+                    }
                     }
                     console.log('myTasks: ', myTasks)
                     resolve(myTasks)
@@ -74,6 +78,7 @@ export const getMyServices = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+// Check if given task has already been accepted by someone.
 export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     try {
         firebase.database().ref(`/servicesRequests/${serviceId}/serverId`).once('value', (snapshot) => {
@@ -85,13 +90,14 @@ export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     }
 })
 
+// Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester.
 export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
         ref.child(`serverId`).set(userId);        
+        // Now returning the Whatsapp number of requester (client)
         ref.child(`clientId`).once("value", function(snapshot) {
-            //resolve(snapshot.val());
             console.log("Client Id: "+snapshot.val());
             var wRef = firebase.database().ref(`/users/${snapshot.val()}/whatsapp`);
             wRef.once("value", function(whatsapp)
@@ -105,6 +111,7 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     }
 })
 
+// To note in database that user {userId} has rejected task {serviceId}
 export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
         resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));

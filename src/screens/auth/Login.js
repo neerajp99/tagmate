@@ -17,6 +17,8 @@ class Login extends Component {
 
   handleLogin = () => {
     const { email, password } = this.state;
+    
+    // Ensuring no fields are empty:
     if(email == '' || password == '')
       {
         alert('Please fill all the fields.');

@@ -1,7 +1,7 @@
 // SignUp.js
 import React, {Component} from 'react';
 import firebase from 'react-native-firebase';
-import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity  } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator  } from 'react-native';
 import {connect} from 'react-redux';
 import {signupUser} from '../../actions';
 import Icon from 'react-native-vector-icons/MaterialIcons'
@@ -17,6 +17,8 @@ class SignUp extends Component {
   handleSignUp = () => {
       console.log('inside handleSignUp')
       const { email, password } = this.state
+      
+      // Ensuring no fields are empty.
       if(email == '' || password == '')
       {
         alert('Please fill all the fields.');
@@ -33,6 +35,7 @@ class SignUp extends Component {
       }
     }
 
+  // Toggle eye icon to show/hide password.
   showPass = () => {
       if (this.state.showPass == true) {
         this.setState({ showPass: false})

@@ -12,6 +12,7 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
   res.send("Hello from a Serverless Database!");
 });
 
+// This function pushes notification every time a new service request is created to those who offer that service.
 exports.sendPushNotification = functions.database
     .ref('/servicesRequests/{pushId}')
     .onCreate((snapshot, context) => {
@@ -21,20 +22,20 @@ exports.sendPushNotification = functions.database
         }
         let clientUser = {id: clientId}, deviceTokens = []
         const getUsersPromise = admin.database().ref(`/users`).once('value')
-        const serviceDetailsPromise = admin.database()
-            .ref(`/services/${serviceId}`).once('value')
+        const serviceDetailsPromise = admin.database().ref(`/services/${serviceId}`).once('value')
 
         return Promise.all([getUsersPromise, serviceDetailsPromise])
             .then(results => {
                 const serviceObj = results[1].val() || {}
                 const usersObj = results[0].val() || {}
                 const iDs = Object.keys(usersObj)
+                // Running over all users one by one and putting their device IDs into a list if they offer the requested service.
                 for (const id of iDs) {
                     let user = usersObj[id] || {}
                     if (id === clientId) {
                         Object.assign(clientUser, user)
-
-                    } else if (user.hasOwnProperty('services')
+                    }
+                    else if (user.hasOwnProperty('services')
                         && user.hasOwnProperty('deviceTokens')
                         && _.includes(user.services, serviceId)) {
                         deviceTokens = (user.deviceTokens || [])
@@ -49,7 +50,7 @@ exports.sendPushNotification = functions.database
                         body: `A new request is there for ${serviceObj.title} service.`
                     },
                     data: {
-                        notifType: 'SERVICE_REQUEST', // for future if we add notif for more things, this type will let us identify
+                        notifType: 'SERVICE_REQUEST', // To tell the app what kind of notification this is.
                         serviceId
                     }
 
@@ -58,13 +59,13 @@ exports.sendPushNotification = functions.database
                 if (!Array.isArray(deviceTokens) || !deviceTokens.length) {
                     return console.log('no user found to send push to.')
                 }
-                // Send notifications to all tokens.
+                // Send notifications to all unique tokens.
                 return admin.messaging()
                     .sendToDevice(_.uniq(deviceTokens), payload);
             })
     });
 
-
+// This function pushes notifications to a user (client) when their requested task is accepted by someone.
     exports.sendPushNotificationToRequester = functions.database
     .ref('/servicesRequests/{pushId}/serverId')
     .onCreate((snapshot, context) => {
@@ -75,18 +76,22 @@ exports.sendPushNotification = functions.database
         let deviceTokens = []
         const requesterIdPromise = snapshot.ref.parent.child('clientId').once('value')
         const acceptorIdPromise = snapshot.ref.parent.child('serverId').once('value')
+        // Once we have clientId and serverId:
         return Promise.all([requesterIdPromise, acceptorIdPromise])
             .then(results => {
                 const clientId = results[0].val()
                 const serverId = results[1].val()
                 const clientDevicesPromise = admin.database().ref(`/users/${clientId}`).once('value')
                 const serverWhatsappPromise = admin.database().ref(`/users/${serverId}`).once('value')
+                // Once we have device IDs of client (requester) and Whatsapp number of server (acceptor)
                 return Promise.all([clientDevicesPromise, serverWhatsappPromise])
                 .then(finResults => 
                 {
                     const client = finResults[0].val()
                     const server = finResults[1].val()
+                    // Terminate here if the client does not have any device IDs.
                     if(!client.hasOwnProperty('deviceTokens') || !client.deviceTokens.length) return console.log('No clients.')
+                    // Terminate here if the server does not have any Whatsapp number.
                     if(!server.hasOwnProperty('whatsapp')) return console.log('Server does not have Whatsapp.')
                     const payload = {
                         notification: {
@@ -94,8 +99,8 @@ exports.sendPushNotification = functions.database
                             body: `Open to contact your request's acceptor.`
                         },
                         data: {
-                            notifType: 'FOUND_ACCEPTOR', // for future if we add notif for more things, this type will let us identify
-                            whatsapp: server.whatsapp
+                            notifType: 'FOUND_ACCEPTOR', // To tell the app what kind of notification this is.
+                            whatsapp: server.whatsapp // Passing server's whatsapp number to client's devices.
                         }
                     };
                     return admin.messaging().sendToDevice(client.deviceTokens, payload);

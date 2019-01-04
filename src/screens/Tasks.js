@@ -28,6 +28,8 @@ class TaskScreen extends Component {
         }
     }
 
+
+    // Locally hide task by removing it from myTasks object in the state 
     hideTask = (id) =>
     {
         let allTasks = [...this.state.myTasks];
@@ -35,11 +37,12 @@ class TaskScreen extends Component {
         this.setState({myTasks:filteredTasks})
     }
 
+    // Reject a task
     rejectTask = (id) =>
     {
         this.hideTask(id);
         const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid) appendRejectedTask(uid, id);
+        if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
     }
 
     acceptTask = (id) =>
@@ -47,10 +50,10 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
-            serverExists(id).then(exists => 
+            serverExists(id).then(exists => // Check if someone has already accepted the task {id}. 
             {
                 this.hideTask(id);
-                if(!exists)
+                if(!exists) // If the task is still not accepted by anyone, assign it to user {uid}.
                 {
                     addServer(uid, id).then(whatsapp =>
                     {
@@ -60,30 +63,7 @@ class TaskScreen extends Component {
             });
         }
     }
-/*
-    assignTask = (id) => {
-        const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid)
-        {
-            if(!serverExists(id))
-            {
-
-            }
-        }
-    }
-*/
-    /*
-    *
-    * remove an item from the list
-    * 
-
-    rejectItem = (serviceId) =>
-    {
-        let allTasks = [...myTasks];
-        let filteredItems = allTasks.filter(item => item.serviceId != serviceId);
-        myTasks = allTasks
-    }
-    */
+    
     /*
     * render an item of the list
     * */

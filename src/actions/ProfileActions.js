@@ -12,18 +12,9 @@ export const submitUserUpdates = (myServices, whatsapp) => {
     const {currentUser} = firebase.auth();
     return () => {
         var ref = firebase.database().ref(`/users/${currentUser.uid}`);
-        ref.child(`services`)
-            .set(myServices)
-            .then(() => {
-                console.log('firebase submitted');
-                this.props.navigation.navigate('MainStack');
-            });
-        ref.child(`whatsapp`)
-            .set(whatsapp)
-            .then(() => {
-                console.log('firebase submitted');
-                this.props.navigation.navigate('MainStack');
-            });
+        // Updating services offered and whatsapp number:
+        ref.child(`services`).set(myServices);
+        ref.child(`whatsapp`).set(whatsapp);
     };
 }
 /*
