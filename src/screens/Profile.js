@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
 import firebase from 'react-native-firebase';
 import AddDetails from './auth/AddDetails';
 
@@ -7,13 +7,11 @@ const { width: WIDTH } = Dimensions.get('window')
 
 class ProfileScreen extends Component{
 
-
   handleSignout = () => {
       firebase
         .auth()
         .signOut()
   }
-
 
   render(){
     const {currentUser: {uid} = {}} = firebase.auth()
