@@ -20,7 +20,7 @@ class Loading extends Component {
         })
         // configure push notification capability & get deviceToken
         Notification.configure((token) => {
-            console.log('token: ' + token)
+            // console.log('token: ' + token)
             setDeviceToken(token)
         })
 

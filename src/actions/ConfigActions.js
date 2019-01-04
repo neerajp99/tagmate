@@ -7,7 +7,7 @@ import * as _ from 'lodash'
 
 
 export const setDeviceToken = (deviceToken) => {
-    console.log('insideSetDeviceToken: ' + deviceToken)
+    //console.log('insideSetDeviceToken: ' + deviceToken)
     const {currentUser} = firebase.auth();
 
     return (dispatch) => {

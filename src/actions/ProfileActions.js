@@ -17,18 +17,6 @@ export const submitUserUpdates = (myServices, whatsapp) => {
         ref.child(`whatsapp`).set(whatsapp);
     };
 }
-/*
-export const submitWhatsappNumber = (mobile) => {
-    const {currentUser} = firebase.auth();
-    return () => {
-        firebase.database().ref(`/users/${currentUser.uid}/mobile`)
-            .set(mobile)
-            .then(() => {
-                console.log('firebase submitted');
-                this.props.navigation.navigate('MainStack');
-            });
-    };
-}*/
 
 export const fetchAllServices = () => {
     return (dispatch) => {
