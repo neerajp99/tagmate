@@ -20,6 +20,14 @@ class SignUp extends Component {
       this.props.signupUser({email, password})
     }
 
+    handleLoading = () => {
+      if(this.props.loading){
+        return <ActivityIndicator />;
+      } else {
+        return <Text style={styles.text}> Signup </Text>;
+      }
+    }
+
   showPass = () => {
       if (this.state.showPass == true) {
         this.setState({ showPass: false})
@@ -73,7 +81,7 @@ render() {
           </View>
 
         <TouchableOpacity style={styles.btnLogin} onPress={this.handleSignUp}>
-          <Text style={styles.text}> Sign Up </Text>
+          {this.handleLoading()}
         </TouchableOpacity>
         <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('Login')} >
           Already a user? Login

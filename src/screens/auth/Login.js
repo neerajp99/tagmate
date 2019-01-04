@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import firebase from 'react-native-firebase';
 import {connect} from 'react-redux';
 import {loginUser} from '../../actions';
-import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import bgImage from '../../img/background.jpg'
@@ -18,6 +18,14 @@ class Login extends Component {
   handleLogin = () => {
     const { email, password } = this.state;
     this.props.loginUser({email, password});
+  }
+
+  handleLoading = () => {
+    if(this.props.loading){
+      return <ActivityIndicator />;
+    } else {
+      return <Text style={styles.text}> Login </Text>;
+    }
   }
 
   showPass = () => {
@@ -72,7 +80,7 @@ class Login extends Component {
         </View>
 
         <TouchableOpacity style={styles.btnLogin} onPress={this.handleLogin}>
-          <Text style={styles.text}> Login </Text>
+          {this.handleLoading()}
         </TouchableOpacity>
         <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('SignUp')} >
           New to Adour? Sign Up
