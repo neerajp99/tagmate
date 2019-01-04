@@ -17,6 +17,11 @@ class SignUp extends Component {
   handleSignUp = () => {
       console.log('inside handleSignUp')
       const { email, password } = this.state
+      if(email == '' || password == '')
+      {
+        alert('Please fill all the fields.');
+        return;
+      }
       this.props.signupUser({email, password})
     }
 

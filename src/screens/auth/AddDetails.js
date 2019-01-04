@@ -24,7 +24,17 @@ class AddDetails extends Component {
 
     onButtonPress() {
         const {myServices, mobile} = this.state;
-        this.props.submitUserUpdates(myServices, mobile);
+        if(_.isEmpty(myServices))
+        {
+            alert('You have to offer at least one service.');
+            return;
+        }
+        else if(!(/^\d{10}$/.test(mobile)))
+        {
+            alert('Please fill in a valid mobile number.');
+            return;
+        }
+        else this.props.submitUserUpdates(myServices, mobile);
     }
 
     renderServices = () => {

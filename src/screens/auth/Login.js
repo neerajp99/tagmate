@@ -17,6 +17,11 @@ class Login extends Component {
 
   handleLogin = () => {
     const { email, password } = this.state;
+    if(email == '' || password == '')
+      {
+        alert('Please fill all the fields.');
+        return;
+      }
     this.props.loginUser({email, password});
   }
 
