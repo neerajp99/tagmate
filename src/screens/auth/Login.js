@@ -22,7 +22,7 @@ class Login extends Component {
         alert('Please fill all the fields.');
         return;
       }
-    this.props.loginUser({email, password});
+    else this.props.loginUser({email, password});
   }
 
   handleLoading = () => {
