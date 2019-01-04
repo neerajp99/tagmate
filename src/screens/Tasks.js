@@ -89,6 +89,7 @@ class TaskScreen extends Component {
                     data={myTasks}
                     extraData={myTasks}
                     renderItem={this.renderItem}
+                    keyExtractor={(item, index) => item.id}
                 />
                 {
                     fetching && <View style={styles.progressContainer}>

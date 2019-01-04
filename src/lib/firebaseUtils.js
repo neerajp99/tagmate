@@ -52,7 +52,7 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                                 myTasks.push(allRequests[key])
                             }
                     }
-                    }
+                    
                     console.log('myTasks: ', myTasks)
                     resolve(myTasks)
                     return
