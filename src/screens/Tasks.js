@@ -16,18 +16,15 @@ class TaskScreen extends Component {
         this.getMyTasks()
     }
 
-    componentDidMount()
-    {
+    componentDidMount(){
         // Keep new tasks coming
         this.taskInterval = setInterval(() => 
         {
             this.getMyTasks(true);
-            this.setState({ time: Date.now() })
         }, 10000);
     }
 
-    componentWillUnmount()
-    {
+    componentWillUnmount(){
         clearInterval(this.taskInterval);
     }
 
@@ -117,7 +114,7 @@ class TaskScreen extends Component {
         return (
             <View key={id} style={styles.rowItem}>
                 <Text>{serviceId}</Text>
-                <Text>{when} {details}</Text>
+                <Text>{when}</Text>
                 {
                     detailsAvailable &&
                     (

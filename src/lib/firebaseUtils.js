@@ -64,6 +64,29 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+
+export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
+    try {
+            // Fetching all tasks
+            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
+                let requestedTasks = []
+                let acceptedTasks = []
+                const allRequests = snapshot.val() || {}
+                const keys = Object.keys(allRequests)
+                for (let key of keys)
+                {
+                    if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key]) 
+                    else if(allRequests[key].clientId !== userId) requestedTasks.push(allRequests[key])
+                }
+                let allRelatedTasks = {requestedTasks, acceptedTasks}
+                resolve(allRelatedTasks)
+                return
+            })
+        } catch (e) {
+            reject(e)
+        }
+})
+
 /*
 * get all the services that user with userId can perform
 * */
