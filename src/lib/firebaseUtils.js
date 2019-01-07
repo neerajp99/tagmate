@@ -5,7 +5,7 @@ import * as _ from 'lodash'
 /*
 * method to post the service request.
 * */
-export const postServiceRequest = (serviceId) => new Promise((resolve, reject) => {
+export const postServiceRequest = ({serviceId: serviceId, when: when, details: details}) => new Promise((resolve, reject) => {
     try {
         console.log('inside posting Req')
         const {currentUser: {uid} = {}} = firebase.auth()
@@ -15,9 +15,9 @@ export const postServiceRequest = (serviceId) => new Promise((resolve, reject) =
                 servicesRequests = {}
             }
             const id = uuid.v4()
-            servicesRequests[id] = {id, serviceId, clientId: uid}
+            servicesRequests[id] = {id, serviceId, clientId: uid, when: when, details: details}
             firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
-                Alert.alert('succesfully requested.')
+                Alert.alert('Service requested.')
                 resolve(true)
             })
         })
