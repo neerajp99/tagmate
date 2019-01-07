@@ -53,10 +53,20 @@ class TaskScreen extends Component {
                         });
                         if(!already_present) toAdd.push(myTask);
                     });
-                    console.log("toAdd",toAdd);
+                    var toRemove = [];
+                    this.state.myTasks.map(stateTask =>
+                    {
+                        var shouldRemove = true;
+                        myTasks.map(myTask => 
+                        {
+                            if(stateTask.id == myTask.id) shouldRemove = false;
+                        });
+                        if(shouldRemove) toRemove.push(stateTask.id);
+                    });
+
                     let loadedTasks = [...this.state.myTasks];
-                    var scroll = window.pageYOffset;
-                    this.setState({myTasks:loadedTasks.concat(toAdd)});
+                    let filteredTasks = loadedTasks.filter(item => !_.includes(toRemove, item.id));
+                    this.setState({myTasks:filteredTasks.concat(toAdd)});
                 }
             })
         }
