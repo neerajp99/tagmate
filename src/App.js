@@ -14,7 +14,6 @@ class App extends Component {
     {
         // Listeners for push notifications below:
 
-
         // When app was open
         this.notificationOpenListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
             this.handlePushNotification(notificationOpen.notification, false)

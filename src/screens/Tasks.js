@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
 import {getMyTasks, serverExists, addServer, appendRejectedTask} from "../lib/firebaseUtils";
-import firebase from 'react-native-firebase'
-import { Button } from 'react-native-elements'
+import firebase from 'react-native-firebase';
+import { Button } from 'react-native-elements';
+import * as _ from 'lodash';
 
 
 class TaskScreen extends Component {
@@ -15,15 +16,48 @@ class TaskScreen extends Component {
         this.getMyTasks()
     }
 
+    componentDidMount()
+    {
+        // Keep new tasks coming
+        this.taskInterval = setInterval(() => 
+        {
+            this.getMyTasks(true);
+            this.setState({ time: Date.now() })
+        }, 10000);
+    }
+
+    componentWillUnmount()
+    {
+        clearInterval(this.taskInterval);
+    }
+
     /*
     * get all the task requests that this user can perform
     * */
-    getMyTasks = () => {
+    getMyTasks = (selective = false) => {
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid) {
-            this.setState({fetching: true})
+            if(!selective) this.setState({fetching: true})
             getMyTasks(uid).then(myTasks => {
-                this.setState({myTasks, fetching: false})
+                if(!selective) this.setState({myTasks, fetching: false})
+                else
+                {
+                    var toAdd = [];
+                    myTasks.map(myTask => 
+                    {
+                        var curId = myTask.id;
+                        var already_present = false;
+                        this.state.myTasks.map(stateTask =>
+                        {
+                            if(stateTask.id == curId) already_present = true;
+                        });
+                        if(!already_present) toAdd.push(myTask);
+                    });
+                    console.log("toAdd",toAdd);
+                    let loadedTasks = [...this.state.myTasks];
+                    var scroll = window.pageYOffset;
+                    this.setState({myTasks:loadedTasks.concat(toAdd)});
+                }
             })
         }
     }
