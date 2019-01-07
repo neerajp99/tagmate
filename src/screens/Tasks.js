@@ -111,10 +111,19 @@ class TaskScreen extends Component {
     /*
     * render an item of the list
     * */
-    renderItem = ({item: {serviceId, id} = {}}) => {
+    renderItem = ({item: {serviceId, id, when, details} = {}}) => {
+        var detailsAvailable = true;
+        if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
             <View key={id} style={styles.rowItem}>
                 <Text>{serviceId}</Text>
+                <Text>{when} {details}</Text>
+                {
+                    detailsAvailable &&
+                    (
+                        <Text>{details}</Text>
+                    )
+                }
                 <View style={styles.buttonsContainer}>
                     <Button title='ACCEPT'  onPress={() => { this.acceptTask(id) }} />
                     <Button title='REJECT' onPress={() => { this.rejectTask(id) }} />
