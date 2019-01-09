@@ -32,6 +32,7 @@ class TaskScreen extends Component {
     * get all the task requests that this user can perform
     * */
     getMyTasks = (selective = false) => {
+        console.log("Currently loaded:", this.state.myTasks);
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid) {
             if(!selective) this.setState({fetching: true})

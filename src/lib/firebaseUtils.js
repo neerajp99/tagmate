@@ -48,7 +48,8 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                     const rejectedTasks = snapshotb.val() || {}
                     for (let key of keys) {
                     // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
-                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].status == 0) {
+                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
+                                
                                 myTasks.push(allRequests[key])
                             }
                     }

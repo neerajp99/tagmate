@@ -24,6 +24,7 @@ class Details extends Component {
   render()
   {
     const {item} = this.props.navigation.state.params
+    console.log(item);
     var statusStr = 'Not available';
     if(typeof item.status != 'undefined')
     {
