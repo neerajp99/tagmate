@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
 import { createBottomTabNavigator, SwitchNavigator} from 'react-navigation';
-import {ProfileScreen, RequestScreen, TaskScreen, DashboardScreen, Loading} from './screens';
+import {ProfileScreen, RequestScreen, TaskScreen, DashboardScreen, Details, Loading} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
@@ -45,6 +45,7 @@ export const RootNav = SwitchNavigator(
     Loading,
     SignUp,
     Login,
+    Details,
     MainStack
   },
   {

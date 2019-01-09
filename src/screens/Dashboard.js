@@ -1,65 +1,85 @@
 import React, {Component} from 'react';
-import {View, Text, Button, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
-import {getAllRelatedTasks} from "../lib/firebaseUtils";
+import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
+import {getAllRelatedTasks, getWhatsapp} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
+import { Button } from 'react-native-elements';
+import * as _ from 'lodash';
 
-class DashboardScreen extends Component{
-  state = {
-    active:2,
-    fetching:false,
-    requested:[],
-    accepted:[],
-  }
 
-  componentWillMount(){
-    this.getAllRelatedTasks();
-  }
-
-  getAllRelatedTasks = () => {
-    const {currentUser: {uid} = {}} = firebase.auth()
-    if(uid)
-    {
-      this.setState({fetching: true})
-      getAllRelatedTasks(uid).then(allRelatedTasks => {
-        const {requestedTasks, acceptedTasks} = allRelatedTasks;
-        console.log('requestedTasks',requestedTasks);
-        console.log('acceptedTasks',acceptedTasks);
-
-        this.setState({requested:requestedTasks,accepted:acceptedTasks,fetching:false});
-      })
+class DashboardScreen extends Component {
+    state = {
+      active:2,
+      fetching:false,
+      requested:[],
+      accepted:[],
     }
-  }
-  renderItem = ({item: {serviceId, id, when, details} = {}}) => {
-      var detailsAvailable = true;
-      if(details == "" || typeof details == "undefined") detailsAvailable = false
-      return (
-          <View key={id} style={styles.rowItem}>
-              <Text>{serviceId}</Text>
-              <Text>{when}</Text>
-              {
-                  detailsAvailable &&
-                  (
-                      <Text>{details}</Text>
-                  )
-              }
-          </View>
-      )
-  }
 
-  render() {
-        const {fetching, active, requested, accepted} = this.state
+    componentWillMount(){
+      this.getAllRelatedTasks();
+    }
+
+    getAllRelatedTasks = () => {
+      const {currentUser: {uid} = {}} = firebase.auth()
+      if(uid)
+      {
+        this.setState({fetching: true})
+        getAllRelatedTasks(uid).then(allRelatedTasks => {
+          const {requestedTasks, acceptedTasks} = allRelatedTasks;
+          this.setState({requested:requestedTasks,accepted:acceptedTasks,fetching:false});
+        })
+      }
+    }
+    
+    openDetails = (item) =>
+    {
+      const {currentUser: {uid} = {}} = firebase.auth()
+      if(uid)
+      {
+        this.setState({fetching: true})
+        var oppUser = '', isClient = true;
+        if(uid == item.clientId) oppUser = item.serverId;
+        else if(uid == item.serverId)
+        {
+          isClient = false;
+          oppUser = item.clientId;
+        }
+        getWhatsapp(oppUser).then(whatsapp => {
+          let obj = {...item, ...{whatsapp, isClient}}
+          this.setState({fetching:false})
+          this.props.navigation.navigate('Details',{item: obj})      
+        })
+      }
+    }
+
+    /*
+    * render an item of the list
+    * */
+    renderItem = ({item}) => {
+        const{serviceId, id, when, details} = item;
         return (
-          <View>
-            <View style={styles.container}>
-               <View style={styles.buttonContainer}>
-                <Button title="Requested Tasks"/>
-              </View>
-              <View style={styles.buttonContainer}>
-                <Button title="Accepted Tasks"/>
-              </View>
+          <TouchableOpacity onPress={() => this.openDetails(item)}>
+            <View key={id} style={styles.rowItem}>
+                <Text>{serviceId}</Text>
+                <Text>{when}</Text>
             </View>
-            <View style={styles.mainContainer}>
-                <FlatList
+          </TouchableOpacity>
+        )
+    }
+
+    render() {
+        const {fetching, accepted, requested, active} = this.state
+        return (
+          <View style={styles.mainContainer}>
+              <View style={styles.container}>
+                <View style={styles.buttonContainer}>
+                  <Button onPress={()=>{this.setState({active:1})}} title="Requested Tasks"/>
+                </View>
+                <View style={styles.buttonContainer}>
+                  <Button onPress={()=>{this.setState({active:2})}} title="Accepted Tasks"/>
+                </View>
+              </View>
+              {
+                !fetching &&  <FlatList
                     style={styles.listContainer}
                     contentContainerStyle={styles.contentContainer}
                     data={(active == 1)?requested:accepted}
@@ -67,46 +87,36 @@ class DashboardScreen extends Component{
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />
-                {
-                    fetching && <View style={styles.progressContainer}>
-                        <ActivityIndicator color={'black'} size={'large'}/>
-                    </View>
-                }
-            </View>
+              }
+              { 
+                  fetching && <View style={styles.progressContainer}>
+                      <ActivityIndicator color={'black'} size={'large'}/>
+                  </View>
+              }
           </View>
         )
     }
-
-  /*render(){
-  	var txt = "Chat Screen";
-    // A quick fix to see if a whatsapp number was passed onto this screen.
-    
-    return(
-      <View style={styles.container}>
-         <View style={styles.buttonContainer}>
-          <Button title="Requested Tasks"/>
-        </View>
-        <View style={styles.buttonContainer}>
-          <Button title="Accepted Tasks"/>
-        </View>
-      </View>
-    )
-  }*/
 }
 
+export {DashboardScreen};
+
+/*
+* Styles used in this screen
+* */
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 0,
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonContainer: {
-    flex: 1,
-  },
-  mainContainer: {
+    container: {
+      position:'relative',
+      top:0,
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonContainer: {
+      flex: 1,
+      flexDirection: 'row',
+    },
+    mainContainer: {
         flex: 1
     },
     progressContainer: {
@@ -138,6 +148,4 @@ const styles = StyleSheet.create({
     contentContainer: {
         width: '100%'
     }
-});
-
-export {DashboardScreen};
+})
