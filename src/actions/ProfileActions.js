@@ -26,7 +26,8 @@ export const fetchAllServices = () => {
                 const servicesObj = snapshot.val()
                 const keys = !_.isEmpty(servicesObj) ? Object.keys(servicesObj) : []
                 let finalServices = []
-                for (const key of keys) {
+                for(const key of keys)
+                {
                     finalServices.push(servicesObj[key])
                 }
                 dispatch({

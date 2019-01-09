@@ -15,7 +15,7 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                 servicesRequests = {}
             }
             const id = uuid.v4()
-            servicesRequests[id] = {id, serviceId, clientId: uid, when: when, details: details}
+            servicesRequests[id] = {id, serviceId, clientId: uid, when: when, details: details, status: 0}
             firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
                 Alert.alert('Service requested.')
                 resolve(true)
@@ -48,7 +48,7 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                     const rejectedTasks = snapshotb.val() || {}
                     for (let key of keys) {
                     // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
-                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].serverId == "undefined") {
+                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].status == 0) {
                                 myTasks.push(allRequests[key])
                             }
                     }
@@ -62,6 +62,29 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
     } catch (e) {
         reject(e)
     }
+})
+
+
+export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
+    try {
+            // Fetching all tasks
+            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
+                let requestedTasks = []
+                let acceptedTasks = []
+                const allRequests = snapshot.val() || {}
+                const keys = Object.keys(allRequests)
+                for (let key of keys)
+                {
+                    if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key]) 
+                    else if(allRequests[key].clientId == userId) requestedTasks.push(allRequests[key])
+                }
+                let allRelatedTasks = {requestedTasks, acceptedTasks}
+                resolve(allRelatedTasks)
+                return
+            })
+        } catch (e) {
+            reject(e)
+        }
 })
 
 /*
@@ -95,17 +118,42 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     try {
         const {currentUser} = firebase.auth();
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
-        ref.child(`serverId`).set(userId);        
+        ref.set({serverId:userId,status:1});        
         // Now returning the Whatsapp number of requester (client)
         ref.child(`clientId`).once("value", function(snapshot) {
-            console.log("Client Id: "+snapshot.val());
-            var wRef = firebase.database().ref(`/users/${snapshot.val()}/whatsapp`);
-            wRef.once("value", function(whatsapp)
-            {
-                console.log(whatsapp.val());
-                resolve(whatsapp.val());
-            })
+            resolve(this.getWhatsapp(snapshot.val()));
+            
         });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const markRequestDone = (id) => new Promise((resolve, reject) => {
+    try {
+        var ref = firebase.database().ref(`/servicesRequests/${id}`);
+        ref.set({status:2});        
+        resolve(true);
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const markRequestCancelled = (id) => new Promise((resolve, reject) => {
+    try {
+        var ref = firebase.database().ref(`/servicesRequests/${id}`);
+        ref.set({status:3});
+        resolve(true);
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const getWhatsapp = (userId) => new Promise((resolve, reject) => {
+    try {
+        const {currentUser} = firebase.auth();
+        var wRef = firebase.database().ref(`/users/${userId}/whatsapp`);
+        wRef.once("value", function(whatsapp){console.log("NUMBAH:"+whatsapp.val());resolve(whatsapp.val());})
     } catch (e) {
         reject(e)
     }
