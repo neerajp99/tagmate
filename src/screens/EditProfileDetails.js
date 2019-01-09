@@ -19,14 +19,9 @@ class EditProfileDetails extends Component{
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}
         <View style={styles.headerContainer}>
-        <Text style={styles.titleText}>Edit Details</Text>
         <Text style={styles.subtitleText}>What can you offer?</Text>
         </View>
         <AddDetails userId={uid} />
-        <TouchableOpacity style={styles.btn} onPress={() => firebase.auth().signOut()}>
-          <Text style={styles.btnText}> Signout </Text>
-        </TouchableOpacity>
-
       </View>
     )
   }
