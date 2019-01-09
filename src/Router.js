@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
 import { createBottomTabNavigator, SwitchNavigator} from 'react-navigation';
-import {ProfileScreen, RequestScreen, TaskScreen, ChatScreen, Loading} from './screens';
+import {ProfileScreen, RequestScreen, TaskScreen, DashboardScreen, Details, Loading} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
@@ -10,7 +10,7 @@ export const MainStack = createBottomTabNavigator(
     Profile: ProfileScreen,
     Request: RequestScreen,
     Tasks: TaskScreen,
-    Chat: ChatScreen
+    Dashboard: DashboardScreen
   },
   {
     navigationOptions: ({ navigation }) => ({
@@ -23,8 +23,8 @@ export const MainStack = createBottomTabNavigator(
           iconName = `dashboard`;
         } else if (routeName === 'Tasks'){
           iconName = 'view-list';
-        } else if (routeName === 'Chat'){
-          iconName = 'chat-bubble';
+        } else if (routeName === 'Dashboard'){
+          iconName = 'computer';
         }
 
         // You can return any component that you like here! We usually use an
@@ -45,6 +45,7 @@ export const RootNav = SwitchNavigator(
     Loading,
     SignUp,
     Login,
+    Details,
     MainStack
   },
   {
