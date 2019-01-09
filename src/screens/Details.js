@@ -41,7 +41,7 @@ class Details extends Component {
             this.props.navigation.navigate('Dashboard')
           }} title="Go Back" />
           <Text>{item.serviceId}</Text>
-          <Text>{item.when}</Txt>
+          <Text>{item.when}</Text>
           {
             item.details != "" && <Text>{item.details}</Text>
           }
