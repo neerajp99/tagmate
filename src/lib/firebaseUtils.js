@@ -76,6 +76,9 @@ export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
                 const keys = Object.keys(allRequests)
                 for (let key of keys)
                 {
+                    console.log("USERID: ",userId);
+                    console.log(allRequests[key].clientId,allRequests[key].serverId);
+
                     if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key]) 
                     else if(allRequests[key].clientId == userId) requestedTasks.push(allRequests[key])
                 }
@@ -119,10 +122,10 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     try {
         const {currentUser} = firebase.auth();
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
-        ref.set({serverId:userId,status:1});        
+        ref.update({serverId:userId,status:1});        
         // Now returning the Whatsapp number of requester (client)
         ref.child(`clientId`).once("value", function(snapshot) {
-            resolve(this.getWhatsapp(snapshot.val()));
+            resolve(getWhatsapp(snapshot.val()));
             
         });
     } catch (e) {
@@ -133,7 +136,7 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
 export const markRequestDone = (id) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        ref.set({status:2});        
+        ref.update({status:2});        
         resolve(true);
     } catch (e) {
         reject(e)
@@ -143,7 +146,7 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
 export const markRequestCancelled = (id) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        ref.set({status:3});
+        ref.update({status:3});
         resolve(true);
     } catch (e) {
         reject(e)

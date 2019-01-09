@@ -18,12 +18,17 @@ class DashboardScreen extends Component {
       this.getAllRelatedTasks();
     }
 
+    refreshAll(){
+      this.getAllRelatedTasks();
+    }
+
     getAllRelatedTasks = () => {
       const {currentUser: {uid} = {}} = firebase.auth()
       if(uid)
       {
         this.setState({fetching: true})
         getAllRelatedTasks(uid).then(allRelatedTasks => {
+          console.log('allofthem',allRelatedTasks);
           const {requestedTasks, acceptedTasks} = allRelatedTasks;
           this.setState({requested:requestedTasks,accepted:acceptedTasks,fetching:false});
         })
@@ -78,6 +83,7 @@ class DashboardScreen extends Component {
                 <View style={styles.buttonContainer}>
                   <Button onPress={()=>{this.setState({active:2})}} title="Accepted Tasks"/>
                 </View>
+                <Button onPress={()=>this.refreshAll()} title="Refresh"/>
               </View>
               {
                 !fetching &&  <FlatList
