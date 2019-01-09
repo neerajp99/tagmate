@@ -23,18 +23,18 @@ class Details extends Component {
 
   render()
   {
+    const {item} = this.props.navigation.state.params
     var statusStr = 'Not available';
     if(typeof item.status != 'undefined')
     {
       switch(item.status)
       {
-        case 0: statusStr = 'Looking for your savior';
-        case 1: statusStr = 'Waiting for your savior to complete the task';
-        case 2: statusStr = 'Completed';
-        case 3: statusStr = 'Cancelled';
+        case 0: statusStr = 'Looking for your savior'; break;
+        case 1: statusStr = 'Waiting for your savior to complete the task'; break;
+        case 2: statusStr = 'Completed'; break;
+        case 3: statusStr = 'Cancelled'; break;
       }
     }
-    const {item} = this.props.navigation.state.params
     return (
       <View style={styles.mainContainer}>
           <Button onPress={()=>{
@@ -42,7 +42,9 @@ class Details extends Component {
           }} title="Go Back" />
           <Text>{item.serviceId}</Text>
           <Text>{item.when}</Text>
-          <Text>{item.details}</Text>
+          {
+            item.details != "" && <Text>{item.details}</Text>
+          }
           <Text>Task Status: {statusStr}</Text>
           <Button onPress={()=>{
             Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+item.whatsapp)

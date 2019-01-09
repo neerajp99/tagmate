@@ -32,6 +32,7 @@ class DashboardScreen extends Component {
     
     openDetails = (item) =>
     {
+      console.log(item);
       const {currentUser: {uid} = {}} = firebase.auth()
       if(uid)
       {
