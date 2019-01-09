@@ -6,7 +6,7 @@ import { Button } from 'react-native-elements';
 import * as _ from 'lodash';
 
 
-class Details extends Component {
+class DashboardDetails extends Component {
   markDone = (id) => {
     markRequestDone(id).then(resp =>
     {
@@ -61,7 +61,7 @@ class Details extends Component {
   }
 }
 
-export {Details};
+export {DashboardDetails};
 
 /*
 * Styles used in this screen

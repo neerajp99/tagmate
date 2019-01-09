@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, Details, Loading} from './screens';
+import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
@@ -41,7 +41,7 @@ export const RequestStack = createStackNavigator(
       screen: RequestDetails,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Edit Details'
+          headerTitle: 'More information'
         }
       }
     }
@@ -72,7 +72,7 @@ export const DashboardStack = createStackNavigator(
       }
     },
     DashboardDetails: {
-      screen: Details,
+      screen: DashboardDetails,
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Task Details'
