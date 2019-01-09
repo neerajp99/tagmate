@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
-import { ListItem, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import AddDetails from './auth/AddDetails';
 
 const { width: WIDTH } = Dimensions.get('window')
 
-class ProfileScreen extends Component{
+class EditProfileDetails extends Component{
 
   handleSignout = () => {
       firebase
@@ -20,28 +18,14 @@ class ProfileScreen extends Component{
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}
-        <Card>
-          <ListItem
-            title='Edit Details'
-            leftIcon={{ name: 'mode-edit' }}
-            onPress={() => this.props.navigation.navigate('EditProfileDetails')}
-          />
-          <ListItem
-            title='Support'
-            leftIcon={{ name: 'help-outline' }}
-            onPress={() => firebase.auth().signOut()}
-          />
-          <ListItem
-            title='Privacy Policy'
-            leftIcon={{ name: 'mode-edit' }}
-            onPress={() => firebase.auth().signOut()}
-          />
-          <ListItem
-            title='Logout'
-            leftIcon={{ name: 'exit-to-app' }}
-            onPress={() => firebase.auth().signOut()}
-          />
-        </Card>
+        <View style={styles.headerContainer}>
+        <Text style={styles.titleText}>Edit Details</Text>
+        <Text style={styles.subtitleText}>What can you offer?</Text>
+        </View>
+        <AddDetails userId={uid} />
+        <TouchableOpacity style={styles.btn} onPress={() => firebase.auth().signOut()}>
+          <Text style={styles.btnText}> Signout </Text>
+        </TouchableOpacity>
 
       </View>
     )
@@ -74,6 +58,11 @@ const styles = StyleSheet.create({
     fontWeight: '200',
     textAlign: 'left'
   },
+  headerContainer: {
+    paddingLeft: 10,
+    marginTop: 20,
+    marginBottom: 15
+  },
   btnText: {
     color: 'rgba(255, 255, 255, 1)',
     fontSize: 16,
@@ -82,4 +71,4 @@ const styles = StyleSheet.create({
 })
 
 
-export {ProfileScreen};
+export {EditProfileDetails};

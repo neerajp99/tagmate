@@ -1,37 +1,93 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
-import { createBottomTabNavigator, createSwitchNavigator, createAppContainer} from 'react-navigation';
-import {ProfileScreen, RequestScreen, TaskScreen, DashboardScreen, Details, Loading} from './screens';
+import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
+import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, Loading} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
-export const MainStack = createBottomTabNavigator(
+export const ProfileStack = createStackNavigator(
   {
-    Profile: ProfileScreen,
-    Request: RequestScreen,
-    Tasks: TaskScreen,
-    Dashboard: DashboardScreen
+    ProfileScreen: {
+      screen: ProfileScreen,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Profile'
+        }
+      }
+    },
+    EditProfileDetails: {
+      screen: EditProfileDetails,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Edit Details'
+        }
+      }
+    }
+  }
+)
+
+export const RequestStack = createStackNavigator(
+  {
+    RequestScreen: {
+      screen: RequestScreen,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Request'
+        }
+      }
+    },
+    RequestDetails: {
+      screen: RequestDetails,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Edit Details'
+        }
+      }
+    }
+  }
+)
+
+export const TaskStack = createStackNavigator(
+  {
+    TaskScreen: {
+      screen: TaskScreen,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Tasks'
+        }
+      }
+    }
+  }
+)
+
+export const DashboardStack = createStackNavigator(
+  {
+    TaskScreen: {
+      screen: DashboardScreen,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Dashboard'
+        }
+      }
+    }
+  }
+)
+
+export const MainTabNav = createBottomTabNavigator(
+  {
+    Profile: ProfileStack,
+    Request: RequestStack,
+    Tasks: TaskStack,
+    Dashboard: DashboardStack
   },
   {
-    navigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor }) => {
-        const { routeName } = navigation.state;
-        let iconName;
-        if (routeName === 'Profile') {
-          iconName = `account-circle`;
-        } else if (routeName === 'Request') {
-          iconName = `dashboard`;
-        } else if (routeName === 'Tasks'){
-          iconName = 'view-list';
-        } else if (routeName === 'Dashboard'){
-          iconName = 'computer';
-        }
-
-        // You can return any component that you like here! We usually use an
-        // icon component from react-native-vector-icons
-        return <Icon name={iconName} size={horizontal ? 20 : 25} color={tintColor} />;
-      },
-    }),
+    navigationOptions: ({ navigation }) => {
+      const {routeName} = navigation.state.routes[navigation.state.index]
+      return {
+        header: null,
+        headerTitle: routeName
+      }
+    },
     tabBarOptions: {
       activeTintColor: 'tomato',
       inactiveTintColor: 'gray',
@@ -39,13 +95,16 @@ export const MainStack = createBottomTabNavigator(
   }
 );
 
-
+export const MainStack = createStackNavigator(
+  {
+    MainTabNav: MainTabNav
+  }
+)
 export const RootNav = createSwitchNavigator(
   {
     Loading,
     SignUp,
     Login,
-    Details,
     MainStack
   },
   {
