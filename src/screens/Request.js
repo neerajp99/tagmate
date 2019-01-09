@@ -6,16 +6,6 @@ import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import {postServiceRequest} from "../lib/firebaseUtils";
 
-const list = [
-    {
-        title: 'Get something from Delhi',
-        icon: 'av-timer'
-    },
-    {
-        title: 'Bum a cig',
-        icon: 'flight-takeoff'
-    }];
-
 class RequestScreen extends Component {
     state = {requesting:false}
 
@@ -42,7 +32,7 @@ class RequestScreen extends Component {
         const {when, details, request} = this.state;
         if(when.length == 0) return alert('Please input when.');
         if(when.length > 20) return alert('When should not exceed 20 characters.');
-        if(details.length > 60) return alert('Details should not exceed 60 characters.');   
+        if(details.length > 60) return alert('Details should not exceed 60 characters.');
         postServiceRequest({serviceId:request.id,when:when,details:details}).then(res => {
             console.log('response of postService', res)
             this.setState({requesting:false});
@@ -55,7 +45,7 @@ class RequestScreen extends Component {
         return (
             <View style={styles.mainContainer}>
                 {
-                    !requesting && <Card title='Request'>
+                    !requesting && <Card>
                         {
                             services.map((item, i) => (
                                 <ListItem
@@ -69,7 +59,7 @@ class RequestScreen extends Component {
                     </Card>
                 }
                 {
-                    requesting && 
+                    requesting &&
                     (
                         <View>
                             <Button title="Back" onPress={() => {this.goBack()}}/>
@@ -88,7 +78,7 @@ class RequestScreen extends Component {
                                 <Button title="Request" onPress={() => {this.sendRequest()}}/>
                             </Card>
                         </View>
-                    )   
+                    )
                 }
                 {
                     fetching && <View style={styles.progressContainer}>
