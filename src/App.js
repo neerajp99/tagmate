@@ -3,7 +3,7 @@ import ReduxThunk from 'redux-thunk';
 import reducers from './reducers';
 import {applyMiddleware, createStore} from 'redux';
 import {Provider} from 'react-redux';
-import {RootNav} from './Router';
+import {RootNav, AppContainer} from './Router';
 import * as _ from 'lodash'
 import firebase from 'react-native-firebase';
 import { NavigationActions } from 'react-navigation';
@@ -51,7 +51,8 @@ class App extends Component {
 	  render(){
 	    return(
 	      <Provider store={createStore(reducers, {}, applyMiddleware(ReduxThunk))}>
-	         <RootNav ref={nav => { this.navigator = nav; }} />
+          <AppContainer />
+	         {/*<RootNav ref={nav => { this.navigator = nav; }} />*/}
 	        { /* <AddDetails /> */}
 	      </Provider>
 	    )
