@@ -1,7 +1,8 @@
 import React from 'react';
 import { Icon } from 'react-native-elements';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, Loading} from './screens';
+import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, Details, Loading} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
@@ -62,11 +63,19 @@ export const TaskStack = createStackNavigator(
 
 export const DashboardStack = createStackNavigator(
   {
-    TaskScreen: {
+    DashboardScreen: {
       screen: DashboardScreen,
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Dashboard'
+        }
+      }
+    },
+    DashboardDetails: {
+      screen: Details,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Task Details'
         }
       }
     }
@@ -75,10 +84,38 @@ export const DashboardStack = createStackNavigator(
 
 export const MainTabNav = createBottomTabNavigator(
   {
-    Profile: ProfileStack,
-    Request: RequestStack,
-    Tasks: TaskStack,
-    Dashboard: DashboardStack
+    Profile: {
+      screen: ProfileStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='account-circle' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    },
+    Request: {
+      screen: RequestStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='dashboard' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    },
+    Tasks: {
+      screen: TaskStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='view-list' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    },
+    Dashboard: {
+      screen: DashboardStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='chat-bubble' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    }
   },
   {
     navigationOptions: ({ navigation }) => {
@@ -86,7 +123,8 @@ export const MainTabNav = createBottomTabNavigator(
       return {
         header: null,
         headerTitle: routeName
-      }
+        }
+
     },
     tabBarOptions: {
       activeTintColor: 'tomato',

@@ -29,12 +29,12 @@ class ProfileScreen extends Component{
           <ListItem
             title='Support'
             leftIcon={{ name: 'help-outline' }}
-            onPress={() => firebase.auth().signOut()}
+            onPress={() => alert('WIP')}
           />
           <ListItem
             title='Privacy Policy'
             leftIcon={{ name: 'mode-edit' }}
-            onPress={() => firebase.auth().signOut()}
+            onPress={() => alert('WIP')}
           />
           <ListItem
             title='Logout'
