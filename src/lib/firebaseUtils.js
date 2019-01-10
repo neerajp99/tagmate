@@ -99,6 +99,29 @@ export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
         }
 })
 
+export const canRequestMore = (userId) => new Promise((resolve, reject) => {
+    try {
+            // Fetching all tasks
+            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
+                const allRequests = snapshot.val() || {}
+                const keys = Object.keys(allRequests)
+                var count = 0;
+                for (let key of keys)
+                {
+                    if(allRequests[key].clientId == userId) count++;
+                }
+                getCoins(userId).then(coins => {
+                    console.log('coins',coins,'reqs',count);
+                    if(count >= coins) resolve(false);
+                    else resolve(true);
+                    return;
+                });
+            })
+        } catch (e) {
+            reject(e)
+        }
+})
+
 /*
 * get all the services that user with userId can perform
 * */

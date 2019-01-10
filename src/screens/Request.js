@@ -4,6 +4,7 @@ import {View, ActivityIndicator, StyleSheet, Text, TextInput} from 'react-native
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
+import {canRequestMore} from '../lib/firebaseUtils.js';
 
 class RequestScreen extends Component {
 
@@ -13,11 +14,12 @@ class RequestScreen extends Component {
     }
 
     onItemPress = (item) => {
-        console.log('item', item)
-        if(!item.id) {
-            return
-        }
-        this.props.navigation.navigate('RequestDetails', {item:item});
+        if(!item.id) return;
+        const {currentUser: {uid} = {}} = firebase.auth();
+        canRequestMore(uid).then(requestMore => {
+            if(requestMore) this.props.navigation.navigate('RequestDetails', {item:item});
+            else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
+        });
     }
 
     render() {

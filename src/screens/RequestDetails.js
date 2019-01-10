@@ -1,20 +1,25 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput} from 'react-native';
-import {postServiceRequest} from "../lib/firebaseUtils";
+import firebase from 'react-native-firebase'
+import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
 
 class RequestDetails extends Component{
   	state = {when:'', details:''};
 
   	sendRequest = () =>
     {
+        const {currentUser: {uid} = {}} = firebase.auth();
         const {when, details} = this.state;
         if(when.length == 0) return alert('Please input when.');
         if(when.length > 20) return alert('When should not exceed 20 characters.');
         if(details.length > 60) return alert('Details should not exceed 60 characters.');
-        postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
-        	this.props.navigation.navigate('RequestScreen');
-        })
+        canRequestMore(uid).then(requestMore => {
+            if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
+            this.props.navigation.navigate('RequestScreen');
+        });
+            else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
+        });
     }
 
   render(){
