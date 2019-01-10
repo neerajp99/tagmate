@@ -31,22 +31,20 @@ class DashboardDetails extends Component {
       switch(item.status)
       {
         case 0: statusStr = 'Looking for your savior'; break;
-        case 1: statusStr = 'Waiting for your savior to complete the task'; break;
+        case 1: statusStr = (item.isClient)?'Waiting for your savior to complete the task':'Waiting for you to complete the task'; break;
         case 2: statusStr = 'Completed'; break;
         case 3: statusStr = 'Cancelled'; break;
       }
     }
     return (
       <View style={styles.mainContainer}>
-          <Button onPress={()=>{
-            this.props.navigation.navigate('Dashboard')
-          }} title="Go Back" />
           <Text>{item.serviceId}</Text>
           <Text>{item.when}</Text>
           {
             item.details != "" && <Text>{item.details}</Text>
           }
           <Text>Task Status: {statusStr}</Text>
+          <Text>Whatsapp Number: {item.whatsapp}</Text>
           <Button onPress={()=>{
             Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+item.whatsapp)
           }} title="Chat on Whatsapp" />

@@ -87,19 +87,20 @@ class TaskScreen extends Component {
         if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
     }
 
-    acceptTask = (id) =>
+    acceptTask = (item) =>
     {
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
-            serverExists(id).then(exists => // Check if someone has already accepted the task {id}. 
+            serverExists(item.id).then(exists => // Check if someone has already accepted the task {id}. 
             {
-                this.hideTask(id);
+                this.hideTask(item.id);
                 if(!exists) // If the task is still not accepted by anyone, assign it to user {uid}.
                 {
-                    addServer(uid, id).then(whatsapp =>
+                    addServer(uid, item.id).then(whatsapp =>
                     {
-                        this.props.navigation.navigate('Chat', { whatsapp: whatsapp });
+                        item.status = 1;
+                        this.props.navigation.navigate('DashboardDetails', {item: {...item, ...{ whatsapp: whatsapp }}});
                     });
                 }
             });
@@ -109,7 +110,8 @@ class TaskScreen extends Component {
     /*
     * render an item of the list
     * */
-    renderItem = ({item: {serviceId, id, when, details} = {}}) => {
+    renderItem = ({item}) => {
+        const {serviceId, id, when, details} = item;
         var detailsAvailable = true;
         if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
@@ -123,7 +125,7 @@ class TaskScreen extends Component {
                     )
                 }
                 <View style={styles.buttonsContainer}>
-                    <Button title='ACCEPT'  onPress={() => { this.acceptTask(id) }} />
+                    <Button title='ACCEPT'  onPress={() => { this.acceptTask(item) }} />
                     <Button title='REJECT' onPress={() => { this.rejectTask(id) }} />
                 </View>
             </View>

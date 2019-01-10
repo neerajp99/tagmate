@@ -52,7 +52,7 @@ class DashboardScreen extends Component {
         getWhatsapp(oppUser).then(whatsapp => {
           let obj = {...item, ...{whatsapp, isClient}}
           this.setState({fetching:false})
-          this.props.navigation.navigate('Details',{item: obj})      
+          this.props.navigation.navigate('DashboardDetails',{item: obj})      
         })
       }
     }
@@ -61,10 +61,11 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
+      console.log(item);
         const{serviceId, id, when, details} = item;
         return (
-          <TouchableOpacity onPress={() => this.openDetails(item)}>
-            <View key={id} style={styles.rowItem}>
+          <TouchableOpacity key={id} onPress={() => this.openDetails(item)}>
+            <View style={styles.rowItem}>
                 <Text>{serviceId}</Text>
                 <Text>{when}</Text>
             </View>
