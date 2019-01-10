@@ -1,5 +1,5 @@
 import firebase from 'react-native-firebase';
-import {LOGIN_USER, LOGIN_USER_SUCCESS, LOGIN_USER_FAIL} from './types';
+import {LOGIN_USER, LOGIN_USER_SUCCESS, LOGIN_USER_FAIL, SIGNUP_USER_SUCCESS} from './types';
 
 export const loginUser = ({email, password}) => {
   return (dispatch) => {
@@ -32,7 +32,7 @@ const loginUserSuccess = (dispatch, user) => {
 
 const signupUserSuccess = (dispatch, user) => {
   dispatch({
-    type: LOGIN_USER_SUCCESS,
+    type: SIGNUP_USER_SUCCESS,
     payload: user
   });
 };

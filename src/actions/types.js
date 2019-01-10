@@ -1,6 +1,7 @@
 export const LOGIN_USER_SUCCESS = 'login_user_success';
 export const LOGIN_USER_FAIL = 'login_user_fail';
 export const LOGIN_USER = 'login_user';
+export const SIGNUP_USER_SUCCESS = 'signup_user_success';
 export const SUBMIT_SERVICES = 'submit_services';
 export const SET_DEVICE_TOKEN = 'set_device_token';
 
