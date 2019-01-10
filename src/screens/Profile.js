@@ -4,10 +4,15 @@ import { ListItem, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AddDetails from './auth/AddDetails';
+import {getCoins} from '../lib/firebaseUtils.js';
 
 const { width: WIDTH } = Dimensions.get('window')
 
 class ProfileScreen extends Component{
+  state = 
+  {
+    coins: 'Loading...',
+  }
 
   handleSignout = () => {
       firebase
@@ -15,11 +20,16 @@ class ProfileScreen extends Component{
         .signOut()
   }
 
-  render(){
+  async componentDidMount(){
     const {currentUser: {uid} = {}} = firebase.auth()
+    var coins = await getCoins(uid)
+    this.setState({coins:coins});
+  }
+
+  render(){
     return(
       <View style={styles.backgroundContainer}>
-        {/* <Text>{firebase.auth().currentUser.uid}</Text> */}
+        {<Text>Adour Coins: {this.state.coins}</Text>}
         <Card>
           <ListItem
             title='Edit Details'

@@ -7,9 +7,15 @@ import * as _ from 'lodash';
 
 
 class DashboardDetails extends Component {
+  state = 
+  {
+    disabledDone:false,
+  }
   markDone = (id) => {
+    this.setState({disabledDone:true});
     markRequestDone(id).then(resp =>
     {
+      this.setState({disabledDone:false});
       this.props.navigation.navigate('DashboardScreen')
     })
   }
@@ -49,7 +55,7 @@ class DashboardDetails extends Component {
             Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+item.whatsapp)
           }} title="Chat on Whatsapp" />
           {
-            item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} title="Mark as Done" />
+            item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} disabled={this.state.disabledDone} title="Mark as Done" />
           }
           {
            item.status < 2 && <Button onPress={()=>this.markCancelled(item.id)} title="Cancel Request" />

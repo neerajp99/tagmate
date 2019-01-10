@@ -1,5 +1,6 @@
 import firebase from 'react-native-firebase';
 import {LOGIN_USER, LOGIN_USER_SUCCESS, LOGIN_USER_FAIL, SIGNUP_USER_SUCCESS} from './types';
+import {creditCoins} from '../lib/firebaseUtils.js';
 
 export const loginUser = ({email, password}) => {
   return (dispatch) => {
@@ -31,9 +32,13 @@ const loginUserSuccess = (dispatch, user) => {
 };
 
 const signupUserSuccess = (dispatch, user) => {
-  dispatch({
-    type: SIGNUP_USER_SUCCESS,
-    payload: user
+  const {currentUser: {uid} = {}} = firebase.auth();
+  creditCoins(uid).then(result =>
+  {
+    dispatch({
+      type: SIGNUP_USER_SUCCESS,
+      payload: user
+    });
   });
 };
 

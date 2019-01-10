@@ -26,6 +26,14 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
     }
 })
 
+export const creditCoins = (userId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${userId}`).update({coins:3}).then(res=>{resolve(true)});
+    } catch (e) {
+        reject(e)
+    }
+})      
+
 /*
 * method toget all the task that user with userId can perform
 * */
@@ -122,11 +130,10 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     try {
         const {currentUser} = firebase.auth();
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
-        ref.update({serverId:userId,status:1});        
+        ref.update({serverId:userId,status:1});       
         // Now returning the Whatsapp number of requester (client)
         ref.child(`clientId`).once("value", function(snapshot) {
             resolve(getWhatsapp(snapshot.val()));
-            
         });
     } catch (e) {
         reject(e)
@@ -136,8 +143,17 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
 export const markRequestDone = (id) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        ref.update({status:2});        
-        resolve(true);
+        ref.update({status:2});
+        ref.once("value", function(snapshot) {
+            const {clientId, serverId} = snapshot.val();
+            firebase.database().ref(`/users/${clientId}/coins`).transaction(function(coins){
+              return (coins || 0) - 1;
+            });
+            firebase.database().ref(`/users/${serverId}/coins`).transaction(function(coins){
+              return (coins || 0) + 1;
+            });
+            resolve(true);
+        });
     } catch (e) {
         reject(e)
     }
@@ -167,6 +183,14 @@ export const getWhatsapp = (userId) => new Promise((resolve, reject) => {
 export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
         resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const getCoins = (userId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${userId}/coins`).once("value", function(coins){resolve(coins.val() || 0);})
     } catch (e) {
         reject(e)
     }
