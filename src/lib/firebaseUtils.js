@@ -157,7 +157,7 @@ export const getWhatsapp = (userId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
         var wRef = firebase.database().ref(`/users/${userId}/whatsapp`);
-        wRef.once("value", function(whatsapp){console.log("NUMBAH:"+whatsapp.val());resolve(whatsapp.val());})
+        wRef.once("value", function(whatsapp){resolve(whatsapp.val());})
     } catch (e) {
         reject(e)
     }

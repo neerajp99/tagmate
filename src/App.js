@@ -33,7 +33,7 @@ class App extends Component {
         setTimeout(() => {
             const {authToken = ''} = this.props
             const {currentUser} = firebase.auth()
-            const {notifType, whatsapp} = notifData
+            const {notifType, item} = notifData
             if(!_.isEmpty(currentUser)) {
                 if(notifType == 'SERVICE_REQUEST')
                 {
@@ -41,9 +41,13 @@ class App extends Component {
         				NavigationActions.navigate({ routeName: 'Tasks' })
       					);
                 }
-                else if(notifType == 'FOUND_ACCEPTOR') this.navigator.dispatch(
-        				NavigationActions.navigate({ routeName: 'Chat', params: {whatsapp: whatsapp} })
+                else if(notifType == 'FOUND_ACCEPTOR')
+                {
+                    var obj = JSON.parse(item)
+                    this.navigator.dispatch(
+        				NavigationActions.navigate({ routeName: 'DashboardDetails', params: {item: {...obj, ...{'isClient':true}}} })
       					);
+                }
             }
         }, 1000)
     }
@@ -51,8 +55,8 @@ class App extends Component {
 	  render(){
 	    return(
 	      <Provider store={createStore(reducers, {}, applyMiddleware(ReduxThunk))}>
-          <AppContainer />
-	         {/*<RootNav ref={nav => { this.navigator = nav; }} />*/}
+          <AppContainer ref={nav => { this.navigator = nav; }} />
+	         {/*<RootNav  />*/}
 	        { /* <AddDetails /> */}
 	      </Provider>
 	    )

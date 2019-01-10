@@ -10,14 +10,14 @@ class DashboardDetails extends Component {
   markDone = (id) => {
     markRequestDone(id).then(resp =>
     {
-      this.props.navigation.navigate('Dashboard')
+      this.props.navigation.navigate('DashboardScreen')
     })
   }
 
   markCancelled = (id) => {
     markRequestCancelled(id).then(resp =>
     {
-      this.props.navigation.navigate('Dashboard')
+      this.props.navigation.navigate('DashboardScreen')
     })
   }
 

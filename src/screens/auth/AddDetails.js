@@ -5,7 +5,7 @@ import {StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native'
 import {CheckBox} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {submitUserUpdates} from '../../actions';
-import {getMyServices} from '../../lib/firebaseUtils';
+import {getMyServices, getWhatsapp} from '../../lib/firebaseUtils';
 import * as _ from 'lodash'
 
 class AddDetails extends Component {
@@ -16,6 +16,9 @@ class AddDetails extends Component {
         // Loading services already offered:
         var myServicess = await getMyServices(this.props.userId);
         this.setState({myServices: myServicess,});
+        // Loading Whatsapp number:
+        var myWhatsapp = await getWhatsapp(this.props.userId);
+        this.setState({mobile: myWhatsapp || ''});
     }
 
     onButtonPress() {
@@ -55,6 +58,7 @@ class AddDetails extends Component {
                   style={styles.textInput}
                   autoCapitalize="none"
                   onChangeText={mobile => this.setState({ mobile: mobile })}
+                  value={this.state.mobile}
                 />
             )
     }

@@ -74,13 +74,12 @@ exports.sendPushNotification = functions.database
             return console.log('missing mandatory params for sending push.')
         }
         let deviceTokens = []
-        const requesterIdPromise = snapshot.ref.parent.child('clientId').once('value')
-        const acceptorIdPromise = snapshot.ref.parent.child('serverId').once('value')
+        const requestPromise = snapshot.ref.parent.once('value')
         // Once we have clientId and serverId:
-        return Promise.all([requesterIdPromise, acceptorIdPromise])
+        return Promise.all([requestPromise])
             .then(results => {
-                const clientId = results[0].val()
-                const serverId = results[1].val()
+                var item = results[0].val()
+                const {serverId, clientId} = item
                 const clientDevicesPromise = admin.database().ref(`/users/${clientId}`).once('value')
                 const serverWhatsappPromise = admin.database().ref(`/users/${serverId}`).once('value')
                 // Once we have device IDs of client (requester) and Whatsapp number of server (acceptor)
@@ -99,8 +98,11 @@ exports.sendPushNotification = functions.database
                             body: `Open to contact your request's acceptor.`
                         },
                         data: {
+                            item:
+                            JSON.stringify(Object.assign(item,
+                                {whatsapp: server.whatsapp} // Passing server's whatsapp number to client's devices.
+                            )),
                             notifType: 'FOUND_ACCEPTOR', // To tell the app what kind of notification this is.
-                            whatsapp: server.whatsapp // Passing server's whatsapp number to client's devices.
                         }
                     };
                     return admin.messaging().sendToDevice(client.deviceTokens, payload);
