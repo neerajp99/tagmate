@@ -219,6 +219,7 @@ export const getCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+
 /*
 * kept firebase reference in one place
 * */

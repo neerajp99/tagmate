@@ -1,38 +1,101 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
-import {getMyTasks, serverExists, addServer, appendRejectedTask} from "../lib/firebaseUtils";
+import {getMyTasks, serverExists, addServer, appendRejectedTask, getMyServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import { Button } from 'react-native-elements';
 import * as _ from 'lodash';
 
 
 class TaskScreen extends Component {
-    state = {
-        myTasks: [],
-        fetching: false
-    }
-
-    componentWillMount(){
-        this.getMyTasks()
+    constructor(props) {
+        super(props);
+        this.state = {
+            myTasks: [],
+            rejectedTasks: [],
+            myServices: [],
+            fetching: false
+        };
+        this.getMyTasks = this.getMyTasks.bind(this);   
     }
 
     componentDidMount(){
-        // Keep new tasks coming
-        this.taskInterval = setInterval(() => 
+        this.setState({fetching:true});
+        const {currentUser: {uid} = {}} = firebase.auth()
+        // Keep updating tasks
+        getMyServices(uid).then(myServices => 
         {
-            this.getMyTasks(true);
-        }, 10000);
+            this.setState({myServices:myServices});
+            console.log('myservicess:',myServices);
+            this.getMyTasks();
+        });
+        /*getMyTasks(uid).then(myTasks => {
+            this.setState({myTasks,fetching:false});
+        })*/
+
     }
 
     componentWillUnmount(){
-        clearInterval(this.taskInterval);
+    
     }
 
     /*
     * get all the task requests that this user can perform
     * */
-    getMyTasks = (selective = false) => {
-        console.log("Currently loaded:", this.state.myTasks);
+    getMyTasks = () => {
+        const {currentUser: {uid} = {}} = firebase.auth()
+        var ref = firebase.database().ref('servicesRequests')
+        
+        ref.on('child_added', (snapshot) => {
+            this.setState({fetching:false});
+            var request = snapshot.val();
+            if(
+                request.clientId != uid // This request is not made by same user.
+                && request.status == 0 // This request is still not taken by anyone
+                && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                )
+                this.setState({myTasks:this.state.myTasks.concat([request])});
+        });
+
+        ref.on('child_removed', (snapshot) => {
+            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
+        });
+
+        ref.on('child_changed', (snapshot) => { 
+            var request = snapshot.val();
+            if(
+                request.clientId == uid // This request is not made by same user.
+                || request.status != 0 // This request is still not taken by anyone
+                || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                )
+            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
+        });
+
+        firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
+            var rejectId = snapshot.val(); 
+            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
+            console.log('triggered',this.state.rejectedTasks);
+        });
+
+        firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
+            this.setState({myServices: snapshot.val() || []});
+            let myTaskss = this.state.myTasks;
+            let toRemove = [];
+            myTaskss.map(request =>
+            {
+                if(
+                    request.clientId == uid // This request is not made by same user.
+                    || request.status != 0 // This request is still not taken by anyone
+                    || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                    || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                    )    
+                    toRemove.push(request.id);
+            });
+            this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
+        })
+
+        /*console.log("Currently loaded:", this.state.myTasks);
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid) {
             if(!selective) this.setState({fetching: true})
@@ -67,7 +130,7 @@ class TaskScreen extends Component {
                     this.setState({myTasks:filteredTasks.concat(toAdd)});
                 }
             })
-        }
+        }*/
     }
 
 
