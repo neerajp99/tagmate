@@ -7,24 +7,47 @@ import * as _ from 'lodash';
 
 
 class DashboardScreen extends Component {
-    state = {
-      active:2,
-      fetching:false,
-      requested:[],
-      accepted:[],
+    constructor(props) {
+      super(props);
+      this.state = {
+        active:2,
+        fetching:false,
+        requested:[],
+        accepted:[],
+      }
+      this.getAllRelatedTasks = this.getAllRelatedTasks.bind(this);
     }
 
-    componentWillMount(){
-      this.getAllRelatedTasks();
-    }
-
-    refreshAll(){
+    componentDidMount(){
+      this.setState({fetching:true});
       this.getAllRelatedTasks();
     }
 
     getAllRelatedTasks = () => {
       const {currentUser: {uid} = {}} = firebase.auth()
-      if(uid)
+      
+      var ref = firebase.database().ref('servicesRequests')
+        
+      ref.on('child_added', (snapshot) => {
+        this.setState({fetching:false});
+        var request = snapshot.val();
+        if(request.clientId == uid ) this.setState({requested:[request].concat(this.state.requested)});
+        else if(request.serverId == uid) this.setState({accepted:[request].concat(this.state.accepted)});
+      });
+
+      ref.on('child_removed', (snapshot) => {
+          this.setState({
+            requested: this.state.requested.filter(item => item.id !== snapshot.key),
+            accepted: this.state.accepted.filter(item => item.id !== snapshot.key),
+          });
+      });
+
+      ref.on('child_changed', (snapshot) => { 
+        var request = snapshot.val();
+        if(request.clientId == uid ) this.setState({requested:_.uniq([request].concat(this.state.requested))});
+        else if(request.serverId == uid) this.setState({accepted:_.uniq([request].concat(this.state.accepted))});
+      });
+      /*if(uid)
       {
         this.setState({fetching: true})
         getAllRelatedTasks(uid).then(allRelatedTasks => {
@@ -32,7 +55,7 @@ class DashboardScreen extends Component {
           const {requestedTasks, acceptedTasks} = allRelatedTasks;
           this.setState({requested:requestedTasks,accepted:acceptedTasks,fetching:false});
         })
-      }
+      }*/
     }
     
     openDetails = (item) =>
@@ -84,7 +107,6 @@ class DashboardScreen extends Component {
                 <View style={styles.buttonContainer}>
                   <Button onPress={()=>{this.setState({active:2})}} title="Accepted Tasks"/>
                 </View>
-                <Button onPress={()=>this.refreshAll()} title="Refresh"/>
               </View>
               {
                 !fetching &&  <FlatList
