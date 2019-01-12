@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp} from "../lib/firebaseUtils";
+import {getAllRelatedTasks, getWhatsapp, getAllServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import { Button } from 'react-native-elements';
 import * as _ from 'lodash';
@@ -20,7 +20,11 @@ class DashboardScreen extends Component {
 
     componentDidMount(){
       this.setState({fetching:true});
-      this.getAllRelatedTasks();
+      getAllServices().then(services =>
+      {
+        this.setState({services});
+        this.getAllRelatedTasks();
+      });
     }
 
     getAllRelatedTasks = () => {
@@ -84,12 +88,20 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-      console.log(item);
         const{serviceId, id, when, details} = item;
+        const {services} = this.state
+        var serviceTitle = '---';
+        console.log(services);
+        services.map(service => {
+            if(service.id == serviceId)
+            {
+                serviceTitle = service.title;
+            }
+        });
         return (
           <TouchableOpacity key={id} onPress={() => this.openDetails(item)}>
             <View style={styles.rowItem}>
-                <Text>{serviceId}</Text>
+                <Text>{serviceTitle}</Text>
                 <Text>{when}</Text>
             </View>
           </TouchableOpacity>

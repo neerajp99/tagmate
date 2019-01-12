@@ -136,6 +136,37 @@ export const getMyServices = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+export const getAllServices = () => new Promise((resolve, reject) => {
+    try {
+            firebase.database().ref('/services').once('value', (snapshot) => {
+                const servicesObj = snapshot.val()
+                const keys = !_.isEmpty(servicesObj) ? Object.keys(servicesObj) : []
+                let finalServices = []
+                for(const key of keys)
+                {
+                    finalServices.push(servicesObj[key])
+                }
+                resolve(finalServices)
+            })
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const getRelatedServices = (userId) => new Promise((resolve, reject) => {
+    try {
+            getMyServices(userId).then(myServices =>
+            {
+                getAllServices().then(allServices =>
+                {
+                    resolve({myServices, allServices})
+                })
+            })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // Check if given task has already been accepted by someone.
 export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     try {

@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
-import {getMyTasks, serverExists, addServer, appendRejectedTask, getMyServices} from "../lib/firebaseUtils";
+import {serverExists, addServer, appendRejectedTask, getRelatedServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import { Button } from 'react-native-elements';
+import {connect} from "react-redux";
+import {fetchAllServices} from "../actions";
 import * as _ from 'lodash';
 
 
@@ -13,29 +15,25 @@ class TaskScreen extends Component {
             myTasks: [],
             rejectedTasks: [],
             myServices: [],
-            fetching: false
+            fetching: false,
         };
         this.getMyTasks = this.getMyTasks.bind(this);   
     }
 
     componentDidMount(){
+
         this.setState({fetching:true});
         const {currentUser: {uid} = {}} = firebase.auth()
         // Keep updating tasks
-        getMyServices(uid).then(myServices => 
+        getRelatedServices(uid).then(services => 
         {
-            this.setState({myServices:myServices});
-            console.log('myservicess:',myServices);
+            this.setState(services);
+            console.log('relatedServices:',services);
             this.getMyTasks();
         });
         /*getMyTasks(uid).then(myTasks => {
             this.setState({myTasks,fetching:false});
         })*/
-
-    }
-
-    componentWillUnmount(){
-    
     }
 
     /*
@@ -176,10 +174,18 @@ class TaskScreen extends Component {
     renderItem = ({item}) => {
         const {serviceId, id, when, details} = item;
         var detailsAvailable = true;
+        const {allServices} = this.state
+        var serviceTitle = '---';
+        allServices.map(service => {
+            if(service.id == serviceId)
+            {
+                serviceTitle = service.title;
+            }
+        });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
             <View key={id} style={styles.rowItem}>
-                <Text>{serviceId}</Text>
+                <Text>{serviceTitle}</Text>
                 <Text>{when}</Text>
                 {
                     detailsAvailable &&
@@ -215,6 +221,8 @@ class TaskScreen extends Component {
             </View>
         )
     }
+
+
 }
 
 export {TaskScreen};
