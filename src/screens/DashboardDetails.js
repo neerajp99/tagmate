@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, StyleSheet, Linking} from 'react-native';
+import {FlatList, View, ActivityIndicator, StyleSheet, Linking} from 'react-native';
 import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
-import { Button } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
 
 
 class DashboardDetails extends Component {
-  state = 
+  state =
   {
     disabledDone:false,
   }
@@ -48,14 +49,46 @@ class DashboardDetails extends Component {
     }
     return (
       <View style={styles.mainContainer}>
-          <Text>{item.serviceId}</Text>
-          <Text>{item.when}</Text>
+      <Card title={item.serviceId} titleStyle={styles.cardTitleStyle}>
+          {/* Task Status */ }
+          <View style={styles.cardSubtitle}>
+          <Text style={styles.cardSubtitleText}>{statusStr}</Text>
+          </View>
+
+        <Divider />
+          {/* Task Timing and details */ }
+          <ListItem
+              title={item.when}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              leftIcon={{ name: 'access-time'}}
+            />
           {
-            item.details != "" && <Text>{item.details}</Text>
+            item.details != "" &&
+                <ListItem
+                    title={item.details}
+                    hideChevron={true}
+                    containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                    leftIcon={{ name: 'info-outline'}}
+                  />
           }
-          <Text>Task Status: {statusStr}</Text>
-          <Text>Whatsapp Number: {item.whatsapp}</Text>
-          <Button onPress={()=>{
+
+
+            {/* Contact Number */ }
+          <View style={styles.subContent}>
+          <ListItem
+              title={item.whatsapp}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              leftIcon={{ name: 'contact-phone'}}
+            />
+          </View>
+            {/* Whatsapp Chat button */ }
+          <View style={styles.subContent}>
+          <Button
+            icon={{name: 'chat'}}
+            backgroundColor='#21c627'
+            onPress={()=>{
             Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+item.whatsapp)
           }} title="Chat on Whatsapp" />
           {
@@ -64,6 +97,8 @@ class DashboardDetails extends Component {
           {
            item.status < 2 && <Button onPress={()=>this.markCancelled(item.id)} title="Cancel Request" />
           }
+          </View>
+        </Card>
       </View>
     )
   }
@@ -82,6 +117,23 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    cardTitleStyle: {
+      fontSize:20,
+      marginLeft: 18,
+      textAlign:'left',
+    },
+    subContent: {
+      marginTop: 2,
+      marginBottom: 10
+    },
+    cardSubtitle: {
+      marginBottom: 16,
+      marginLeft: 18
+    },
+    cardSubtitleText: {
+      fontSize: 16,
+      fontWeight: '100'
     },
     buttonContainer: {
       flex: 1,
@@ -115,6 +167,16 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         flex: 1,
+    },
+    textTitle: {
+      fontSize: 18,
+      fontWeight: '200',
+      marginBottom: 5,
+    },
+    textDescription: {
+      fontSize: 16,
+      fontWeight: '100',
+      marginLeft:5
     },
     contentContainer: {
         width: '100%'
