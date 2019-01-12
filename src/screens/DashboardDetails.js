@@ -13,12 +13,15 @@ class DashboardDetails extends Component {
   }
   markDone = (id) => {
     if(this.state.disabledDone == true) return;
-    this.setState({disabledDone:true});
-    markRequestDone(id).then(resp =>
+    else
     {
-      this.setState({disabledDone:false});
-      this.props.navigation.navigate('DashboardScreen')
-    })
+      this.setState({disabledDone:true});
+      markRequestDone(id).then(resp =>
+      {
+        this.setState({disabledDone:false});
+        this.props.navigation.navigate('DashboardScreen')
+      })
+    }
   }
 
   markCancelled = (id) => {
