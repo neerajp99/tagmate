@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator}
 import { ListItem, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AddDetails from './auth/AddDetails';
 import {getCoins, listenForChange} from '../lib/firebaseUtils.js';
 
@@ -26,7 +27,7 @@ class ProfileScreen extends Component{
     this.updateCoins();
   }
 
-  updateCoins = () => 
+  updateCoins = () =>
   {
     const {currentUser: {uid} = {}} = firebase.auth()
     firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
@@ -38,8 +39,20 @@ class ProfileScreen extends Component{
   render(){
     return(
       <View style={styles.backgroundContainer}>
-        {<Text>Adour Coins: {this.state.coins}</Text>}
-        {<Text>Email: {this.state.email}</Text>}
+        {/* <Text>Email: {this.state.email}</Text> */}
+
+        <Card>
+          <ListItem
+            title={this.state.coins}
+            subtitle='Adour Coins'
+            subtitleStyle={{fontWeight:'100'}}
+            leftIcon={{ name: 'coins', type:'material-community' }}
+            hideChevron={true}
+            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+          />
+        </Card>
+
+
         <Card>
           <ListItem
             title='Edit Details'

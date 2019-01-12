@@ -146,6 +146,7 @@ class DashboardScreen extends Component {
                   containerStyle={{height: 45}}
                 />
             </View>
+            
               {
                 !fetching &&  <FlatList
                     data={(active == 0)?requested:accepted}
