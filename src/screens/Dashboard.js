@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
 import {getAllRelatedTasks, getWhatsapp, getAllServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
-import { Button } from 'react-native-elements';
+import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
 
 
@@ -10,12 +10,17 @@ class DashboardScreen extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        active:2,
+        active:1,
         fetching:false,
         requested:[],
         accepted:[],
       }
       this.getAllRelatedTasks = this.getAllRelatedTasks.bind(this);
+      this.updateIndex = this.updateIndex.bind(this);
+    }
+
+    updateIndex (active) {
+      this.setState({active})
     }
 
     componentDidMount(){
@@ -29,9 +34,9 @@ class DashboardScreen extends Component {
 
     getAllRelatedTasks = () => {
       const {currentUser: {uid} = {}} = firebase.auth()
-      
+
       var ref = firebase.database().ref('servicesRequests')
-        
+
       ref.on('child_added', (snapshot) => {
         this.setState({fetching:false});
         var request = snapshot.val();
@@ -46,7 +51,7 @@ class DashboardScreen extends Component {
           });
       });
 
-      ref.on('child_changed', (snapshot) => { 
+      ref.on('child_changed', (snapshot) => {
         var request = snapshot.val();
         console.log(request);
         if(request.status == 1 && request.serverId == uid) this.setState({accepted:[request].concat(this.state.accepted)});
@@ -61,7 +66,7 @@ class DashboardScreen extends Component {
             if(part.id == request.id) arr[index] = request;
           });
           this.setState({requested:req});
-          this.setState({accepted:acc});   
+          this.setState({accepted:acc});
         }
         //if(request.clientId == uid ) this.setState({requested:_.uniq([request].concat(this.state.requested))});
         //else if(request.serverId == uid) this.setState({accepted:_.uniq([request].concat(this.state.accepted))});
@@ -76,7 +81,7 @@ class DashboardScreen extends Component {
         })
       }*/
     }
-    
+
     openDetails = (item) =>
     {
       console.log(item);
@@ -94,7 +99,7 @@ class DashboardScreen extends Component {
         getWhatsapp(oppUser).then(whatsapp => {
           let obj = {...item, ...{whatsapp, isClient}}
           this.setState({fetching:false})
-          this.props.navigation.navigate('DashboardDetails',{item: obj})      
+          this.props.navigation.navigate('DashboardDetails',{item: obj})
         })
       }
     }
@@ -114,39 +119,42 @@ class DashboardScreen extends Component {
             }
         });
         return (
-          <TouchableOpacity key={id} onPress={() => this.openDetails(item)}>
-            <View style={styles.rowItem}>
-                <Text>{serviceTitle}</Text>
-                <Text>{when}</Text>
-
+          <View key={id}>
+            <View>
+                <ListItem
+                    title={serviceTitle}
+                    rightTitle={when}
+                    containerStyle={{backgroundColor: '#fff'}}
+                    onPress={() => this.openDetails(item)}
+                  />
             </View>
-          </TouchableOpacity>
+          </View>
         )
     }
 
     render() {
         const {fetching, accepted, requested, active} = this.state
+        const buttons = ['Requested Tasks', 'Accepted Tasks']
+
         return (
           <View style={styles.mainContainer}>
-              <View style={styles.container}>
-                <View style={styles.buttonContainer}>
-                  <Button onPress={()=>{this.setState({active:1})}} title="Requested Tasks"/>
-                </View>
-                <View style={styles.buttonContainer}>
-                  <Button onPress={()=>{this.setState({active:2})}} title="Accepted Tasks"/>
-                </View>
-              </View>
+              <View>
+                <ButtonGroup
+                  onPress={this.updateIndex}
+                  selectedIndex={active}
+                  buttons={buttons}
+                  containerStyle={{height: 45}}
+                />
+            </View>
               {
                 !fetching &&  <FlatList
-                    style={styles.listContainer}
-                    contentContainerStyle={styles.contentContainer}
-                    data={(active == 1)?requested:accepted}
-                    extraData={(active == 1)?requested:accepted}
+                    data={(active == 0)?requested:accepted}
+                    extraData={(active == 0)?requested:accepted}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />
               }
-              { 
+              {
                   fetching && <View style={styles.progressContainer}>
                       <ActivityIndicator color={'black'} size={'large'}/>
                   </View>

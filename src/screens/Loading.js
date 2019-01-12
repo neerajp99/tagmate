@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {View, Text, ActivityIndicator} from 'react-native'
+import {View, Text, ActivityIndicator, StyleSheet} from 'react-native'
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification'
 import connect from "react-redux/es/connect/connect";
@@ -75,7 +75,7 @@ class Loading extends Component {
             }
             if(!_.isEmpty(currentUser) && notifType == 'FOUND_ACCEPTOR') this.props.navigation.navigate('Chat', { whatsapp: notification.whatsapp })
             //const {_data = {}} = notification
-            
+
             //todo: handle here what to do with push Notif when app is opened.
             // handlePushNotification(_data)
         }, 1000)
@@ -88,8 +88,7 @@ class Loading extends Component {
 
     render() {
         return (
-            <View>
-                <Text>Loading</Text>
+            <View style={styles.progressContainer}>
                 <ActivityIndicator size="large"/>
             </View>
         )
@@ -97,3 +96,18 @@ class Loading extends Component {
 }
 
 export default connect(null, {setDeviceToken, fetchAllServices}) (Loading);
+
+const styles = StyleSheet.create({
+  progressContainer: {
+      width: 60,
+      height: 60,
+      backgroundColor: 'transparent',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'absolute',
+      left: '50%',
+      top: '50%',
+      marginLeft: -30,
+      marginTop: -30
+  }
+})
