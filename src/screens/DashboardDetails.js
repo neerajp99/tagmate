@@ -12,6 +12,7 @@ class DashboardDetails extends Component {
     disabledDone:false,
   }
   markDone = (id) => {
+    if(this.state.disabledDone == true) return;
     this.setState({disabledDone:true});
     markRequestDone(id).then(resp =>
     {

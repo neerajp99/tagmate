@@ -48,8 +48,19 @@ class DashboardScreen extends Component {
 
       ref.on('child_changed', (snapshot) => { 
         var request = snapshot.val();
-        if(request.clientId == uid ) this.setState({requested:_.uniq([request].concat(this.state.requested))});
-        else if(request.serverId == uid) this.setState({accepted:_.uniq([request].concat(this.state.accepted))});
+        console.log(request);
+        let req = this.state.requested;
+        let acc = this.state.accepted;
+        req.forEach(function(part, index, arr) {
+          if(part.id == request.id) arr[index] = request;
+        });
+        acc.forEach(function(part, index, arr) {
+          if(part.id == request.id) arr[index] = request;
+        });
+        this.setState({requested:req});
+        this.setState({accepted:acc});
+        //if(request.clientId == uid ) this.setState({requested:_.uniq([request].concat(this.state.requested))});
+        //else if(request.serverId == uid) this.setState({accepted:_.uniq([request].concat(this.state.accepted))});
       });
       /*if(uid)
       {
@@ -103,6 +114,7 @@ class DashboardScreen extends Component {
             <View style={styles.rowItem}>
                 <Text>{serviceTitle}</Text>
                 <Text>{when}</Text>
+
             </View>
           </TouchableOpacity>
         )
