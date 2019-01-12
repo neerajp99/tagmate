@@ -24,6 +24,7 @@ const configure = (onTokenSuccess) => {
       onTokenRefresh(token)
     })
 }
+/*
 const onNotification = (notification = {}) => {
   if (!_.isEmpty(notification) && notification._data && notification._data.type) {
     if (_.isEmpty(firebase.auth().currentUser)) {
@@ -34,7 +35,7 @@ const onNotification = (notification = {}) => {
 
     // todo: handle user is logged in and notification arrived.
   }
-}
+}*/
 const onTokenRefresh = (token) => {
   console.log('Firebase FCM token received: ', token)
   if (token) {
@@ -42,4 +43,4 @@ const onTokenRefresh = (token) => {
   }
 }
 
-export default {configure, onNotification, onTokenRefresh}
+export default {configure, onTokenRefresh}

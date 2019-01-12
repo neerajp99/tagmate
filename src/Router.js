@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading} from './screens';
+import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
@@ -143,6 +143,7 @@ export const RootNav = createSwitchNavigator(
     Loading,
     SignUp,
     Login,
+    Onboarding,
     MainStack
   },
   {

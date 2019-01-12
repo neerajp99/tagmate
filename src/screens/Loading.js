@@ -16,7 +16,18 @@ class Loading extends Component {
     async componentDidMount() {
         const {setDeviceToken} = this.props
         firebase.auth().onAuthStateChanged(user => {
-            this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
+            if(!user) this.props.navigation.navigate('SignUp');
+            else
+            {
+                const {currentUser: {uid} = {}} = firebase.auth();
+                firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
+                {
+                    var vals = snapshot.val();
+                    if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
+                    else this.props.navigation.navigate('MainStack');
+                })
+            }
+            //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })
         // configure push notification capability & get deviceToken
         Notification.configure((token) => {

@@ -15,7 +15,7 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                 servicesRequests = {}
             }
             const id = uuid.v4()
-            servicesRequests[id] = {id, serviceId, clientId: uid, when: when, details: details, status: 0}
+            servicesRequests[id] = {id, serviceId, clientId: uid, when: when, details: details, status: 0, created_at:firebase.database.ServerValue.TIMESTAMP}
             firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
                 Alert.alert('Service requested.')
                 resolve(true)

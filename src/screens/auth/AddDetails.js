@@ -35,7 +35,11 @@ class AddDetails extends Component {
             alert('Please fill in a valid mobile number.');
             return;
         }
-        else this.props.submitUserUpdates(myServices, mobile); // Finalling updating profile.
+        else
+        {
+            this.props.submitUserUpdates(myServices, mobile); // Finalling updating profile.
+            if(typeof this.props.onboarding != "undefined") this.props.onboarding.navigate('MainStack');
+        }
     }
 
     renderServices = () => {

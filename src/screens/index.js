@@ -6,3 +6,4 @@ export * from './Dashboard';
 export * from './DashboardDetails';
 export * from './EditProfileDetails';
 export Loading from './Loading';
+export * from './Onboarding';
