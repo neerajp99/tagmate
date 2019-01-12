@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {serverExists, addServer, appendRejectedTask, getRelatedServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
-import { Button } from 'react-native-elements';
+import { Button, ListItem } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import * as _ from 'lodash';
 
+const { width: WIDTH } = Dimensions.get('window')
 
 class TaskScreen extends Component {
     constructor(props) {
@@ -17,7 +19,7 @@ class TaskScreen extends Component {
             myServices: [],
             fetching: false,
         };
-        this.getMyTasks = this.getMyTasks.bind(this);   
+        this.getMyTasks = this.getMyTasks.bind(this);
     }
 
     componentDidMount(){
@@ -25,7 +27,7 @@ class TaskScreen extends Component {
         this.setState({fetching:true});
         const {currentUser: {uid} = {}} = firebase.auth()
         // Keep updating tasks
-        getRelatedServices(uid).then(services => 
+        getRelatedServices(uid).then(services =>
         {
             this.setState(services);
             console.log('relatedServices:',services);
@@ -41,8 +43,15 @@ class TaskScreen extends Component {
     * */
     getMyTasks = () => {
         const {currentUser: {uid} = {}} = firebase.auth()
+
+        firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
+            var rejectId = snapshot.val();
+            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
+            console.log('triggered',this.state.rejectedTasks);
+        });
+
         var ref = firebase.database().ref('servicesRequests')
-        
+
         ref.on('child_added', (snapshot) => {
             this.setState({fetching:false});
             var request = snapshot.val();
@@ -59,7 +68,7 @@ class TaskScreen extends Component {
             this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
         });
 
-        ref.on('child_changed', (snapshot) => { 
+        ref.on('child_changed', (snapshot) => {
             var request = snapshot.val();
             if(
                 request.clientId == uid // This request is not made by same user.
@@ -70,11 +79,6 @@ class TaskScreen extends Component {
             this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
         });
 
-        firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
-            var rejectId = snapshot.val(); 
-            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
-            console.log('triggered',this.state.rejectedTasks);
-        });
 
         firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
             this.setState({myServices: snapshot.val() || []});
@@ -87,7 +91,7 @@ class TaskScreen extends Component {
                     || request.status != 0 // This request is still not taken by anyone
                     || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )    
+                    )
                     toRemove.push(request.id);
             });
             this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
@@ -102,7 +106,7 @@ class TaskScreen extends Component {
                 else
                 {
                     var toAdd = [];
-                    myTasks.map(myTask => 
+                    myTasks.map(myTask =>
                     {
                         var curId = myTask.id;
                         var already_present = false;
@@ -116,7 +120,7 @@ class TaskScreen extends Component {
                     this.state.myTasks.map(stateTask =>
                     {
                         var shouldRemove = true;
-                        myTasks.map(myTask => 
+                        myTasks.map(myTask =>
                         {
                             if(stateTask.id == myTask.id) shouldRemove = false;
                         });
@@ -132,7 +136,7 @@ class TaskScreen extends Component {
     }
 
 
-    // Locally hide task by removing it from myTasks object in the state 
+    // Locally hide task by removing it from myTasks object in the state
     hideTask = (id) =>
     {
         let allTasks = [...this.state.myTasks];
@@ -153,7 +157,7 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
-            serverExists(item.id).then(exists => // Check if someone has already accepted the task {id}. 
+            serverExists(item.id).then(exists => // Check if someone has already accepted the task {id}.
             {
                 this.hideTask(item.id);
                 if(!exists) // If the task is still not accepted by anyone, assign it to user {uid}.
@@ -167,7 +171,7 @@ class TaskScreen extends Component {
             });
         }
     }
-    
+
     /*
     * render an item of the list
     * */
@@ -182,21 +186,31 @@ class TaskScreen extends Component {
                 serviceTitle = service.title;
             }
         });
+console.log(serviceTitle)
         if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
-            <View key={id} style={styles.rowItem}>
-                <Text>{serviceTitle}</Text>
-                <Text>{when}</Text>
-                {
-                    detailsAvailable &&
-                    (
-                        <Text>{details}</Text>
-                    )
-                }
-                <View style={styles.buttonsContainer}>
-                    <Button title='ACCEPT'  onPress={() => { this.acceptTask(item) }} />
-                    <Button title='REJECT' onPress={() => { this.rejectTask(id) }} />
+          <View key={id}>
+              <ListItem
+              title={serviceTitle}
+              subtitle={ detailsAvailable ? details : null }
+              hideChevron={true}
+              rightTitle={when}
+              subtitleNumberOfLines={2}
+              containerStyle={{backgroundColor: '#fff'}}
+            />
+              <View style={styles.buttonsContainer}>
+                <View>
+                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>
+                    <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                  </TouchableOpacity>
                 </View>
+                <View>
+                  <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
+                    <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                  </TouchableOpacity>
+                </View>
+
+              </View>
             </View>
         )
     }
@@ -206,8 +220,6 @@ class TaskScreen extends Component {
         return (
             <View style={styles.mainContainer}>
                 <FlatList
-                    style={styles.listContainer}
-                    contentContainerStyle={styles.contentContainer}
                     data={myTasks}
                     extraData={myTasks}
                     renderItem={this.renderItem}
@@ -253,9 +265,23 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         paddingHorizontal: 15,
         paddingVertical: 10
+    },btnAccept:{
+        width: WIDTH /2,
+        height: 45,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#79ff4d'
+    },
+    btnReject:{
+        width: WIDTH /2,
+        height: 45,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ff9999'
     },
     buttonsContainer: {
-        flexDirection: 'row',
+    flexDirection: 'row',
+    flex: 2
     },
     listContainer: {
         flex: 1,
