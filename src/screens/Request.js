@@ -47,7 +47,7 @@ class RequestScreen extends Component {
                 <Card>
                     <ListItem
                         title='Add a custom service'
-                        leftIcon='add-circle-outline'
+                        leftIcon={{name: 'add-circle-outline'}}
                         containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                         onPress={() => this.addCustomService()}
                     />
