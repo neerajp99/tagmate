@@ -11,6 +11,25 @@ export const loginUser = ({email, password}) => {
   };
 };
 
+export const addNewGoogleUser =  (uid,fname,lname,picture) => {  
+  try {
+    const usersRef = firebase.database().ref('users/'+uid)
+    usersRef.once('value', (snapshot) => {
+        const usersObj = snapshot.val()
+        if(usersObj == null){
+          firebase.database().ref('users/'+uid).set({
+            firstName: fname,
+            lastName: lname,
+            profilePicture: picture
+          });
+        }
+        //loginUserSuccess(dispatch({type:LOGIN_USER}));
+    })
+  } catch (error) {
+      console.log(error);
+  }
+}
+
 export const signupUser = ({email, password}) => {
   return (dispatch) => {
     dispatch({type:LOGIN_USER});

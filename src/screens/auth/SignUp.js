@@ -8,6 +8,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import bgImage from '../../img/background.jpg'
 import logo from '../../img/logo.png'
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 const { width: WIDTH } = Dimensions.get('window')
 

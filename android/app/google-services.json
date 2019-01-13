@@ -15,36 +15,13 @@
       },
       "oauth_client": [
         {
-          "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyB2YWyHwL7Qx2BLNW0t0InYIaDdzrSDuJc"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
+          "client_id": "768462231622-vgtvu6tdm250dsnub832gl9gutk5167i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.adourapp",
+            "certificate_hash": "850943d8a6faec4b8a2ddb2c7b3e3e05724163f2"
+          }
         },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:768462231622:android:671a4a83a315f65d",
-        "android_client_info": {
-          "package_name": "com.getadour.app"
-        }
-      },
-      "oauth_client": [
         {
           "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
           "client_type": 3
@@ -60,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
