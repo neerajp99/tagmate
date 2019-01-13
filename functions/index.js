@@ -98,10 +98,7 @@ exports.sendPushNotification = functions.database
                             body: `Open to contact your request's acceptor.`
                         },
                         data: {
-                            item:
-                            JSON.stringify(Object.assign(item,
-                                {whatsapp: server.whatsapp} // Passing server's whatsapp number to client's devices.
-                            )),
+                            taskId: item.id,
                             notifType: 'FOUND_ACCEPTOR', // To tell the app what kind of notification this is.
                         }
                     };
