@@ -99,7 +99,7 @@ exports.sendPushNotification = functions.database
                         },
                         data: {
                             taskId: item.id,
-                            notifType: 'FOUND_ACCEPTOR', // To tell the app what kind of notification this is.
+                            notifType: 'OPEN_DASHBOARD_DETAILS', // To tell the app what kind of notification this is.
                         }
                     };
                     return admin.messaging().sendToDevice(client.deviceTokens, payload);
@@ -107,9 +107,33 @@ exports.sendPushNotification = functions.database
             })
     });
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
+
+
+    exports.sendCancellationPushNotification = functions.database
+    .ref('/servicesRequests/{pushId}')
+    .onUpdate((snapshot, context) => {
+        const pushId = context.params.pushId;
+        if(!pushId){return console.log('missing mandatory params for sending push.')}
+        const {status, clientId, serverId} = snapshot.val();
+        if(status != 3 && status != 4) return console.log('not a cancellation');
+        var userPromise = 0;
+        if(status == 3) userPromise = admin.database().ref(`/users/${serverId}`).once('value')
+        else userPromise = admin.database().ref(`/users/${clientId}`).once('value')
+        return Promise.all([userPromise])
+            .then(results => {
+                const user = results[0].val();
+                if(!user.hasOwnProperty('deviceTokens') || !user.deviceTokens.length) return console.log('No device tokens.')
+                const payload = {
+                        notification: {
+                            title: (status == 3)?'Requester cancelled the task!':'Your savior ditched you!',
+                            body: `Tap to view the cancelled task.`
+                        },
+                        data: {
+                            taskId: pushId,
+                            notifType: 'OPEN_DASHBOARD_DETAILS', // To tell the app what kind of notification this is.
+                        }
+                    };
+                    return admin.messaging().sendToDevice(user.deviceTokens, payload);                
+                
+            })
+    });

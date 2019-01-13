@@ -41,7 +41,7 @@ class App extends Component {
         				NavigationActions.navigate({ routeName: 'Tasks' })
       					);
                 }
-                else if(notifType == 'FOUND_ACCEPTOR')
+                else if(notifType == 'OPEN_DASHBOARD_DETAILS')
                 {
                     this.navigator.dispatch(
         				NavigationActions.navigate({ routeName: 'DashboardDetails', params: {taskId: notifData.taskId}})

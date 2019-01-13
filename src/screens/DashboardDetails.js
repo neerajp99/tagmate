@@ -78,8 +78,8 @@ class DashboardDetails extends Component {
     }
   }
 
-  markCancelled = (id) => {
-    markRequestCancelled(id).then(resp =>
+  markCancelled = (item) => {
+    markRequestCancelled(item.id, item.isClient).then(resp =>
     {
       this.props.navigation.navigate('DashboardScreen')
     })
@@ -95,9 +95,10 @@ class DashboardDetails extends Component {
       switch(item.status)
       {
         case 0: statusStr = 'Looking for your savior'; break;
-        case 1: statusStr = (item.isClient)?'Waiting for your savior to complete the task':'Waiting for you to complete the task'; break;
+        case 1: statusStr = (item.isClient)?'Waiting for savior to complete task':'Waiting for you to complete task'; break;
         case 2: statusStr = 'Completed'; break;
-        case 3: statusStr = 'Cancelled'; break;
+        case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by requester'; break;
+        case 4: statusStr = (item.isClient)?'Cancelled by your (ex)savior':'Cancelled by you';break;
       }
     }
     return (
@@ -150,7 +151,7 @@ class DashboardDetails extends Component {
             item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} disabled={this.state.disabledDone} title="Mark as Done" />
           }
           {
-           item.status < 2 && <Button onPress={()=>this.markCancelled(item.id)} title="Cancel Request" />
+           item.status < 2 && <Button onPress={()=>this.markCancelled(item)} title="Cancel Request" />
           }
           </View>
         </Card>

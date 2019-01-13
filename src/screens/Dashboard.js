@@ -129,7 +129,8 @@ class DashboardScreen extends Component {
           case 0: statusStr = 'Looking for your savior.'; break;
           case 1: statusStr = 'Ongoing task.'; break;
           case 2: statusStr = 'Task completed.'; break;
-          case 3: statusStr = 'Task cancelled.'; break;
+          case 3: 
+          case 4: statusStr = 'Task cancelled.'; break;
         }
         return (
           <View key={id}>
