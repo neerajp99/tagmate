@@ -27,6 +27,7 @@ class RequestDetails extends Component{
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
             canRequestMore(uid).then(requestMore => {
                 if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
+                this.setState({disabledBtn:false});
                 this.props.navigation.navigate('RequestScreen');
             });
                 else
