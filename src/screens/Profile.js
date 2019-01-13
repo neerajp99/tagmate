@@ -28,7 +28,7 @@ class ProfileScreen extends Component{
 
   loadWhatsapp = () =>
   {
-    Linking.openURL('whatsapp://send?text=Hey, checkout Adour: link')
+    Linking.openURL('whatsapp://send?text=Hey, checkout Adour: http://getadour.com')
   }
 
   updateCoins = () =>
@@ -44,7 +44,6 @@ class ProfileScreen extends Component{
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>Email: {this.state.email}</Text> */}
-
         <Card>
           <ListItem
             title={this.state.coins}
