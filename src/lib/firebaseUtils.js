@@ -108,7 +108,7 @@ export const canRequestMore = (userId) => new Promise((resolve, reject) => {
                 var count = 0;
                 for (let key of keys)
                 {
-                    if(allRequests[key].clientId == userId) count++;
+                    if(allRequests[key].clientId == userId && (allRequests[key].status == 0 || allRequests[key].status == 1)) count++;
                 }
                 getCoins(userId).then(coins => {
                     console.log('coins',coins,'reqs',count);
