@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput} from 'react-native'
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
@@ -42,6 +43,15 @@ class RequestScreen extends Component {
                         <ActivityIndicator color={'black'} size={'large'}/>
                     </View>
                 }
+
+                <Card>
+                    <ListItem
+                        title='Add a custom service'
+                        leftIcon='add-circle-outline'
+                        containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                        onPress={() => this.addCustomService()}
+                    />
+                </Card>
             </View>
         )
     }
