@@ -5,21 +5,41 @@ import firebase from 'react-native-firebase'
 import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
 
 class RequestDetails extends Component{
-  	state = {when:'', details:''};
+  	constructor(props) {
+        super(props);
+        this.state = {
+            disabledBtn:false,
+            when:'',
+            details:'',
+        }
+    }
 
   	sendRequest = () =>
     {
-        const {currentUser: {uid} = {}} = firebase.auth();
-        const {when, details} = this.state;
-        if(when.length == 0) return alert('Please input when.');
-        if(when.length > 20) return alert('When should not exceed 20 characters.');
-        if(details.length > 60) return alert('Details should not exceed 60 characters.');
-        canRequestMore(uid).then(requestMore => {
-            if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
-            this.props.navigation.navigate('RequestScreen');
-        });
-            else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
-        });
+        if(this.state.disabledBtn == true) return;
+        else
+        {
+            this.setState({disabledBtn:true});
+            const {currentUser: {uid} = {}} = firebase.auth();
+            const {when, details} = this.state;
+            if(when.length == 0) return this.erred('Please input when.');
+            if(when.length > 20) return this.erred('When should not exceed 20 characters.');
+            if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
+            canRequestMore(uid).then(requestMore => {
+                if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
+                this.props.navigation.navigate('RequestScreen');
+            });
+                else
+                {
+                    return this.erred('Sorry, you have as many ongoing requests as your Adour coin balance.');
+                }
+            });
+        }
+    }
+
+    erred = (msg) => {
+        this.setState({disabledBtn:false});
+        return alert(msg);
     }
 
   render(){
@@ -38,7 +58,7 @@ class RequestDetails extends Component{
 	            placeholder="Optional"
 	            style={styles.textInput}
 	            onChangeText={details => this.setState({ details: details })} />
-	            <Button title="Request" onPress={() => {this.sendRequest()}}/>
+	            <Button title="Request"  disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
     )

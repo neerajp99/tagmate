@@ -37,7 +37,6 @@ class DashboardDetails extends Component {
     {
       var item = snapshot.val();
       this.setState({fetching:false});
-      console.log("details check",item);
       if(item.clientId == uid) item.isClient = true;
       else if(item.serverId == uid) item.isClient = false;
       else

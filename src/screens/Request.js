@@ -7,7 +7,6 @@ import {fetchAllServices} from "../actions";
 import {canRequestMore} from '../lib/firebaseUtils.js';
 
 class RequestScreen extends Component {
-
     componentWillMount() {
         const {fetchAllServices} = this.props
         setTimeout(fetchAllServices, 1000)
