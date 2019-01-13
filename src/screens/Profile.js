@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking} from 'react-native';
 import { ListItem, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -16,7 +16,6 @@ class ProfileScreen extends Component{
     this.updateCoins = this.updateCoins.bind(this);
   }
 
-
   handleSignout = () => {
       firebase
         .auth()
@@ -25,6 +24,11 @@ class ProfileScreen extends Component{
 
   componentDidMount(){
     this.updateCoins();
+  }
+
+  loadWhatsapp = () =>
+  {
+    Linking.openURL('whatsapp://send?text=Hey, checkout Adour: link')
   }
 
   updateCoins = () =>
@@ -58,6 +62,11 @@ class ProfileScreen extends Component{
             title='Edit Details'
             leftIcon={{ name: 'mode-edit' }}
             onPress={() => this.props.navigation.navigate('EditProfileDetails')}
+          />
+          <ListItem
+            title='Invite A Friend'
+            leftIcon={{ name: 'person-add' }}
+            onPress={()=>{this.loadWhatsapp()}}
           />
           <ListItem
             title='Support'
