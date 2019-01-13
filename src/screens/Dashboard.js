@@ -53,17 +53,21 @@ class DashboardScreen extends Component {
 
       ref.on('child_changed', (snapshot) => {
         var request = snapshot.val();
-        console.log(request);
+        if(request.clientId != uid && request.serverId != uid) return;
         if(request.status == 1 && request.serverId == uid) this.setState({accepted:[request].concat(this.state.accepted)});
         else
         {
-          let req = this.state.requested;
-          let acc = this.state.accepted;
-          req.forEach(function(part, index, arr) {
-            if(part.id == request.id) arr[index] = request;
+          let req = [];//this.state.requested;
+          let acc = [];//this.state.accepted;
+          this.state.requested.map(item => 
+          {
+            if(item.id == request.id) req.push(request);
+            else req.push(item);
           });
-          acc.forEach(function(part, index, arr) {
-            if(part.id == request.id) arr[index] = request;
+          this.state.accepted.map(item => 
+          {
+            if(item.id == request.id) acc.push(request);
+            else acc.push(item);
           });
           this.setState({requested:req});
           this.setState({accepted:acc});
@@ -85,7 +89,8 @@ class DashboardScreen extends Component {
     openDetails = (item) =>
     {
       console.log(item);
-      const {currentUser: {uid} = {}} = firebase.auth()
+      this.props.navigation.navigate('DashboardDetails',{taskId: item.id})
+      /*const {currentUser: {uid} = {}} = firebase.auth()
       if(uid)
       {
         this.setState({fetching: true})
@@ -99,9 +104,9 @@ class DashboardScreen extends Component {
         getWhatsapp(oppUser).then(whatsapp => {
           let obj = {...item, ...{whatsapp, isClient}}
           this.setState({fetching:false})
-          this.props.navigation.navigate('DashboardDetails',{item: obj})
+          this.props.navigation.navigate('DashboardDetails',{taskId: })
         })
-      }
+      }*/
     }
 
     /*

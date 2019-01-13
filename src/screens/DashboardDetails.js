@@ -5,23 +5,77 @@ import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
+import {getAllServices, getWhatsapp} from '../lib/firebaseUtils.js';
 
 
 class DashboardDetails extends Component {
-  state =
-  {
-    disabledDone:false,
+  constructor(props) {
+    super(props);
+    this.state = {
+      disabledDone:false,
+      fetching:true,
+      item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'},
+      hide:false,
+      whatsappAvailable:false,
+    }
+    this.liveUpdates = this.liveUpdates.bind(this);
   }
+
+  componentDidMount(){
+    getAllServices().then(services =>
+    {
+      this.setState({services});
+      this.liveUpdates();
+    });
+  }
+
+  liveUpdates = () => {
+  
+    const {currentUser: {uid} = {}} = firebase.auth()
+    
+    firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
+    {
+      var item = snapshot.val();
+      this.setState({fetching:false});
+      console.log("details check",item);
+      if(item.clientId == uid) item.isClient = true;
+      else if(item.serverId == uid) item.isClient = false;
+      else
+      {
+        this.setState({hide:true});
+        return;
+      }
+      item.serviceTitle = '';
+      this.state.services.map(service =>
+      {
+        if(item.serviceId == service.id) item.serviceTitle = service.title;
+      })
+      item.whatsapp = this.state.item.whatsapp;
+      this.setState({item:item});
+      if(!this.state.whatsappAvailable)
+      {
+        getWhatsapp((item.isClient)?item.serverId:item.clientId).then(whatsapp=>
+        {
+          item.whatsapp = whatsapp;
+          this.setState({item:item, whatsappAvailable:true});
+        });
+      }
+    }.bind(this));
+  
+  }
+
+  loadWhatsapp = () =>
+  {
+    if(this.state.whatsappAvailable)
+    Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+this.state.item.whatsapp)
+  }
+
   markDone = (id) => {
     if(this.state.disabledDone == true) return;
     else
     {
       this.setState({disabledDone:true});
-      markRequestDone(id).then(resp =>
-      {
-        this.setState({disabledDone:false});
-        this.props.navigation.navigate('DashboardScreen')
-      })
+      markRequestDone(id).then(resp=>{this.props.navigation.navigate('DashboardScreen')})
     }
   }
 
@@ -34,7 +88,7 @@ class DashboardDetails extends Component {
 
   render()
   {
-    const {item} = this.props.navigation.state.params
+    const {item} = this.state;
     console.log(item);
     var statusStr = 'Not available';
     if(typeof item.status != 'undefined')
@@ -49,7 +103,7 @@ class DashboardDetails extends Component {
     }
     return (
       <View style={styles.mainContainer}>
-      <Card title={item.serviceId} titleStyle={styles.cardTitleStyle}>
+      <Card title={item.serviceTitle} titleStyle={styles.cardTitleStyle}>
           {/* Task Status */ }
           <View style={styles.cardSubtitle}>
           <Text style={styles.cardSubtitleText}>{statusStr}</Text>
@@ -85,12 +139,14 @@ class DashboardDetails extends Component {
           </View>
             {/* Whatsapp Chat button */ }
           <View style={styles.subContent}>
-          <Button
-            icon={{name: 'chat'}}
-            backgroundColor='#21c627'
-            onPress={()=>{
-            Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+item.whatsapp)
-          }} title="Chat on Whatsapp" />
+          {
+            <Button
+              icon={{name: 'chat'}}
+              backgroundColor='#21c627'
+              disabled={!this.state.whatsappAvailable}
+              onPress={()=>{this.loadWhatsapp()}}
+              title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
+          }
           {
             item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} disabled={this.state.disabledDone} title="Mark as Done" />
           }
