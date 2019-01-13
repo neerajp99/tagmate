@@ -114,8 +114,9 @@ exports.sendPushNotification = functions.database
     .onUpdate((snapshot, context) => {
         const pushId = context.params.pushId;
         if(!pushId){return console.log('missing mandatory params for sending push.')}
-        const {status, clientId, serverId} = snapshot.val();
-        if(status != 3 && status != 4) return console.log('not a cancellation');
+        const {status, clientId, serverId} = snapshot.after.val();
+        var prev = snapshot.before.val().status;
+        if(prev != 1 && (status != 3 || status != 4)) return console.log('not a cancellation');
         var userPromise = 0;
         if(status == 3) userPromise = admin.database().ref(`/users/${serverId}`).once('value')
         else userPromise = admin.database().ref(`/users/${clientId}`).once('value')

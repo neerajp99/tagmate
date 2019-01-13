@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput} from 'react-native'
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking} from 'react-native'
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
@@ -20,6 +20,11 @@ class RequestScreen extends Component {
             if(requestMore) this.props.navigation.navigate('RequestDetails', {item:item});
             else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
         });
+    }
+
+    addCustomService = () =>
+    {
+        Linking.openURL('mailto:shivam@getadour.com?subject=New Service Suggestion&body=Hey there, please add this service: ')
     }
 
     render() {
