@@ -32,7 +32,7 @@ class ProfileScreen extends Component{
     const {currentUser: {uid} = {}} = firebase.auth()
     firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
     {
-      this.setState({coins: snapshot.val()});
+      this.setState({coins: snapshot.val() || "0"});
     }.bind(this));
   }
 

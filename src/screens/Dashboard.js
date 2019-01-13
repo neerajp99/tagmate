@@ -118,11 +118,20 @@ class DashboardScreen extends Component {
                 serviceTitle = service.title;
             }
         });
+        var statusStr = 'Not available';
+        switch(item.status)
+        {
+          case 0: statusStr = 'Looking for your savior.'; break;
+          case 1: statusStr = 'Ongoing task.'; break;
+          case 2: statusStr = 'Task completed.'; break;
+          case 3: statusStr = 'Task cancelled.'; break;
+        }
         return (
           <View key={id}>
             <View>
                 <ListItem
                     title={serviceTitle}
+                    subtitle={statusStr}
                     rightTitle={when}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
