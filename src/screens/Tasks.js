@@ -164,8 +164,7 @@ class TaskScreen extends Component {
                 {
                     addServer(uid, item.id).then(whatsapp =>
                     {
-                        item.status = 1;
-                        this.props.navigation.navigate('DashboardDetails', {item: {...item, ...{ whatsapp: whatsapp, isClient:false }}});
+                        this.props.navigation.navigate('DashboardDetails', {taskId: item.id});
                     });
                 }
             });
