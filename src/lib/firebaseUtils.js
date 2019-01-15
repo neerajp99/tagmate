@@ -108,7 +108,7 @@ export const canRequestMore = (userId) => new Promise((resolve, reject) => {
                 var count = 0;
                 for (let key of keys)
                 {
-                    if(allRequests[key].clientId == userId) count++;
+                    if(allRequests[key].clientId == userId && (allRequests[key].status == 0 || allRequests[key].status == 1)) count++;
                 }
                 getCoins(userId).then(coins => {
                     console.log('coins',coins,'reqs',count);
@@ -213,10 +213,11 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
     }
 })
 
-export const markRequestCancelled = (id) => new Promise((resolve, reject) => {
+export const markRequestCancelled = (id, isClient) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        ref.update({status:3});
+        if(isClient) ref.update({status:3});
+        else         ref.update({status:4});
         resolve(true);
     } catch (e) {
         reject(e)

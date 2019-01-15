@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput} from 'react-native'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking} from 'react-native'
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import {canRequestMore} from '../lib/firebaseUtils.js';
 
 class RequestScreen extends Component {
-
     componentWillMount() {
         const {fetchAllServices} = this.props
         setTimeout(fetchAllServices, 1000)
@@ -20,6 +20,11 @@ class RequestScreen extends Component {
             if(requestMore) this.props.navigation.navigate('RequestDetails', {item:item});
             else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
         });
+    }
+
+    addCustomService = () =>
+    {
+        Linking.openURL('mailto:shivam@getadour.com?subject=New Service Suggestion&body=Hey there, please add this service: ')
     }
 
     render() {
@@ -43,6 +48,15 @@ class RequestScreen extends Component {
                         <ActivityIndicator color={'black'} size={'large'}/>
                     </View>
                 }
+
+                <Card>
+                    <ListItem
+                        title='Add a custom service'
+                        leftIcon={{name: 'add-circle-outline'}}
+                        containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                        onPress={() => this.addCustomService()}
+                    />
+                </Card>
             </View>
         )
     }

@@ -33,7 +33,7 @@ class App extends Component {
         setTimeout(() => {
             const {authToken = ''} = this.props
             const {currentUser} = firebase.auth()
-            const {notifType, item} = notifData
+            const {notifType} = notifData
             if(!_.isEmpty(currentUser)) {
                 if(notifType == 'SERVICE_REQUEST')
                 {
@@ -41,11 +41,10 @@ class App extends Component {
         				NavigationActions.navigate({ routeName: 'Tasks' })
       					);
                 }
-                else if(notifType == 'FOUND_ACCEPTOR')
+                else if(notifType == 'OPEN_DASHBOARD_DETAILS')
                 {
-                    var obj = JSON.parse(item)
                     this.navigator.dispatch(
-        				NavigationActions.navigate({ routeName: 'DashboardDetails', params: {item: {...obj, ...{'isClient':true}}} })
+        				NavigationActions.navigate({ routeName: 'DashboardDetails', params: {taskId: notifData.taskId}})
       					);
                 }
             }

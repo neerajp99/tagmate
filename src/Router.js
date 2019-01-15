@@ -12,7 +12,8 @@ export const ProfileStack = createStackNavigator(
       screen: ProfileScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Profile'
+          headerTitle: 'Profile',
+          headerStyle: {fontFamily: 'OpenSans-Regular'}
         }
       }
     },
