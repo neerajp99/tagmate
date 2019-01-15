@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AddDetails from './auth/AddDetails';
 import {getCoins, listenForChange} from '../lib/firebaseUtils.js';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -24,6 +25,16 @@ class ProfileScreen extends Component{
 
   componentDidMount(){
     this.updateCoins();
+    GoogleSignin.configure({
+      //It is mandatory to call this method before attempting to call signIn()
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      // Repleace with your webClientId generated from Firebase console
+      webClientId:
+        '768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
+      hostedDomain: '', // specifies a hosted domain restriction
+      loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
+      forceConsentPrompt: true, // [Android] if you want to show the authorization prompt at each login.
+    });
   }
 
   loadWhatsapp = () =>
@@ -80,7 +91,18 @@ class ProfileScreen extends Component{
           <ListItem
             title='Logout'
             leftIcon={{ name: 'exit-to-app' }}
-            onPress={() => firebase.auth().signOut()}
+            onPress={async () => {
+              try {
+                const isSignedIn = await GoogleSignin.isSignedIn();
+                if(isSignedIn == true){
+                  await GoogleSignin.signOut();
+                }
+                firebase.auth().signOut();
+              }
+              catch (error) {
+                console.log(error);
+              }
+            }}
           />
         </Card>
 

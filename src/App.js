@@ -7,7 +7,7 @@ import {RootNav, AppContainer} from './Router';
 import * as _ from 'lodash'
 import firebase from 'react-native-firebase';
 import { NavigationActions } from 'react-navigation';
-
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 class App extends Component {
     async componentDidMount()

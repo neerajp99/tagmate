@@ -1,8 +1,9 @@
 // Login.js
 import React, {Component} from 'react'
-import firebase from 'react-native-firebase';
+import firebase, { config } from 'react-native-firebase';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {connect} from 'react-redux';
-import {loginUser} from '../../actions';
+import {loginUser, loginGoogleUser,addNewGoogleUser} from '../../actions';
 import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -25,6 +26,66 @@ class Login extends Component {
         return;
       }
     else this.props.loginUser({email, password});
+  }
+
+  componentDidMount() {
+    GoogleSignin.configure({
+      //It is mandatory to call this method before attempting to call signIn()
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      // Repleace with your webClientId generated from Firebase console
+      webClientId:
+        '768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
+      hostedDomain: '', // specifies a hosted domain restriction
+      loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
+      forceConsentPrompt: true, // [Android] if you want to show the authorization prompt at each login.
+    });
+  }
+
+  _signOut = async () => {
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+      this.setState({ user: null }); // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  _signIn = async () => {
+    
+    try {
+      await GoogleSignin.hasPlayServices({
+        //Check if device has Google Play Services installed.
+        //Always resolves to true on iOS.
+        showPlayServicesUpdateDialog: true,
+      });
+
+      const isSignedIn = await GoogleSignin.isSignedIn();
+      if(isSignedIn == true){
+        await GoogleSignin.signOut();
+      }
+      const userInfo = await GoogleSignin.signIn();
+      
+      this.setState({ g_first_name: userInfo.user.givenName, g_last_name: userInfo.user.familyName, g_profile: userInfo.user.photo });
+      
+      // create a new firebase credential with the token
+      const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
+      // login with credential
+      const currentUser = await firebase.auth().signInWithCredential(credential);      
+      addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
+
+    } catch (error) {
+      console.log('Message', error.message);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        console.log('User Cancelled the Login Flow');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        console.log('Signing In');
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log('Play Services Not Available or Outdated');
+      } else {
+        console.log('Some Other Error Happened');
+      }
+    }
   }
 
   handleLoading = () => {
@@ -90,8 +151,11 @@ class Login extends Component {
           {this.handleLoading()}
         </TouchableOpacity>
         <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('SignUp')} >
-          New to Adour? Sign Up
+          New to Adoursss? Sign Up
         </Text>
+
+        <GoogleSigninButton style={styles.btnGoogleLogin}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
+     
       </View>
       </ImageBackground>
     )
@@ -143,6 +207,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#432577',
     justifyContent: 'center',
     marginTop: 20
+  },
+  btnGoogleLogin: {
+    width: 312,
+    height: 48,
+    marginTop: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    left: 25
   },
   btnEye: {
     position: 'absolute',

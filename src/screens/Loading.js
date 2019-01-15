@@ -23,8 +23,13 @@ class Loading extends Component {
                 firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
                 {
                     var vals = snapshot.val();
-                    if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
-                    else this.props.navigation.navigate('MainStack');
+                    if(vals != null){
+                        if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
+                        else this.props.navigation.navigate('MainStack');
+                    }
+                    else{
+                        this.props.navigation.navigate('MainStack');
+                    }
                 })
             }
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
