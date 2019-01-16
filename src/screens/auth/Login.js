@@ -13,7 +13,7 @@ import logo from '../../img/logo.png'
 const { width: WIDTH } = Dimensions.get('window')
 
 class Login extends Component {
-  state = { email: '', password: '', showPass: true, passPress: false}
+  state = { email: '', password: '', showPass: true, passPress: false, loading:false}
 
 
   handleLogin = () => {
@@ -29,9 +29,14 @@ class Login extends Component {
   }
 
   componentDidMount() {
+
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
+      /*
+      This scope was used earlier:
       scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      */
+      scopes: [],
       // Repleace with your webClientId generated from Firebase console
       webClientId:
         '768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',//'768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
@@ -52,8 +57,9 @@ class Login extends Component {
   };
 
   _signIn = async () => {
-    
+    if(this.state.loading) return;
     try {
+      this.setState({loading:true});
       await GoogleSignin.hasPlayServices({
         //Check if device has Google Play Services installed.
         //Always resolves to true on iOS.
@@ -72,9 +78,10 @@ class Login extends Component {
       const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);      
-      addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
-
+      await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
+      this.setState({loading:false});
     } catch (error) {
+      this.setState({loading:false});
       console.log('Message', error.message);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         console.log('User Cancelled the Login Flow');
@@ -153,8 +160,10 @@ class Login extends Component {
         <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('SignUp')} >
           New to Adour? Sign Up
         </Text>
-
-        <GoogleSigninButton style={styles.btnGoogleLogin}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
+        {
+          this.state.loading && <ActivityIndicator />
+        }
+        <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
      
       </View>
       </ImageBackground>

@@ -7,6 +7,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import * as _ from 'lodash';
+import TimeAgo from 'react-native-timeago';
+
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -175,7 +177,7 @@ class TaskScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {serviceId, id, when, details} = item;
+        const {serviceId, id, when, details, created_at} = item;
         var detailsAvailable = true;
         const {allServices} = this.state
         var serviceTitle = '---';
@@ -185,18 +187,27 @@ class TaskScreen extends Component {
                 serviceTitle = service.title;
             }
         });
-console.log(serviceTitle)
         if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
           <View key={id}>
               <ListItem
               title={serviceTitle}
-              subtitle={ detailsAvailable ? details : null }
+              subtitle={ "Needed by: "+(when) }
               hideChevron={true}
-              rightTitle={when}
+              rightTitle={['Created ', <TimeAgo key={id} time={created_at} />]}
               subtitleNumberOfLines={2}
               containerStyle={{backgroundColor: '#fff'}}
             />
+            {
+                detailsAvailable && <ListItem
+                  subtitle={ "Description: "+details }
+                  hideChevron={true}
+                  subtitleNumberOfLines={2}
+                  containerStyle={{backgroundColor: '#fff'}}
+                />
+            }
+              <View>
+              </View>
               <View style={styles.buttonsContainer}>
                 <View>
                   <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>

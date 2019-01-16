@@ -16,7 +16,6 @@ class Loading extends Component {
     async componentDidMount() {
         const {setDeviceToken} = this.props
         firebase.auth().onAuthStateChanged(user => {
-            console.log("We're here.");
             if(!user) this.props.navigation.navigate('SignUp');
             else
             {
@@ -29,7 +28,7 @@ class Loading extends Component {
                         else this.props.navigation.navigate('MainStack');
                     }
                     else{
-                        this.props.navigation.navigate('MainStack');
+                        this.props.navigation.navigate('Onboarding');
                     }
                 })
             }

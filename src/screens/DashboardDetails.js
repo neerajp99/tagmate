@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
 import {getAllServices, getWhatsapp} from '../lib/firebaseUtils.js';
+import TimeAgo from 'react-native-timeago';
 
 
 class DashboardDetails extends Component {
@@ -135,6 +136,15 @@ class DashboardDetails extends Component {
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'contact-phone'}}
+            />
+          </View>
+            {/* Timestamp */ }
+          <View style={styles.subContent}>
+          <ListItem
+              title={<TimeAgo time={item.created_at} />}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              leftIcon={{ name: 'access-time'}}
             />
           </View>
             {/* Whatsapp Chat button */ }
