@@ -61,7 +61,7 @@ class TaskScreen extends Component {
                 && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                 && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
                 )
-                this.setState({myTasks:this.state.myTasks.concat([request])});
+                this.setState({myTasks:[request].concat(this.state.myTasks)});
         });
 
         ref.on('child_removed', (snapshot) => {

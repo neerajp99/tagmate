@@ -20,7 +20,8 @@ export const addNewGoogleUser =  (uid,fname,lname,picture) => {
           firebase.database().ref('users/'+uid).set({
             firstName: fname,
             lastName: lname,
-            profilePicture: picture
+            profilePicture: picture,
+            coins: 3,
           });
         }
         //loginUserSuccess(dispatch({type:LOGIN_USER}));

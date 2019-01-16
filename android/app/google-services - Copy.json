@@ -23,22 +23,6 @@
           }
         },
         {
-          "client_id": "768462231622-m8aigguis4phg74j44are8rnoqkfrjp6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.adourapp",
-            "certificate_hash": "11b32bb143103a50319c2c5928bd8755efdcb0c6"
-          }
-        },
-        {
-          "client_id": "768462231622-s1a96margkmp43duhbh8tlgd7m5g4kfj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.adourapp",
-            "certificate_hash": "7c08feb2c56c4842c6eb5e7ec67d7d251f76eb6f"
-          }
-        },
-        {
           "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
           "client_type": 3
         }

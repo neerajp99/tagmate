@@ -30,7 +30,7 @@ class ProfileScreen extends Component{
       scopes: ['https://www.googleapis.com/auth/drive.readonly'],
       // Repleace with your webClientId generated from Firebase console
       webClientId:
-        '768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
+        '768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',//'768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
       hostedDomain: '', // specifies a hosted domain restriction
       loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
       forceConsentPrompt: true, // [Android] if you want to show the authorization prompt at each login.
