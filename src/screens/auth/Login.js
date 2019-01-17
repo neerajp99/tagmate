@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import bgImage from '../../img/background.jpg'
 import logo from '../../img/logo.png'
+import adourStyle from '../style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -18,7 +19,7 @@ class Login extends Component {
 
   handleLogin = () => {
     const { email, password } = this.state;
-    
+
     // Ensuring no fields are empty:
     if(email == '' || password == '')
       {
@@ -70,13 +71,13 @@ class Login extends Component {
         await GoogleSignin.signOut();
       }
       const userInfo = await GoogleSignin.signIn();
-      
+
       this.setState({ g_first_name: userInfo.user.givenName, g_last_name: userInfo.user.familyName, g_profile: userInfo.user.photo });
-      
+
       // create a new firebase credential with the token
       const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
       // login with credential
-      const currentUser = await firebase.auth().signInWithCredential(credential);      
+      const currentUser = await firebase.auth().signInWithCredential(credential);
       await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
       this.setState({loading:false});
     } catch (error) {
@@ -113,15 +114,15 @@ class Login extends Component {
   render() {
     return (
       <ImageBackground source={bgImage} style={styles.backgroundContainer}>
-      <View>
+      <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <View style={styles.logoContainer}>
           <Image source={logo} style={styles.logo} />
-          <Text style={styles.logoText}> Do more for others. Get more done. </Text>
+          <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text>
         </View>
           <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
             {this.props.error}
           </Text>
-
+          {/*
         <View style={styles.inputContainer}>
         <Icon name={'email'} size={25} color={'rgba(255, 255, 255, 0.7)'} style={styles.inputIcon} />
         <TextInput
@@ -162,8 +163,10 @@ class Login extends Component {
         {
           this.state.loading && <ActivityIndicator />
         }
+
+        */}
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
-     
+
       </View>
       </ImageBackground>
     )
@@ -193,13 +196,6 @@ const styles = StyleSheet.create({
     height: 47,
     width: 150
   },
-  logoText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '200',
-    marginTop: 10,
-    opacity: 0.5
-  },
   inputIcon: {
     position: 'absolute',
     top: 10,
@@ -218,11 +214,7 @@ const styles = StyleSheet.create({
   },
   btnGoogleLogin: {
     width: 312,
-    height: 48,
-    marginTop: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    left: 25
+    height: 48
   },
   btnEye: {
     position: 'absolute',

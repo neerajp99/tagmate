@@ -141,7 +141,7 @@ export const MainTabNav = createBottomTabNavigator(
 
     },
     tabBarOptions: {
-      activeTintColor: 'tomato',
+      activeTintColor: '#4a8fe7',
       inactiveTintColor: 'gray',
       labelStyle: adourStyle.bottomTabLabelStyle
     },

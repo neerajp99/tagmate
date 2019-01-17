@@ -6,6 +6,7 @@ import {getAllRelatedTasks, getWhatsapp, getAllServices} from "../lib/firebaseUt
 import firebase from 'react-native-firebase';
 import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
+import adourStyle from './style/AdourStyle';
 
 
 class DashboardScreen extends Component {
@@ -71,12 +72,12 @@ class DashboardScreen extends Component {
         {
           let req = [];//this.state.requested;
           let acc = [];//this.state.accepted;
-          this.state.requested.map(item => 
+          this.state.requested.map(item =>
           {
             if(item.id == request.id) req.push(request);
             else req.push(item);
           });
-          this.state.accepted.map(item => 
+          this.state.accepted.map(item =>
           {
             if(item.id == request.id) acc.push(request);
             else acc.push(item);
@@ -115,7 +116,7 @@ class DashboardScreen extends Component {
           case 0: statusStr = 'Looking for your savior.'; break;
           case 1: statusStr = 'Ongoing task.'; break;
           case 2: statusStr = 'Task completed.'; break;
-          case 3: 
+          case 3:
           case 4: statusStr = 'Task cancelled.'; break;
         }
         return (
@@ -123,8 +124,11 @@ class DashboardScreen extends Component {
             <View>
                 <ListItem
                     title={serviceTitle}
+                    titleStyle={adourStyle.listItemText}
                     subtitle={statusStr}
+                    subtitleStyle={adourStyle.listItemText}
                     rightTitle={when}
+                    rightTitleStyle={adourStyle.listItemText}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
                   />
@@ -132,7 +136,7 @@ class DashboardScreen extends Component {
           </View>
         )
     }
-    
+
     render() {
         const {fetching, accepted, requested, active} = this.state
         const buttons = ['Requested Tasks', 'Accepted Tasks']
@@ -144,10 +148,11 @@ class DashboardScreen extends Component {
                   onPress={this.updateIndex}
                   selectedIndex={active}
                   buttons={buttons}
+                  textStyle={adourStyle.buttonText}
                   containerStyle={{height: 45}}
                 />
             </View>
-            
+
               {
                 !fetching &&  <FlatList
                     data={(active == 0)?requested:accepted}

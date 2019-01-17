@@ -1,9 +1,12 @@
 import React, {Component} from 'react'
-import {View, Text, ActivityIndicator, AsyncStorage, StyleSheet} from 'react-native'
+import {View, Text, ActivityIndicator, AsyncStorage, StyleSheet, ImageBackground, Image} from 'react-native'
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification'
 import connect from "react-redux/es/connect/connect";
 import {fetchAllServices, setDeviceToken, submitUserServices} from "../actions";
+import bgImage from '../img/background.jpg'
+import logo from '../img/logo.png'
+import adourStyle from './style/AdourStyle'
 import * as _ from 'lodash'
 
 class Loading extends Component {
@@ -39,7 +42,7 @@ class Loading extends Component {
         firebase.auth().onAuthStateChanged(user => {
             if(!stay)
             {
-                if(!user) this.props.navigation.navigate('SignUp');
+                if(!user) this.props.navigation.navigate('Login');
                 else
                 {
                     const {currentUser: {uid} = {}} = firebase.auth();
@@ -54,7 +57,7 @@ class Loading extends Component {
                             this.props.navigation.navigate('Onboarding');
                         }
                     })
-                }    
+                }
             }
             else stay = false;
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
@@ -118,9 +121,15 @@ class Loading extends Component {
 
     render() {
         return (
-            <View style={styles.progressContainer}>
-                <ActivityIndicator size="large"/>
+          <ImageBackground source={bgImage} style={styles.backgroundContainer}>
+            <View style={styles.logoContainer}>
+              <Image source={logo} style={styles.logo} />
+              <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text>
             </View>
+            <View style={{marginTop: 10, marginBottom: 10}}>
+                <ActivityIndicator size="large" color="white"/>
+            </View>
+          </ImageBackground>
         )
     }
 }
@@ -139,5 +148,19 @@ const styles = StyleSheet.create({
       top: '50%',
       marginLeft: -30,
       marginTop: -30
-  }
+  },
+  backgroundContainer: {
+    flex: 1,
+    width: null,
+    height: null,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  logoContainer: {
+    alignItems: 'center'
+  },
+  logo: {
+    height: 47,
+    width: 150
+  },
 })

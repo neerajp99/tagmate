@@ -6,6 +6,7 @@ import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import {canRequestMore} from '../lib/firebaseUtils.js';
+import adourStyle from './style/AdourStyle';
 
 class RequestScreen extends Component {
     componentWillMount() {
@@ -37,6 +38,7 @@ class RequestScreen extends Component {
                             <ListItem
                                 key={i}
                                 title={item.title}
+                                titleStyle={adourStyle.listItemText}
                                 leftIcon={{name: item.icon}}
                                 onPress={() => this.onItemPress(item)}
                             />
@@ -52,6 +54,7 @@ class RequestScreen extends Component {
                 <Card>
                     <ListItem
                         title='Add a custom service'
+                        titleStyle={adourStyle.listItemText}
                         leftIcon={{name: 'add-circle-outline'}}
                         containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                         onPress={() => this.addCustomService()}
