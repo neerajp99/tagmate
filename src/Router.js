@@ -2,10 +2,12 @@ import React from 'react';
 import { Icon } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding} from './screens';
+import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 
+
+// Stack Navigator for Profile and Edit Profile screens:
 export const ProfileStack = createStackNavigator(
   {
     ProfileScreen: {
@@ -28,6 +30,7 @@ export const ProfileStack = createStackNavigator(
   }
 )
 
+// Stack Navigator for Request and Request Details screens:
 export const RequestStack = createStackNavigator(
   {
     RequestScreen: {
@@ -49,6 +52,7 @@ export const RequestStack = createStackNavigator(
   }
 )
 
+// Stack Navigator for Tasks screen:
 export const TaskStack = createStackNavigator(
   {
     TaskScreen: {
@@ -62,6 +66,7 @@ export const TaskStack = createStackNavigator(
   }
 )
 
+// Stack Navigator for Dashboard and Dashboard Details screens:
 export const DashboardStack = createStackNavigator(
   {
     DashboardScreen: {
@@ -83,6 +88,7 @@ export const DashboardStack = createStackNavigator(
   }
 )
 
+// Bottom Tab Navigator connecting all the above navigators as siblings:
 export const MainTabNav = createBottomTabNavigator(
   {
     Profile: {
@@ -145,7 +151,8 @@ export const RootNav = createSwitchNavigator(
     SignUp,
     Login,
     Onboarding,
-    MainStack
+    OnboardingSplash,
+    MainStack,
   },
   {
     initialRouteName: 'Loading'

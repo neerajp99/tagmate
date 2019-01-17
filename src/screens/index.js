@@ -7,3 +7,4 @@ export * from './DashboardDetails';
 export * from './EditProfileDetails';
 export Loading from './Loading';
 export * from './Onboarding';
+export * from './OnboardingSplash';

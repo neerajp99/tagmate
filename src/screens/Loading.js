@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {View, Text, ActivityIndicator, StyleSheet} from 'react-native'
+import {View, Text, ActivityIndicator, AsyncStorage, StyleSheet} from 'react-native'
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification'
 import connect from "react-redux/es/connect/connect";
@@ -14,23 +14,47 @@ class Loading extends Component {
         fetchAllServices()
     }
     async componentDidMount() {
+        var stay = false;
+        await AsyncStorage.getItem('56', (err, result) => {
+          console.log("INSIDE");
+          if (err) {
+          } else {
+            if(result == null) {
+                stay = true;
+                this.props.navigation.navigate('OnboardingSplash')
+             }else {
+              console.log("result", result);
+            }
+          }
+        });
+
+        //console.log(aaa);
+
+        AsyncStorage.setItem('56', JSON.stringify({"value":"true"}), (err,result) => {
+            console.log("error",err,"result",result);
+        });
+
+
         const {setDeviceToken} = this.props
         firebase.auth().onAuthStateChanged(user => {
-            if(!user) this.props.navigation.navigate('SignUp');
-            else
+            if(!stay)
             {
-                const {currentUser: {uid} = {}} = firebase.auth();
-                firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
+                if(!user) this.props.navigation.navigate('SignUp');
+                else
                 {
-                    var vals = snapshot.val();
-                    if(vals != null){
-                        if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
-                        else this.props.navigation.navigate('MainStack');
-                    }
-                    else{
-                        this.props.navigation.navigate('Onboarding');
-                    }
-                })
+                    const {currentUser: {uid} = {}} = firebase.auth();
+                    firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
+                    {
+                        var vals = snapshot.val();
+                        if(vals != null){
+                            if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
+                            else this.props.navigation.navigate('MainStack');
+                        }
+                        else{
+                            this.props.navigation.navigate('Onboarding');
+                        }
+                    })
+                }    
             }
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })

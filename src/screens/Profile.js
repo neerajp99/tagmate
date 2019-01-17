@@ -27,7 +27,11 @@ class ProfileScreen extends Component{
     this.updateCoins();
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
+      /*
+      Scope used earlier:
       scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      */
+      scopes: [],
       // Repleace with your webClientId generated from Firebase console
       webClientId:
         '768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',//'768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',

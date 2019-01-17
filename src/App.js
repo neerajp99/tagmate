@@ -35,12 +35,14 @@ class App extends Component {
             const {currentUser} = firebase.auth()
             const {notifType} = notifData
             if(!_.isEmpty(currentUser)) {
+                // If the notification informed about a new available task:
                 if(notifType == 'SERVICE_REQUEST')
                 {
                 	this.navigator.dispatch(
         				NavigationActions.navigate({ routeName: 'Tasks' })
       					);
                 }
+                // If the notification asked to open Dashboard Details screen:
                 else if(notifType == 'OPEN_DASHBOARD_DETAILS')
                 {
                     this.navigator.dispatch(

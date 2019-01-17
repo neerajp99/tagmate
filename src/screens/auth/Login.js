@@ -29,7 +29,6 @@ class Login extends Component {
   }
 
   componentDidMount() {
-
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
       /*
