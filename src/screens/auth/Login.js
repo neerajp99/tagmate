@@ -160,11 +160,15 @@ class Login extends Component {
         <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('SignUp')} >
           New to Adour? Sign Up
         </Text>
+        */}
+
         {
-          this.state.loading && <ActivityIndicator />
+          this.state.loading && <View style={{marginBottom: 15}}>
+                                    <ActivityIndicator size="large" color="white" />
+                                </View>
         }
 
-        */}
+
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
 
       </View>
