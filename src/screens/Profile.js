@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image} from 'react-native';
 import { ListItem, Card } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -24,7 +24,9 @@ class ProfileScreen extends Component{
   }
 
   componentDidMount(){
-    console.log(firebase.auth());
+    const {currentUser: {displayName, photoURL} = {}} = firebase.auth();
+    this.setState({displayName, photoURL});
+    //console.log(firebase.auth());
     this.updateCoins();
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
@@ -59,7 +61,15 @@ class ProfileScreen extends Component{
   render(){
     return(
       <View style={styles.backgroundContainer}>
-        {/* <Text>Email: {this.state.email}</Text> */}
+        {
+          this.state.displayName != "" && <Text>Name: {this.state.displayName}</Text>
+        }
+        {
+          this.state.photoURL != "" && 
+          <Image 
+            style={{width: 50, height: 50}}
+            source={{uri: this.state.photoURL}} />
+        }
         <Card>
           <ListItem
             title={this.state.coins}
