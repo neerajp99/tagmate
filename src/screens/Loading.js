@@ -56,6 +56,7 @@ class Loading extends Component {
                     })
                 }    
             }
+            else stay = false;
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })
         // configure push notification capability & get deviceToken

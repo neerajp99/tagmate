@@ -24,6 +24,7 @@ class ProfileScreen extends Component{
   }
 
   componentDidMount(){
+    console.log(firebase.auth());
     this.updateCoins();
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
