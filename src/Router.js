@@ -5,6 +5,7 @@ import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, cr
 import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
+import adourStyle from './screens/style/AdourStyle';
 
 
 // Stack Navigator for Profile and Edit Profile screens:
@@ -15,7 +16,7 @@ export const ProfileStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Profile',
-          headerStyle: {fontFamily: 'OpenSans-Regular'}
+          headerTitleStyle: adourStyle.headerText
         }
       }
     },
@@ -23,7 +24,8 @@ export const ProfileStack = createStackNavigator(
       screen: EditProfileDetails,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Edit Details'
+          headerTitle: 'Edit Details',
+          headerTitleStyle: adourStyle.headerText
         }
       }
     }
@@ -37,7 +39,8 @@ export const RequestStack = createStackNavigator(
       screen: RequestScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Request'
+          headerTitle: 'Request',
+          headerTitleStyle: adourStyle.headerText
         }
       }
     },
@@ -45,7 +48,8 @@ export const RequestStack = createStackNavigator(
       screen: RequestDetails,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'More information'
+          headerTitle: 'Additional Info',
+          headerTitleStyle: adourStyle.headerText
         }
       }
     }
@@ -59,7 +63,8 @@ export const TaskStack = createStackNavigator(
       screen: TaskScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Tasks'
+          headerTitle: 'Tasks',
+          headerTitleStyle: adourStyle.headerText
         }
       }
     }
@@ -73,7 +78,8 @@ export const DashboardStack = createStackNavigator(
       screen: DashboardScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Dashboard'
+          headerTitle: 'Dashboard',
+          headerTitleStyle: adourStyle.headerText
         }
       }
     },
@@ -81,7 +87,8 @@ export const DashboardStack = createStackNavigator(
       screen: DashboardDetails,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Task Details'
+          headerTitle: 'Task Details',
+          headerTitleStyle: adourStyle.headerText
         }
       }
     }
@@ -136,6 +143,7 @@ export const MainTabNav = createBottomTabNavigator(
     tabBarOptions: {
       activeTintColor: 'tomato',
       inactiveTintColor: 'gray',
+      labelStyle: adourStyle.bottomTabLabelStyle
     },
   }
 );

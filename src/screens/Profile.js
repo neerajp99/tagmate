@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image} from 'react-native';
-import { ListItem, Card } from 'react-native-elements';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image, ScrollView} from 'react-native';
+import { ListItem, Card, Avatar } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AddDetails from './auth/AddDetails';
 import {getCoins, listenForChange} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+import adourStyle from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -60,21 +61,29 @@ class ProfileScreen extends Component{
 
   render(){
     return(
+      <ScrollView>
       <View style={styles.backgroundContainer}>
         {
-          this.state.displayName != "" && <Text>Name: {this.state.displayName}</Text>
+          this.state.displayName != "" &&
+            <Card containerStyle={{alignItems: 'center', justifyContent: 'center'}}>
+            <View style={{alignItems: 'center', marginBottom: 8}} >
+              <Avatar
+                large
+                rounded
+                source={{uri: this.state.photoURL}}
+                activeOpacity={0.7}
+              />
+              </View>
+              <Text style={adourStyle.titleText}>{this.state.displayName}</Text>
+            </Card>
         }
-        {
-          this.state.photoURL != "" && 
-          <Image 
-            style={{width: 50, height: 50}}
-            source={{uri: this.state.photoURL}} />
-        }
+
         <Card>
           <ListItem
             title={this.state.coins}
+            titleStyle={adourStyle.listItemText}
             subtitle='Adour Coins'
-            subtitleStyle={{fontWeight:'100'}}
+            subtitleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'coins', type:'material-community' }}
             hideChevron={true}
             containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
@@ -85,26 +94,31 @@ class ProfileScreen extends Component{
         <Card>
           <ListItem
             title='Edit Details'
+            titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'mode-edit' }}
             onPress={() => this.props.navigation.navigate('EditProfileDetails')}
           />
           <ListItem
             title='Invite A Friend'
+            titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'person-add' }}
             onPress={()=>{this.loadWhatsapp()}}
           />
           <ListItem
             title='Support'
+            titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'help-outline' }}
             onPress={() => alert('WIP')}
           />
           <ListItem
             title='Privacy Policy'
+            titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'mode-edit' }}
             onPress={() => alert('WIP')}
           />
           <ListItem
             title='Logout'
+            titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'exit-to-app' }}
             onPress={async () => {
               try {
@@ -122,6 +136,7 @@ class ProfileScreen extends Component{
         </Card>
 
       </View>
+      </ScrollView>
     )
   }
 }
