@@ -13,7 +13,7 @@ const adourStyle = StyleSheet.create({
   headerText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200',
-    fontSize: 28
+    fontSize: 24
   },
   bottomTabLabelStyle: {
     fontFamily:'OpenSans-Regular',
