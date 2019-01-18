@@ -11,7 +11,7 @@ class RequestDetails extends Component{
   	constructor(props) {
         super(props);
         this.state = {
-            disabledBtn:false,
+            disabledBtn:false, // Check if service request button is disabeld or not. Default: not disabled.
             when:'ASAP', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
         }
@@ -22,16 +22,16 @@ class RequestDetails extends Component{
         if(this.state.disabledBtn == true) return;
         else
         {
-            this.setState({disabledBtn:true});
+            this.setState({disabledBtn:true}); // Disable button while function is running.
             const {currentUser: {uid} = {}} = firebase.auth();
             const {when, details} = this.state;
             if(when.length == 0) return this.erred('Please input when.');
             if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
-            canRequestMore(uid).then(requestMore => {
+            canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
                 if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
-                this.setState({disabledBtn:false});
-                this.props.navigation.navigate('RequestScreen');
+                this.setState({disabledBtn:false}); // Enable the button again
+                this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
             });
                 else
                 {
@@ -42,6 +42,8 @@ class RequestDetails extends Component{
         }
     }
 
+    // This function changes the button's state from disabled to enabled
+    // and returns an alert box with the message that was sent as parameter.
     erred = (msg) => {
         this.setState({disabledBtn:false});
         return alert(msg);

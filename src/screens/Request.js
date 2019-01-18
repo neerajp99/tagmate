@@ -14,10 +14,11 @@ class RequestScreen extends Component {
         setTimeout(fetchAllServices, 1000)
     }
 
+    // This function expects a valid service object to be passed to it as parameter.
     onItemPress = (item) => {
         if(!item.id) return;
         const {currentUser: {uid} = {}} = firebase.auth();
-        canRequestMore(uid).then(requestMore => {
+        canRequestMore(uid).then(requestMore => { // Check if the user is permitted to create more service requests:
             if(requestMore) this.props.navigation.navigate('RequestDetails', {item:item});
             else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
         });
@@ -25,6 +26,7 @@ class RequestScreen extends Component {
 
     addCustomService = () =>
     {
+         // Trigger default email app to open "Compose email" box preloaded with an Adour rep's email and a subject line.
         Linking.openURL('mailto:shivam@getadour.com?subject=New Service Suggestion&body=Hey there, please add this service: ')
     }
 

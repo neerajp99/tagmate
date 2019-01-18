@@ -14,7 +14,7 @@ const { width: WIDTH } = Dimensions.get('window')
 class ProfileScreen extends Component{
   constructor(props) {
     super(props);
-    this.state = {coins: 'Loading...',email:'Loading...'};
+    this.state = {coins: 'Loading...'}; // Message to show while Adour coins are being loaded
     this.updateCoins = this.updateCoins.bind(this);
   }
 
@@ -25,9 +25,10 @@ class ProfileScreen extends Component{
   }
 
   componentDidMount(){
+    //Fetching name and photo URL
     const {currentUser: {displayName, photoURL} = {}} = firebase.auth();
     this.setState({displayName, photoURL});
-    //console.log(firebase.auth());
+    // Updating Adour coin balance
     this.updateCoins();
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
@@ -47,9 +48,12 @@ class ProfileScreen extends Component{
 
   loadWhatsapp = () =>
   {
+    // Triggering the app to open whatsapp with a preloaded message.
     Linking.openURL('whatsapp://send?text=Hey, checkout Adour: http://getadour.com')
   }
 
+  // This functions expects the user to be logged in.
+  // It, in real-time, updates the Adour coin balance of the user.
   updateCoins = () =>
   {
     const {currentUser: {uid} = {}} = firebase.auth()

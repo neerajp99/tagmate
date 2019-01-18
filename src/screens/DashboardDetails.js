@@ -14,20 +14,20 @@ class DashboardDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      disabledDone:false,
+      disabledDone:false, // "Mark as Done" is not disabled
       fetching:true,
-      item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'},
+      item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
-      whatsappAvailable:false,
+      whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
   }
 
   componentDidMount(){
-    getAllServices().then(services =>
+    getAllServices().then(services => // Get list of all services, then:
     {
-      this.setState({services});
-      this.liveUpdates();
+      this.setState({services}); // Make services list available to the screen
+      this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
   }
 
@@ -35,28 +35,34 @@ class DashboardDetails extends Component {
 
     const {currentUser: {uid} = {}} = firebase.auth()
 
+    // Listen for changes in service request {this.state.item.id}
     firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
       var item = snapshot.val();
       this.setState({fetching:false});
-      if(item.clientId == uid) item.isClient = true;
-      else if(item.serverId == uid) item.isClient = false;
+      if(item.clientId == uid) item.isClient = true; // The user is requester
+      else if(item.serverId == uid) item.isClient = false; // The user is acceptor
       else
       {
+        // The user is neither requester nor acceptor
         this.setState({hide:true});
         return;
       }
       item.serviceTitle = '';
+      // Fetching service's title:
       this.state.services.map(service =>
       {
         if(item.serviceId == service.id) item.serviceTitle = service.title;
       })
       item.whatsapp = this.state.item.whatsapp;
       this.setState({item:item});
+      // If whatsapp number is not available yet:
       if(!this.state.whatsappAvailable)
       {
+        // Get whatsapp number of the other person involved in this service request:
         getWhatsapp((item.isClient)?item.serverId:item.clientId).then(whatsapp=>
         {
+          // Then, update the whatsapp number:
           item.whatsapp = whatsapp;
           this.setState({item:item, whatsappAvailable:true});
         });
@@ -65,21 +71,25 @@ class DashboardDetails extends Component {
 
   }
 
+  // Expects a valid mobile number in this.state.item.whatsapp
+  // Changes nothing, opens Whatsapp.
   loadWhatsapp = () =>
   {
-    if(this.state.whatsappAvailable)
+    if(this.state.whatsappAvailable) // Trigger whatsapp to open with a preloaded message ready to be sent to available whatsapp number
     Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+this.state.item.whatsapp)
   }
 
   markDone = (id) => {
     if(this.state.disabledDone == true) return;
-    else
+    else // Only if the button is not disabled:
     {
       this.setState({disabledDone:true});
       markRequestDone(id).then(resp=>{this.props.navigation.navigate('DashboardScreen')})
     }
   }
 
+  // Expects {item} parameter to be an object with two valid properties: id (of service request) and isClient
+  // Changes service request's status to cancelled in Firebase realtime database
   markCancelled = (item) => {
     markRequestCancelled(item.id, item.isClient).then(resp =>
     {

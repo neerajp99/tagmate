@@ -17,12 +17,13 @@ class Loading extends Component {
         fetchAllServices()
     }
     async componentDidMount() {
+        // variable `stay` tells whether user should go to OnboardingSplash or not. Initialized as false.
         var stay = false;
         await AsyncStorage.getItem('56', (err, result) => {
-          console.log("INSIDE");
           if (err) {
           } else {
             if(result == null) {
+                // The user has to go to Onboarding splash if it's user's first time on the app.
                 stay = true;
                 this.props.navigation.navigate('OnboardingSplash')
              }else {
@@ -31,7 +32,7 @@ class Loading extends Component {
           }
         });
 
-        //console.log(aaa);
+        // Setting a value in the AsyncStorage so that the user is never redirected to OnboardSplash again.
 
         AsyncStorage.setItem('56', JSON.stringify({"value":"true"}), (err,result) => {
             console.log("error",err,"result",result);
@@ -40,6 +41,7 @@ class Loading extends Component {
 
         const {setDeviceToken} = this.props
         firebase.auth().onAuthStateChanged(user => {
+            // If the user does not have to go to OnboardingSplash:
             if(!stay)
             {
                 if(!user) this.props.navigation.navigate('Login');
@@ -59,12 +61,13 @@ class Loading extends Component {
                     })
                 }
             }
+            // If the user has to go to OnboardingSplash, revert `stay` to false
+            // so that he/she can go to MainStack upon AuthStateChange next time.
             else stay = false;
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })
         // configure push notification capability & get deviceToken
         Notification.configure((token) => {
-            // console.log('token: ' + token)
             setDeviceToken(token)
         })
 

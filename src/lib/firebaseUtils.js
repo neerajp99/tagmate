@@ -26,13 +26,15 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
     }
 })
 
+// Expects a user object ID in parameters.
+// Updates the Adour coin balance of the corresponding user to 3.
 export const creditCoins = (userId) => new Promise((resolve, reject) => {
     try {
         firebase.database().ref(`/users/${userId}`).update({coins:3}).then(res=>{resolve(true)});
     } catch (e) {
         reject(e)
     }
-})      
+})
 
 /*
 * method toget all the task that user with userId can perform
@@ -57,11 +59,11 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                     for (let key of keys) {
                     // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
                         if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
-                                
+
                                 myTasks.push(allRequests[key])
                             }
                     }
-                    
+
                     console.log('myTasks: ', myTasks)
                     resolve(myTasks)
                     return
@@ -73,7 +75,8 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-
+// Expects a user object ID in parameters.
+// Resolves all tasks the user is involved in as
 export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
     try {
             // Fetching all tasks
@@ -87,7 +90,7 @@ export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
                     console.log("USERID: ",userId);
                     console.log(allRequests[key].clientId,allRequests[key].serverId);
 
-                    if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key]) 
+                    if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key])
                     else if(allRequests[key].clientId == userId) requestedTasks.push(allRequests[key])
                 }
                 let allRelatedTasks = {requestedTasks, acceptedTasks}
@@ -99,6 +102,8 @@ export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
         }
 })
 
+// Expects user ID in parameter
+// Checks whether user can create more service requests
 export const canRequestMore = (userId) => new Promise((resolve, reject) => {
     try {
             // Fetching all tasks
@@ -153,6 +158,8 @@ export const getAllServices = () => new Promise((resolve, reject) => {
     }
 })
 
+// Expects user ID in parameter
+// Pass on user's related services and all services
 export const getRelatedServices = (userId) => new Promise((resolve, reject) => {
     try {
             getMyServices(userId).then(myServices =>
@@ -184,7 +191,7 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     try {
         const {currentUser} = firebase.auth();
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
-        ref.update({serverId:userId,status:1});       
+        ref.update({serverId:userId,status:1});
         // Now returning the Whatsapp number of requester (client)
         ref.child(`clientId`).once("value", function(snapshot) {
             resolve(getWhatsapp(snapshot.val()));
@@ -194,6 +201,9 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     }
 })
 
+// Expects service request ID in parameter
+// Marks request as done and deducts Adour coins from requester
+// and credits to the acceptor
 export const markRequestDone = (id) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
@@ -213,6 +223,8 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
     }
 })
 
+// Expects service request ID and isClient boolean value in parameters
+// Marks service request cancelled
 export const markRequestCancelled = (id, isClient) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
@@ -224,6 +236,8 @@ export const markRequestCancelled = (id, isClient) => new Promise((resolve, reje
     }
 })
 
+// Expects user ID in parameters
+// Returns whatsapp number of the user
 export const getWhatsapp = (userId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
@@ -243,6 +257,8 @@ export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, r
     }
 })
 
+// Expects user Id in parameters
+// Returns the current Adour coin balance of user
 export const getCoins = (userId) => new Promise((resolve, reject) => {
     try {
         firebase.database().ref(`/users/${userId}/coins`).once("value", function(coins){resolve(coins.val() || 0);})

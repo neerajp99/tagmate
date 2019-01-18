@@ -34,11 +34,9 @@ class TaskScreen extends Component {
         {
             this.setState(services);
             console.log('relatedServices:',services);
+            // Keep updating tasks
             this.getMyTasks();
         });
-        /*getMyTasks(uid).then(myTasks => {
-            this.setState({myTasks,fetching:false});
-        })*/
     }
 
     /*
@@ -47,6 +45,7 @@ class TaskScreen extends Component {
     getMyTasks = () => {
         const {currentUser: {uid} = {}} = firebase.auth()
 
+        // Load the service request IDs for the ones the user has rejected and push them to the state.
         firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
             var rejectId = snapshot.val();
             this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
@@ -55,7 +54,9 @@ class TaskScreen extends Component {
 
         var ref = firebase.database().ref('servicesRequests')
 
+        // When a service request object is added to the realtime database:
         ref.on('child_added', (snapshot) => {
+            // To hide activity indicator:
             this.setState({fetching:false});
             var request = snapshot.val();
             if(
@@ -67,10 +68,12 @@ class TaskScreen extends Component {
                 this.setState({myTasks:[request].concat(this.state.myTasks)});
         });
 
+        // If a service request object is removed from the realtime database:
         ref.on('child_removed', (snapshot) => {
             this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
         });
 
+        // If an existing service request object is changed in the realtime database:
         ref.on('child_changed', (snapshot) => {
             var request = snapshot.val();
             if(
@@ -82,11 +85,12 @@ class TaskScreen extends Component {
             this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
         });
 
-
+        // If there is a change noted in the services the user offers:
         firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
             this.setState({myServices: snapshot.val() || []});
             let myTaskss = this.state.myTasks;
             let toRemove = [];
+            // Filter the currently shown service requests to adjust to the user's new choices:
             myTaskss.map(request =>
             {
                 if(
@@ -100,42 +104,6 @@ class TaskScreen extends Component {
             this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
         })
 
-        /*console.log("Currently loaded:", this.state.myTasks);
-        const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid) {
-            if(!selective) this.setState({fetching: true})
-            getMyTasks(uid).then(myTasks => {
-                if(!selective) this.setState({myTasks, fetching: false})
-                else
-                {
-                    var toAdd = [];
-                    myTasks.map(myTask =>
-                    {
-                        var curId = myTask.id;
-                        var already_present = false;
-                        this.state.myTasks.map(stateTask =>
-                        {
-                            if(stateTask.id == curId) already_present = true;
-                        });
-                        if(!already_present) toAdd.push(myTask);
-                    });
-                    var toRemove = [];
-                    this.state.myTasks.map(stateTask =>
-                    {
-                        var shouldRemove = true;
-                        myTasks.map(myTask =>
-                        {
-                            if(stateTask.id == myTask.id) shouldRemove = false;
-                        });
-                        if(shouldRemove) toRemove.push(stateTask.id);
-                    });
-
-                    let loadedTasks = [...this.state.myTasks];
-                    let filteredTasks = loadedTasks.filter(item => !_.includes(toRemove, item.id));
-                    this.setState({myTasks:filteredTasks.concat(toAdd)});
-                }
-            })
-        }*/
     }
 
 
@@ -147,7 +115,8 @@ class TaskScreen extends Component {
         this.setState({myTasks:filteredTasks})
     }
 
-    // Reject a task
+    // Filter the currently shown service requests to adjust to the user's new choices:
+    // It hides the service request corresponding to the ID and appends the ID to user's list of rejected tasks.
     rejectTask = (id) =>
     {
         this.hideTask(id);
@@ -155,6 +124,9 @@ class TaskScreen extends Component {
         if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
     }
 
+    // This function takes service request ID as parameter.
+    // It first checks whether the service request is still up to be accepted.
+    // If yes, it assigns it to the user and navigates him/her to the DashboardDetails screen.
     acceptTask = (item) =>
     {
         const {currentUser: {uid} = {}} = firebase.auth()
