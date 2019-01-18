@@ -33,7 +33,7 @@ class AddDetails extends Component {
         }
         else if(!(/^\d{10}$/.test(mobile)))
         {
-            alert('Please fill in a valid mobile number.');
+            alert('Please fill in a valid 10-digit Indian mobile number.');
             return;
         }
         else

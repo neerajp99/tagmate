@@ -69,6 +69,18 @@ export const adourStyle = StyleSheet.create({
     backgroundColor: 'rgba(54, 105, 169, 0.5)',
     color: 'rgba(255, 255, 255, 0.9)'
   },
+  picker: {
+    fontFamily:'OpenSans-Semibold',
+    paddingLeft: 25,
+    backgroundColor: 'rgba(54, 105, 169, 0.5)',
+    color: 'rgba(255, 255, 255, 0.9)'
+  },
+  pickerContainer: {
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: BRAND_COLOR_ONE,
+    overflow: 'hidden'
+  },
   onboardingSubtitle: {
     fontFamily:'OpenSans-Semibold',
     color: 'white',

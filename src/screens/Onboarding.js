@@ -16,9 +16,6 @@ class Onboarding extends Component{
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}
-        <View style={styles.headerContainer}>
-        <Text style={styles.subtitleText}>What can you offer?</Text>
-        </View>
         <AddDetails onboarding={this.props.navigation} userId={uid} />
       </View>
     )

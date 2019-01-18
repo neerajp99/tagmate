@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput, Dimensions} from 'react-native';
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions} from 'react-native';
 import firebase from 'react-native-firebase'
 import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
@@ -12,7 +12,7 @@ class RequestDetails extends Component{
         super(props);
         this.state = {
             disabledBtn:false,
-            when:'',
+            when:'ASAP', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
         }
     }
@@ -35,7 +35,8 @@ class RequestDetails extends Component{
             });
                 else
                 {
-                    return this.erred('Sorry, you have as many ongoing requests as your Adour coin balance.');
+                    return this.erred('Sorry, you do not have enough Adour coins. Contact customer support for help.');
+                    // user has as many ongoing requests as their Adour coin balance.
                 }
             });
         }
@@ -51,6 +52,11 @@ class RequestDetails extends Component{
     return(
       	<View style={styles.backgroundContainer}>
 	        <Card title={title} titleStyle={adourStyle.cardTitle} >
+          <View style={styles.cardSubtitle}>
+          <Text style={adourStyle.cardSubtitle}>You are about to request a task. We will notify you once someone accepts your request. Please provide additional details if you need to. </Text>
+          </View>
+
+          {/* DISABLED FOR LATER. DO NOT REMOVE
               <TextInput
                 style={adourStyle.textInput}
                 autoCapitalize="none"
@@ -60,6 +66,7 @@ class RequestDetails extends Component{
                 underlineColorAndroid='transparent'
                 onChangeText={when => this.setState({ when: when })}
               />
+            */}
               <TextInput
                 style={adourStyle.textInput}
                 autoCapitalize="none"
