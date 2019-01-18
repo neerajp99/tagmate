@@ -195,11 +195,9 @@ class TaskScreen extends Component {
               <ListItem
               title={serviceTitle}
               titleStyle={adourStyle.listItemText}
-              subtitle={ "Needed by: "+(when) }
-              subtitleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              rightTitle={['Created ', <TimeAgo key={id} time={created_at} />]}
+              rightTitle={<TimeAgo key={id} time={created_at} />}
               subtitleNumberOfLines={2}
             />
             {
@@ -211,6 +209,9 @@ class TaskScreen extends Component {
                   subtitleNumberOfLines={2}
                 />
             }
+            {/* HIDING WHEN TEXT BY DISABLING THE FOLLOWING CODE */}
+            {/* subtitle={ "Needed by: "+(when) }  subtitleStyle={adourStyle.listItemText} */}
+            {/*rightTitle={['Created ', <TimeAgo key={id} time={created_at} />]} */}
               <View>
               </View>
               <View style={styles.buttonsContainer}>
@@ -297,6 +298,7 @@ const styles = StyleSheet.create({
     buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
+    marginTop: 10,
     flex: 2
     },
     listContainer: {
