@@ -6,7 +6,7 @@ import {getAllRelatedTasks, getWhatsapp, getAllServices} from "../lib/firebaseUt
 import firebase from 'react-native-firebase';
 import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
-import adourStyle from './style/AdourStyle';
+import {adourStyle} from './style/AdourStyle';
 
 
 class DashboardScreen extends Component {

@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import bgImage from '../../img/background.jpg'
 import logo from '../../img/logo.png'
-import adourStyle from '../style/AdourStyle'
+import {adourStyle} from '../style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -170,7 +170,9 @@ class Login extends Component {
 
 
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
-
+        <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
+          Onboarding screen (Debug)
+        </Text>
       </View>
       </ImageBackground>
     )
@@ -198,7 +200,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     height: 47,
-    width: 150
+    width: 150,
+    marginBottom: 8
   },
   inputIcon: {
     position: 'absolute',

@@ -6,7 +6,7 @@ import connect from "react-redux/es/connect/connect";
 import {fetchAllServices, setDeviceToken, submitUserServices} from "../actions";
 import bgImage from '../img/background.jpg'
 import logo from '../img/logo.png'
-import adourStyle from './style/AdourStyle'
+import {adourStyle} from './style/AdourStyle'
 import * as _ from 'lodash'
 
 class Loading extends Component {
@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     height: 47,
-    width: 150
+    width: 150,
+    marginBottom: 8
   },
 })

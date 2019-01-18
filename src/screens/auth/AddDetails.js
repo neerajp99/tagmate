@@ -23,7 +23,7 @@ class AddDetails extends Component {
 
     onButtonPress() {
         const {myServices, mobile} = this.state;
-        
+
         // Validating user inputs:
         if(_.isEmpty(myServices))
         {

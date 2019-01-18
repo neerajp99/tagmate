@@ -2,12 +2,13 @@ import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {serverExists, addServer, appendRejectedTask, getRelatedServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
-import { Button, ListItem } from 'react-native-elements';
+import { Button, ListItem, Card } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
+import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
 
 const { width: WIDTH } = Dimensions.get('window')
@@ -190,20 +191,24 @@ class TaskScreen extends Component {
         if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
           <View key={id}>
+          <Card>
               <ListItem
               title={serviceTitle}
+              titleStyle={adourStyle.listItemText}
               subtitle={ "Needed by: "+(when) }
+              subtitleStyle={adourStyle.listItemText}
               hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               rightTitle={['Created ', <TimeAgo key={id} time={created_at} />]}
               subtitleNumberOfLines={2}
-              containerStyle={{backgroundColor: '#fff'}}
             />
             {
                 detailsAvailable && <ListItem
                   subtitle={ "Description: "+details }
+                  subtitleStyle={adourStyle.listItemText}
                   hideChevron={true}
+                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                   subtitleNumberOfLines={2}
-                  containerStyle={{backgroundColor: '#fff'}}
                 />
             }
               <View>
@@ -221,6 +226,8 @@ class TaskScreen extends Component {
                 </View>
 
               </View>
+
+              </Card>
             </View>
         )
     }
@@ -271,26 +278,25 @@ const styles = StyleSheet.create({
     rowItem: {
         alignSelf: 'stretch',
         justifyContent: 'flex-end',
-        borderBottomColor: '#5d5d5d',
-        borderBottomWidth: 1,
         paddingHorizontal: 15,
         paddingVertical: 10
     },btnAccept:{
-        width: WIDTH /2,
+        width: ((WIDTH/2) - 35) ,
         height: 45,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#79ff4d'
+        backgroundColor: BRAND_COLOR_ONE
     },
     btnReject:{
-        width: WIDTH /2,
+        width: ((WIDTH/2) - 35),
         height: 45,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#ff9999'
+        backgroundColor: BRAND_COLOR_FOUR
     },
     buttonsContainer: {
     flexDirection: 'row',
+    justifyContent: 'center',
     flex: 2
     },
     listContainer: {

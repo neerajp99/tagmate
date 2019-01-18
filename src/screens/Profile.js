@@ -7,7 +7,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AddDetails from './auth/AddDetails';
 import {getCoins, listenForChange} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
-import adourStyle from './style/AdourStyle';
+import {adourStyle} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
 

@@ -6,7 +6,7 @@ import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import {canRequestMore} from '../lib/firebaseUtils.js';
-import adourStyle from './style/AdourStyle';
+import {adourStyle} from './style/AdourStyle';
 
 class RequestScreen extends Component {
     componentWillMount() {

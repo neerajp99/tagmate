@@ -6,7 +6,12 @@ import {StyleSheet} from 'react-native';
 
 //TODO: Separate Router related style to another file so that Hot Reloading starts working
 
-const adourStyle = StyleSheet.create({
+export const BRAND_COLOR_ONE = '#5C7AFF';
+export const BRAND_COLOR_TWO = '#4A8FE7';
+export const BRAND_COLOR_THREE = '#845BFF';
+export const BRAND_COLOR_FOUR = '#215596';
+
+export const adourStyle = StyleSheet.create({
   listItemText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200'
@@ -21,21 +26,27 @@ const adourStyle = StyleSheet.create({
     fontWeight:'200',
     fontSize: 24
   },
-  bottomTabLabelStyle: {
-    fontFamily:'OpenSans-Regular',
-    fontWeight:'200'
-  },
   buttonText: {
     fontFamily:'OpenSans-Regular'
   },
   logoSubtitle: {
     color: 'white',
-    fontSize: 15,
+    fontFamily:'OpenSans-Semibold',
+    fontSize: 16,
     fontWeight: '200',
     marginTop: 10,
     opacity: 0.8
+  },
+  onboardingSubtitle: {
+    fontFamily:'OpenSans-Semibold',
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '200'
+  },
+  onboardingTitle: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    fontSize: 35
   }
 
 })
-
-export default adourStyle;
