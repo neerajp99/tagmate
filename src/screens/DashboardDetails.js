@@ -7,7 +7,6 @@ import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
 import {getAllServices, getWhatsapp} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
-import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
 
 class DashboardDetails extends Component {
@@ -15,7 +14,7 @@ class DashboardDetails extends Component {
     super(props);
     this.state = {
       disabledDone:false, // "Mark as Done" is not disabled
-      fetching:true,
+      fetching:true, 
       item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
       whatsappAvailable:false, // Whatsapp number is not yet loaded
@@ -32,9 +31,8 @@ class DashboardDetails extends Component {
   }
 
   liveUpdates = () => {
-
+  
     const {currentUser: {uid} = {}} = firebase.auth()
-
     // Listen for changes in service request {this.state.item.id}
     firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
@@ -68,7 +66,7 @@ class DashboardDetails extends Component {
         });
       }
     }.bind(this));
-
+  
   }
 
   // Expects a valid mobile number in this.state.item.whatsapp
@@ -79,6 +77,8 @@ class DashboardDetails extends Component {
     Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+this.state.item.whatsapp)
   }
 
+  // Expects {id} parameter to be a valid service request ID
+  // Changes service request's status to 2 (Complete) in Firebase realtime database
   markDone = (id) => {
     if(this.state.disabledDone == true) return;
     else // Only if the button is not disabled:
@@ -115,84 +115,64 @@ class DashboardDetails extends Component {
     }
     return (
       <View style={styles.mainContainer}>
-      <Card title={item.serviceTitle} titleStyle={adourStyle.cardTitle}>
+      <Card title={item.serviceTitle} titleStyle={styles.cardTitleStyle}>
           {/* Task Status */ }
           <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>{statusStr}</Text>
+          <Text style={styles.cardSubtitleText}>{statusStr}</Text>
           </View>
 
         <Divider />
           {/* Task Timing and details */ }
-          {/* DISABLED WHEN TEMPORARILY
           <ListItem
               title={item.when}
-              titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
             />
-          */}
           {
             item.details != "" &&
                 <ListItem
                     title={item.details}
-                    titleStyle={adourStyle.listItemText}
                     hideChevron={true}
                     containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                     leftIcon={{ name: 'info-outline'}}
                   />
           }
 
-          {/* Timestamp */ }
-          <View style={styles.subContent}>
-          <ListItem
-              title={<TimeAgo time={item.created_at} />}
-              titleStyle={adourStyle.listItemText}
-              hideChevron={true}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              leftIcon={{ name: 'access-time'}}
-            />
-          </View>
 
             {/* Contact Number */ }
           <View style={styles.subContent}>
           <ListItem
               title={item.whatsapp}
-              titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'contact-phone'}}
             />
           </View>
-
+            {/* Timestamp */ }
+          <View style={styles.subContent}>
+          <ListItem
+              title={<TimeAgo time={item.created_at} />}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              leftIcon={{ name: 'access-time'}}
+            />
+          </View>
             {/* Whatsapp Chat button */ }
           <View style={styles.subContent}>
           {
             <Button
               icon={{name: 'chat'}}
+              backgroundColor='#21c627'
               disabled={!this.state.whatsappAvailable}
               onPress={()=>{this.loadWhatsapp()}}
-              buttonStyle={adourStyle.btnGeneral}
-              textStyle={adourStyle.btnText}
               title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
           }
           {
-            item.isClient && item.status == 1 &&
-                  <Button onPress={()=>this.markDone(item.id)}
-                      buttonStyle={adourStyle.btnGeneral}
-                      textStyle={adourStyle.btnText}
-                      disabled={this.state.disabledDone}
-                      title="Mark as Done"
-                  />
+            item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} disabled={this.state.disabledDone} title="Mark as Done" />
           }
           {
-           item.status < 2 &&
-                <Button
-                    onPress={()=>this.markCancelled(item)}
-                    buttonStyle={adourStyle.btnCancel}
-                    textStyle={adourStyle.btnText}
-                    title="Cancel Request"
-                />
+           item.status < 2 && <Button onPress={()=>this.markCancelled(item)} title="Cancel Request" />
           }
           </View>
         </Card>
@@ -214,6 +194,11 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    cardTitleStyle: {
+      fontSize:20,
+      marginLeft: 18,
+      textAlign:'left',
     },
     subContent: {
       marginTop: 2,
