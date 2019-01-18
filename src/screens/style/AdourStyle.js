@@ -14,11 +14,21 @@ export const BRAND_COLOR_THREE = '#845BFF';
 //Dark Blue
 export const BRAND_COLOR_FOUR = '#215596';
 
+//Cyan
+export const BRAND_COLOR_FIVE = '#73FBD3'
+
 //const { width: WIDTH } = Dimensions.get('window');
 
 export const adourStyle = StyleSheet.create({
   listItemText: {
     fontFamily:'OpenSans-Regular',
+    fontWeight:'200'
+  },
+  defaultText: {
+    fontFamily:'OpenSans-Regular',
+    marginLeft: 12,
+    marginBottom: 10,
+    marginTop: 10,
     fontWeight:'200'
   },
   titleText: {
@@ -49,14 +59,14 @@ export const adourStyle = StyleSheet.create({
   },
   textInput: {
     height: 45,
-    width: 300,
+    width: 295,
     borderRadius: 25,
     marginLeft: 15,
     marginBottom: 15,
     fontSize: 16,
     fontFamily:'OpenSans-Semibold',
     paddingLeft: 25,
-    backgroundColor: BRAND_COLOR_FOUR,
+    backgroundColor: 'rgba(54, 105, 169, 0.5)',
     color: 'rgba(255, 255, 255, 0.9)'
   },
   onboardingSubtitle: {
@@ -96,5 +106,12 @@ export const adourStyle = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
+  btnText: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    color: 'rgba(255, 255, 255, 1)',
+    fontSize: 16,
+    textAlign: 'center'
+  }
 
 })

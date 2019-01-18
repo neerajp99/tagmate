@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator} from 'react-native';
 import firebase from 'react-native-firebase';
 import AddDetails from './auth/AddDetails';
+import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -18,9 +19,6 @@ class EditProfileDetails extends Component{
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}
-        <View style={styles.headerContainer}>
-        <Text style={styles.subtitleText}>What can you offer?</Text>
-        </View>
         <AddDetails userId={uid} />
       </View>
     )

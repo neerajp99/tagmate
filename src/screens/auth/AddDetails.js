@@ -2,11 +2,12 @@
 import React, {Component} from 'react';
 import firebase from 'react-native-firebase';
 import {StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native';
-import {CheckBox} from 'react-native-elements';
+import {CheckBox, Card, Divider} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {submitUserUpdates} from '../../actions';
 import {getMyServices, getWhatsapp} from '../../lib/firebaseUtils';
 import * as _ from 'lodash'
+import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from '../style/AdourStyle'
 
 class AddDetails extends Component {
     state = {myServices: [],};
@@ -49,6 +50,9 @@ class AddDetails extends Component {
                 <CheckBox
                     key={service.id}
                     title={service.description}
+                    textStyle={adourStyle.listItemText}
+                    checkedIcon='check'
+                    checkedColor={BRAND_COLOR_ONE}
                     checked={_.includes(myServices, service.id)}
                     onPress={() => this.onItemPressed(service.id)}
                 />
@@ -59,7 +63,7 @@ class AddDetails extends Component {
     renderWhatsapp = () => {
         return (
                 <TextInput
-                  style={styles.textInput}
+                  style={adourStyle.textInput}
                   autoCapitalize="none"
                   onChangeText={mobile => this.setState({ mobile: mobile })}
                   value={this.state.mobile}
@@ -85,15 +89,17 @@ class AddDetails extends Component {
     render() {
         const {services} = this.props
         return (
-            <View>
+            <Card>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
-                <Text>What's your Whatsapp number?</Text>
+                <Text style={adourStyle.defaultText}>Your 10-digit Indian Mobile Number</Text>
                 {this.renderWhatsapp()}
+                <Divider />
+                <Text style={adourStyle.defaultText}>What can you offer?</Text>
                 {this.renderServices()}
-                <TouchableOpacity style={styles.btn} onPress={this.onButtonPress.bind(this)}>
-                  <Text style={styles.btnText}>Save Preferences</Text>
+                <TouchableOpacity style={adourStyle.btnGeneral} onPress={this.onButtonPress.bind(this)}>
+                  <Text style={adourStyle.btnText}>Save Preferences</Text>
                 </TouchableOpacity>
-            </View>
+            </Card>
         )
     }
 }
@@ -117,11 +123,6 @@ const styles = StyleSheet.create({
       backgroundColor: 'darkgrey',
       justifyContent: 'center',
       marginTop: 20
-    },
-    btnText: {
-      color: 'rgba(255, 255, 255, 1)',
-      fontSize: 16,
-      textAlign: 'center'
     }
 })
 

@@ -12,7 +12,8 @@ export const routerStyle = StyleSheet.create({
   headerText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200',
-    fontSize: 24
+    fontSize: 24,
+    paddingLeft: 15
   },
   bottomTabLabelStyle: {
     fontFamily:'OpenSans-Regular',

@@ -160,13 +160,26 @@ class DashboardDetails extends Component {
               disabled={!this.state.whatsappAvailable}
               onPress={()=>{this.loadWhatsapp()}}
               buttonStyle={adourStyle.btnGeneral}
+              textStyle={adourStyle.btnText}
               title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
           }
           {
-            item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledDone} title="Mark as Done" />
+            item.isClient && item.status == 1 &&
+                  <Button onPress={()=>this.markDone(item.id)}
+                      buttonStyle={adourStyle.btnGeneral}
+                      textStyle={adourStyle.btnText}
+                      disabled={this.state.disabledDone}
+                      title="Mark as Done"
+                  />
           }
           {
-           item.status < 2 && <Button onPress={()=>this.markCancelled(item)} buttonStyle={adourStyle.btnCancel} title="Cancel Request" />
+           item.status < 2 &&
+                <Button
+                    onPress={()=>this.markCancelled(item)}
+                    buttonStyle={adourStyle.btnCancel}
+                    textStyle={adourStyle.btnText}
+                    title="Cancel Request"
+                />
           }
           </View>
         </Card>
