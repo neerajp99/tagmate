@@ -174,7 +174,7 @@ class TaskScreen extends Component {
             />
             {
                 detailsAvailable && <ListItem
-                  subtitle={ details }
+                  subtitle={ "Description: "+details }
                   subtitleStyle={adourStyle.listItemText}
                   hideChevron={true}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}

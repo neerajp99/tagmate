@@ -98,11 +98,11 @@ export const DashboardStack = createStackNavigator(
 // Bottom Tab Navigator connecting all the above navigators as siblings:
 export const MainTabNav = createBottomTabNavigator(
   {
-    Dashboard: {
-      screen: DashboardStack,
+    Profile: {
+      screen: ProfileStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='chat-bubble' size={horizontal ? 20 : 25} color={tintColor} />
+          <Icon name='account-circle' size={horizontal ? 20 : 25} color={tintColor} />
         ),
       },
     },
@@ -122,11 +122,11 @@ export const MainTabNav = createBottomTabNavigator(
         ),
       },
     },
-    Profile: {
-      screen: ProfileStack,
+    Dashboard: {
+      screen: DashboardStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='account-circle' size={horizontal ? 20 : 25} color={tintColor} />
+          <Icon name='chat-bubble' size={horizontal ? 20 : 25} color={tintColor} />
         ),
       },
     }

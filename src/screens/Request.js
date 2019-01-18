@@ -39,7 +39,7 @@ class RequestScreen extends Component {
                         services.map((item, i) => (
                             <ListItem
                                 key={i}
-                                title={item.description}
+                                title={item.title}
                                 titleStyle={adourStyle.listItemText}
                                 leftIcon={{name: item.icon}}
                                 onPress={() => this.onItemPress(item)}
