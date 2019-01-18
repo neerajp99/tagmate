@@ -155,19 +155,22 @@ class DashboardDetails extends Component {
           </View>
 
             {/* Contact Number */ }
-          <View style={styles.subContent}>
-          <ListItem
-              title={item.whatsapp}
-              titleStyle={adourStyle.listItemText}
-              hideChevron={true}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              leftIcon={{ name: 'contact-phone'}}
-            />
-          </View>
-
+          {
+            item.status != 0 &&
+            <View style={styles.subContent}>
+            <ListItem
+                title={item.whatsapp}
+                titleStyle={adourStyle.listItemText}
+                hideChevron={true}
+                containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                leftIcon={{ name: 'contact-phone'}}
+              />
+            </View>
+          }
             {/* Whatsapp Chat button */ }
           <View style={styles.subContent}>
           {
+            item.status != 0 &&
             <Button
               icon={{name: 'chat'}}
               disabled={!this.state.whatsappAvailable}

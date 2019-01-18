@@ -7,7 +7,7 @@ import firebase from 'react-native-firebase';
 import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
-
+import TimeAgo from 'react-native-timeago';
 
 class DashboardScreen extends Component {
     constructor(props) {
@@ -98,7 +98,7 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, when, details} = item;
+        const{serviceId, id, created_at, details} = item;
         const {services} = this.state
         var serviceTitle = '---';
         console.log(services);
@@ -127,7 +127,7 @@ class DashboardScreen extends Component {
                     titleStyle={adourStyle.listItemText}
                     subtitle={statusStr}
                     subtitleStyle={adourStyle.listItemText}
-                    rightTitle={when}
+                    rightTitle={<TimeAgo time={created_at} />}
                     rightTitleStyle={adourStyle.listItemText}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
