@@ -123,6 +123,7 @@ class DashboardDetails extends Component {
 
         <Divider />
           {/* Task Timing and details */ }
+          {/* DISABLED WHEN TEMPORARILY
           <ListItem
               title={item.when}
               titleStyle={adourStyle.listItemText}
@@ -130,6 +131,7 @@ class DashboardDetails extends Component {
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
             />
+          */}
           {
             item.details != "" &&
                 <ListItem
@@ -141,6 +143,16 @@ class DashboardDetails extends Component {
                   />
           }
 
+          {/* Timestamp */ }
+          <View style={styles.subContent}>
+          <ListItem
+              title={<TimeAgo time={item.created_at} />}
+              titleStyle={adourStyle.listItemText}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              leftIcon={{ name: 'access-time'}}
+            />
+          </View>
 
             {/* Contact Number */ }
           <View style={styles.subContent}>
@@ -152,16 +164,7 @@ class DashboardDetails extends Component {
               leftIcon={{ name: 'contact-phone'}}
             />
           </View>
-            {/* Timestamp */ }
-          <View style={styles.subContent}>
-          <ListItem
-              title={<TimeAgo time={item.created_at} />}
-              titleStyle={adourStyle.listItemText}
-              hideChevron={true}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              leftIcon={{ name: 'access-time'}}
-            />
-          </View>
+
             {/* Whatsapp Chat button */ }
           <View style={styles.subContent}>
           {
