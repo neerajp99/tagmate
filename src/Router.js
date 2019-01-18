@@ -5,7 +5,7 @@ import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, cr
 import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
-import routerStyle from './screens/style/RouterStyle';
+import {routerStyle, BRAND_COLOR_TWO} from './screens/style/RouterStyle';
 
 
 // Stack Navigator for Profile and Edit Profile screens:
@@ -141,7 +141,7 @@ export const MainTabNav = createBottomTabNavigator(
 
     },
     tabBarOptions: {
-      activeTintColor: '#4a8fe7',
+      activeTintColor: BRAND_COLOR_TWO,
       inactiveTintColor: 'gray',
       labelStyle: routerStyle.bottomTabLabelStyle
     },

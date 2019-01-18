@@ -7,6 +7,7 @@ import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
 import {getAllServices, getWhatsapp} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
+import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
 
 class DashboardDetails extends Component {
@@ -31,9 +32,9 @@ class DashboardDetails extends Component {
   }
 
   liveUpdates = () => {
-  
+
     const {currentUser: {uid} = {}} = firebase.auth()
-    
+
     firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
       var item = snapshot.val();
@@ -61,7 +62,7 @@ class DashboardDetails extends Component {
         });
       }
     }.bind(this));
-  
+
   }
 
   loadWhatsapp = () =>
@@ -104,16 +105,17 @@ class DashboardDetails extends Component {
     }
     return (
       <View style={styles.mainContainer}>
-      <Card title={item.serviceTitle} titleStyle={styles.cardTitleStyle}>
+      <Card title={item.serviceTitle} titleStyle={adourStyle.cardTitle}>
           {/* Task Status */ }
           <View style={styles.cardSubtitle}>
-          <Text style={styles.cardSubtitleText}>{statusStr}</Text>
+          <Text style={adourStyle.cardSubtitle}>{statusStr}</Text>
           </View>
 
         <Divider />
           {/* Task Timing and details */ }
           <ListItem
               title={item.when}
+              titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
@@ -122,6 +124,7 @@ class DashboardDetails extends Component {
             item.details != "" &&
                 <ListItem
                     title={item.details}
+                    titleStyle={adourStyle.listItemText}
                     hideChevron={true}
                     containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                     leftIcon={{ name: 'info-outline'}}
@@ -133,6 +136,7 @@ class DashboardDetails extends Component {
           <View style={styles.subContent}>
           <ListItem
               title={item.whatsapp}
+              titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'contact-phone'}}
@@ -142,6 +146,7 @@ class DashboardDetails extends Component {
           <View style={styles.subContent}>
           <ListItem
               title={<TimeAgo time={item.created_at} />}
+              titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
@@ -152,16 +157,16 @@ class DashboardDetails extends Component {
           {
             <Button
               icon={{name: 'chat'}}
-              backgroundColor='#21c627'
               disabled={!this.state.whatsappAvailable}
               onPress={()=>{this.loadWhatsapp()}}
+              buttonStyle={adourStyle.btnGeneral}
               title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
           }
           {
-            item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} disabled={this.state.disabledDone} title="Mark as Done" />
+            item.isClient && item.status == 1 && <Button onPress={()=>this.markDone(item.id)} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledDone} title="Mark as Done" />
           }
           {
-           item.status < 2 && <Button onPress={()=>this.markCancelled(item)} title="Cancel Request" />
+           item.status < 2 && <Button onPress={()=>this.markCancelled(item)} buttonStyle={adourStyle.btnCancel} title="Cancel Request" />
           }
           </View>
         </Card>
@@ -183,11 +188,6 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    cardTitleStyle: {
-      fontSize:20,
-      marginLeft: 18,
-      textAlign:'left',
     },
     subContent: {
       marginTop: 2,

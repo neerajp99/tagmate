@@ -8,7 +8,7 @@ import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
-import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_FOUR} from './style/AdourStyle';
+import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
 
 const { width: WIDTH } = Dimensions.get('window')
@@ -244,7 +244,7 @@ class TaskScreen extends Component {
                 />
                 {
                     fetching && <View style={styles.progressContainer}>
-                        <ActivityIndicator color={'black'} size={'large'}/>
+                        <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
                     </View>
                 }
             </View>

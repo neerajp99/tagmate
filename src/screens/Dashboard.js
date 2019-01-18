@@ -6,7 +6,7 @@ import {getAllRelatedTasks, getWhatsapp, getAllServices} from "../lib/firebaseUt
 import firebase from 'react-native-firebase';
 import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
-import {adourStyle} from './style/AdourStyle';
+import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 
 
 class DashboardScreen extends Component {
@@ -163,7 +163,7 @@ class DashboardScreen extends Component {
               }
               {
                   fetching && <View style={styles.progressContainer}>
-                      <ActivityIndicator color={'black'} size={'large'}/>
+                      <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
                   </View>
               }
           </View>

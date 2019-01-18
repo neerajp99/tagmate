@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput} from 'react-native';
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Dimensions} from 'react-native';
 import firebase from 'react-native-firebase'
 import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
+import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
+
+const { width: WIDTH } = Dimensions.get('window');
 
 class RequestDetails extends Component{
   	constructor(props) {
@@ -47,19 +50,26 @@ class RequestDetails extends Component{
   	const { title } = this.props.navigation.state.params.item;
     return(
       	<View style={styles.backgroundContainer}>
-	        <Card title='Request Service'>
-	            <Text style={styles.requestTitle}>{title}</Text>
-	            <Text>When?</Text>
-	            <TextInput
-	            placeholder="Required"
-	            style={styles.textInput}
-	            onChangeText={when => this.setState({ when: when })} />
-	            <Text>Details?</Text>
-	            <TextInput
-	            placeholder="Optional"
-	            style={styles.textInput}
-	            onChangeText={details => this.setState({ details: details })} />
-	            <Button title="Request"  disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
+	        <Card title={title} titleStyle={adourStyle.cardTitle} >
+              <TextInput
+                style={adourStyle.textInput}
+                autoCapitalize="none"
+                placeholder="When do you want it? (Required)"
+                placeholderStyle={adourStyle.placeholderStyle}
+                placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
+                underlineColorAndroid='transparent'
+                onChangeText={when => this.setState({ when: when })}
+              />
+              <TextInput
+                style={adourStyle.textInput}
+                autoCapitalize="none"
+                placeholder="Additional Details (Optional)"
+                placeholderStyle={adourStyle.placeholderStyle}
+                placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
+                underlineColorAndroid='transparent'
+                onChangeText={details => this.setState({ details: details })}
+              />
+	            <Button title="Request" buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
     )
@@ -94,11 +104,8 @@ const styles = StyleSheet.create({
     requestTitle: {
         fontWeight: 'bold',
     },
-    textInput: {
-        height: 40,
-        width: '90%',
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 8,
+    cardSubtitle: {
+      marginBottom: 16,
+      marginLeft: 18
     },
 })
