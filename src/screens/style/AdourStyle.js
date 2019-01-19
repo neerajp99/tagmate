@@ -17,7 +17,7 @@ export const BRAND_COLOR_FOUR = '#215596';
 //Cyan
 export const BRAND_COLOR_FIVE = '#73FBD3'
 
-//const { width: WIDTH } = Dimensions.get('window');
+const { width: WIDTH } = Dimensions.get('window');
 
 export const adourStyle = StyleSheet.create({
   listItemText: {
@@ -36,6 +36,13 @@ export const adourStyle = StyleSheet.create({
     fontWeight:'200',
     fontSize: 28
   },
+  guideText: {
+    fontFamily:'OpenSans-Semibold',
+    fontWeight:'200',
+    fontSize: 22,
+    color: '#999999',
+    marginBottom: 10
+  },
   headerText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200',
@@ -43,6 +50,9 @@ export const adourStyle = StyleSheet.create({
   },
   buttonText: {
     fontFamily:'OpenSans-Regular'
+  },
+  buttonTextBold: {
+    fontFamily:'OpenSans-Semibold',
   },
   logoSubtitle: {
     color: 'white',
@@ -55,19 +65,20 @@ export const adourStyle = StyleSheet.create({
   placeholderStyle: {
     fontFamily:'OpenSans-Semibold',
     fontSize: 16,
-    fontWeight: '200'
+    fontWeight: '200',
+    color: 'rgba(0, 0, 0, 0.35)'
   },
   textInput: {
     height: 45,
-    width: 295,
+    width: WIDTH -120,
     borderRadius: 25,
     marginLeft: 15,
     marginBottom: 15,
     fontSize: 16,
     fontFamily:'OpenSans-Semibold',
     paddingLeft: 25,
-    backgroundColor: 'rgba(54, 105, 169, 0.5)',
-    color: 'rgba(255, 255, 255, 0.9)'
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    color: 'rgba(0, 0, 0, 0.35)'
   },
   picker: {
     fontFamily:'OpenSans-Semibold',

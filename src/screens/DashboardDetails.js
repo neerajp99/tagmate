@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, View, ActivityIndicator, StyleSheet, Linking} from 'react-native';
+import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert} from 'react-native';
 import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -90,6 +90,16 @@ class DashboardDetails extends Component {
     }
   }
 
+  confirmCancel = (item) => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to cancel this task? Frequent cancellations may affect your Adour reputation.',
+      [
+        {text: 'No', onPress: () => console.log('Cancellation Revoked')},
+        {text: 'Yes', onPress: () => this.markCancelled(item)}
+      ]
+    );
+  }
   // Expects {item} parameter to be an object with two valid properties: id (of service request) and isClient
   // Changes service request's status to cancelled in Firebase realtime database
   markCancelled = (item) => {
@@ -193,10 +203,10 @@ class DashboardDetails extends Component {
           {
            item.status < 2 &&
                 <Button
-                    onPress={()=>this.markCancelled(item)}
+                    onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     textStyle={adourStyle.btnText}
-                    title="Cancel Request"
+                    title="Cancel"
                 />
           }
           </View>

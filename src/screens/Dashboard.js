@@ -94,6 +94,31 @@ class DashboardScreen extends Component {
       this.props.navigation.navigate('DashboardDetails',{taskId: item.id})
     }
 
+    userGuideContainer = (active) =>
+    {
+      if(active){
+          if(this.state.accepted.length == 0) {
+            //Get Display Name
+            const {currentUser: {displayName} = {}} = firebase.auth();
+            return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
+                      <Text style={adourStyle.guideText}>
+                      Hello {displayName} {"\n"}It's lonely in here! {"\n"} {"\n"}You have haven't accepted any tasks yet. Start doing something for others and earn Adour coins!
+                      </Text>
+                      <Button title="Help someone out" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Tasks')}}/>
+                    </View>
+          }
+      } else {
+        if(this.state.requested.length == 0) {
+          return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
+                    <Text style={adourStyle.guideText}>
+                    It's pitch white in here! {"\n"} {"\n"}You have haven't requested anything yet. Start your Adour journey by requesting a task. {"\n"}{"\n"}Remember to Mark As Done when your request is completed.
+                    </Text>
+                    <Button title="Request A Task" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Request')}}/>
+                  </View>
+        }
+      }
+    }
+
     /*
     * render an item of the list
     * */
@@ -152,6 +177,7 @@ class DashboardScreen extends Component {
                   containerStyle={{height: 45}}
                 />
             </View>
+              {!fetching && this.userGuideContainer(active)}
 
               {
                 !fetching &&  <FlatList
@@ -161,6 +187,7 @@ class DashboardScreen extends Component {
                     keyExtractor={(item, index) => item.id}
                 />
               }
+
               {
                   fetching && <View style={styles.progressContainer}>
                       <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
