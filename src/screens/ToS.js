@@ -5,10 +5,12 @@ class ToS extends Component{
 
     render() {
       return (
+        <View style={{ flex: 1 }}>
           <WebView
-        source={{uri: 'http://getadour.com/app/tos.html'}}
-        style={{marginTop: 20}}
-      />
+              source={{uri: 'http://getadour.com/app/tos.html'}}
+              style={{ flex: 1 }}
+          />
+        </View>
       )
     }
 
