@@ -90,36 +90,55 @@ class ProfileScreen extends Component{
             subtitleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'coins', type:'material-community' }}
             hideChevron={true}
-            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
           />
         </Card>
 
 
-        <Card>
+        <Card title="Account" titleStyle={adourStyle.cardTitleSmall}>
           <ListItem
             title='Edit Details'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'mode-edit' }}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={() => this.props.navigation.navigate('EditProfileDetails')}
           />
           <ListItem
             title='Invite A Friend'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'person-add' }}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={()=>{this.loadWhatsapp()}}
           />
           <ListItem
             title='Support'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'help-outline' }}
-            onPress={() => alert('WIP')}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
+            onPress={() => this.props.navigation.navigate('SupportScreen')}
           />
+
+          </Card>
+
+          <Card title="Legal" titleStyle={adourStyle.cardTitleSmall}>
           <ListItem
             title='Privacy Policy'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'mode-edit' }}
-            onPress={() => alert('WIP')}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
+            onPress={() => this.props.navigation.navigate('PrivacyPolicyScreen')}
           />
+          <ListItem
+            title='Terms of Service'
+            titleStyle={adourStyle.listItemText}
+            leftIcon={{ name: 'mode-edit' }}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
+            onPress={() => this.props.navigation.navigate('ToS')}
+          />
+
+          </Card>
+
+          <Card>
           <ListItem
             title='Logout'
             titleStyle={adourStyle.listItemText}

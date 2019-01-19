@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import {routerStyle, BRAND_COLOR_TWO} from './screens/style/RouterStyle';
@@ -28,7 +28,34 @@ export const ProfileStack = createStackNavigator(
           headerTitleStyle: routerStyle.headerText
         }
       }
-    }
+    },
+    SupportScreen: {
+      screen: SupportScreen,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Support',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    PrivacyPolicyScreen: {
+      screen: PrivacyPolicyScreen,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Privacy Policy',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    ToS: {
+      screen: ToS,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Terms of Service',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
   }
 )
 

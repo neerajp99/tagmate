@@ -121,6 +121,13 @@ export const adourStyle = StyleSheet.create({
     marginLeft: 18,
     textAlign:'left',
   },
+  cardTitleSmall: {
+    fontFamily:'OpenSans-Semibold',
+    fontWeight:'200',
+    fontSize:16,
+    marginLeft: 18,
+    textAlign:'left',
+  },
   cardSubtitle: {
     fontFamily:'OpenSans-Regular',
     fontSize: 16,
