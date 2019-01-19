@@ -143,6 +143,7 @@ class ProfileScreen extends Component{
             title='Logout'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'exit-to-app' }}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={async () => {
               try {
                 const isSignedIn = await GoogleSignin.isSignedIn();

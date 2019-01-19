@@ -102,7 +102,7 @@ class DashboardScreen extends Component {
             const {currentUser: {displayName} = {}} = firebase.auth();
             return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                       <Text style={adourStyle.guideText}>
-                      Hello {displayName} {"\n"}It's lonely in here! {"\n"} {"\n"}You have haven't accepted any tasks yet. Start doing something for others and earn Adour coins!
+                      Hello {displayName} {"\n"}It's lonely in here! {"\n"} {"\n"}You haven't accepted any tasks yet. Start doing something for others and earn Adour coins!
                       </Text>
                       <Button title="Help someone out" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Tasks')}}/>
                     </View>
