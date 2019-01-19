@@ -79,6 +79,8 @@ class DashboardDetails extends Component {
     Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request.&phone=+91'+this.state.item.whatsapp)
   }
 
+  // Expects {id} parameter to be a valid service request ID
+  // Changes service request's status to 2 (Complete) in Firebase realtime database
   markDone = (id) => {
     if(this.state.disabledDone == true) return;
     else // Only if the button is not disabled:
