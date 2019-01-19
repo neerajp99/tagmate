@@ -124,14 +124,14 @@ class ProfileScreen extends Component{
           <ListItem
             title='Privacy Policy'
             titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'mode-edit' }}
+            leftIcon={{ name: 'https' }}
             containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={() => this.props.navigation.navigate('PrivacyPolicyScreen')}
           />
           <ListItem
             title='Terms of Service'
             titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'mode-edit' }}
+            leftIcon={{ name: 'info-outline' }}
             containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={() => this.props.navigation.navigate('ToS')}
           />
