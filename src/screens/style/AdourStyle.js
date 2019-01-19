@@ -24,6 +24,17 @@ export const adourStyle = StyleSheet.create({
     fontFamily:'OpenSans-Regular',
     fontWeight:'200'
   },
+  listItemTextBold: {
+    fontFamily:'OpenSans-Semibold',
+    fontWeight:'200'
+  },
+  fadedText: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    color: '#bfbfbf',
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid'
+  },
   defaultText: {
     fontFamily:'OpenSans-Regular',
     marginLeft: 12,

@@ -149,7 +149,7 @@ class DashboardScreen extends Component {
             <View>
                 <ListItem
                     title={serviceTitle}
-                    titleStyle={adourStyle.listItemText}
+                    titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
                     subtitle={statusStr}
                     subtitleStyle={adourStyle.listItemText}
                     rightTitle={<TimeAgo time={created_at} />}
