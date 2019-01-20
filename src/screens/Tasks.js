@@ -26,7 +26,7 @@ class TaskScreen extends Component {
     }
 
     componentDidMount(){
-
+        this._isMounted = true;
         this.setState({fetching:true});
         const {currentUser: {uid} = {}} = firebase.auth()
         // Keep updating tasks
@@ -38,7 +38,10 @@ class TaskScreen extends Component {
             this.getMyTasks();
         });
     }
-
+    componentWillUnmount()
+    {
+        this._isMounted = false;
+    }
     /*
     * get all the task requests that this user can perform
     * */
@@ -48,7 +51,7 @@ class TaskScreen extends Component {
         // Load the service request IDs for the ones the user has rejected and push them to the state.
         firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
             var rejectId = snapshot.val();
-            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
+            if(this._isMounted) this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
             console.log('triggered',this.state.rejectedTasks);
         });
 
@@ -56,52 +59,62 @@ class TaskScreen extends Component {
 
         // When a service request object is added to the realtime database:
         ref.on('child_added', (snapshot) => {
-            // To hide activity indicator:
-            this.setState({fetching:false});
-            var request = snapshot.val();
-            if(
-                request.clientId != uid // This request is not made by same user.
-                && request.status == 0 // This request is still not taken by anyone
-                && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                )
-                this.setState({myTasks:[request].concat(this.state.myTasks)});
+            if(this._isMounted)
+            {
+                // To hide activity indicator:
+                this.setState({fetching:false});
+                var request = snapshot.val();
+                if(
+                    request.clientId != uid // This request is not made by same user.
+                    && request.status == 0 // This request is still not taken by anyone
+                    && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                    && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                    )
+                    this.setState({myTasks:[request].concat(this.state.myTasks)});   
+            }
+            
         });
 
         // If a service request object is removed from the realtime database:
         ref.on('child_removed', (snapshot) => {
-            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
+            if(this._isMounted)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
         });
 
         // If an existing service request object is changed in the realtime database:
         ref.on('child_changed', (snapshot) => {
-            var request = snapshot.val();
-            if(
-                request.clientId == uid // This request is not made by same user.
-                || request.status != 0 // This request is still not taken by anyone
-                || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                )
-            this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
-        });
-
-        // If there is a change noted in the services the user offers:
-        firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
-            this.setState({myServices: snapshot.val() || []});
-            let myTaskss = this.state.myTasks;
-            let toRemove = [];
-            // Filter the currently shown service requests to adjust to the user's new choices:
-            myTaskss.map(request =>
+            if(this._isMounted)
             {
+                var request = snapshot.val();
                 if(
                     request.clientId == uid // This request is not made by same user.
                     || request.status != 0 // This request is still not taken by anyone
                     || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
-                    toRemove.push(request.id);
-            });
-            this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
+                this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});   
+            }
+        });
+
+        // If there is a change noted in the services the user offers:
+        firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
+            if(this._isMounted)
+            {
+                this.setState({myServices: snapshot.val() || []});
+                let myTaskss = this.state.myTasks;
+                let toRemove = [];
+                // Filter the currently shown service requests to adjust to the user's new choices:
+                myTaskss.map(request =>
+                {
+                    if(
+                        request.clientId == uid // This request is not made by same user.
+                        || request.status != 0 // This request is still not taken by anyone
+                        || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                        || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                        )
+                        toRemove.push(request.id);
+                });
+                this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});   
+            }
         })
 
     }

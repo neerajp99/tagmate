@@ -25,6 +25,7 @@ class ProfileScreen extends Component{
   }
 
   componentDidMount(){
+    this._isMounted = true;
     //Fetching name and photo URL
     const {currentUser: {displayName, photoURL} = {}} = firebase.auth();
     this.setState({displayName, photoURL});
@@ -46,6 +47,10 @@ class ProfileScreen extends Component{
     });
   }
 
+  componentWillUnmount(){
+    this._isMounted = false;
+  }
+
   loadWhatsapp = () =>
   {
     // Triggering the app to open whatsapp with a preloaded message.
@@ -59,7 +64,7 @@ class ProfileScreen extends Component{
     const {currentUser: {uid} = {}} = firebase.auth()
     firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
     {
-      this.setState({coins: snapshot.val() || "0"});
+      if(this._isMounted) this.setState({coins: snapshot.val() || "0"});
     }.bind(this));
   }
 

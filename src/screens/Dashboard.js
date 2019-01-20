@@ -27,12 +27,17 @@ class DashboardScreen extends Component {
     }
 
     componentDidMount(){
+      this._isMounted = true;
       this.setState({fetching:true});
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});
         this.getAllRelatedTasks();
       });
+    }
+
+    componentWillUnmount(){
+      this._isMounted = false;
     }
 
     // Home to all the listeners for the service request objects:
@@ -43,17 +48,18 @@ class DashboardScreen extends Component {
 
       // When a new service request object is added:
       ref.on('child_added', (snapshot) => {
-        this.setState({fetching:false});
+        if(this._isMounted) this.setState({fetching:false});
         var request = snapshot.val();
         //If the user is the requester, add to requested array:
-        if(request.clientId == uid ) this.setState({requested:[request].concat(this.state.requested)});
+        if(request.clientId == uid && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
         //If the user is the accepter, add to accepted array:
-        else if(request.serverId == uid) this.setState({accepted:[request].concat(this.state.accepted)});
+        else if(request.serverId == uid && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
       });
 
       // When an existing service request object is removed:
       ref.on('child_removed', (snapshot) => {
           // Remove it from both arrays:
+          if(this._isMounted)
           this.setState({
             requested: this.state.requested.filter(item => item.id !== snapshot.key),
             accepted: this.state.accepted.filter(item => item.id !== snapshot.key),
@@ -66,9 +72,9 @@ class DashboardScreen extends Component {
         // Do nothing if the service request was not related to the user:
         if(request.clientId != uid && request.serverId != uid) return;
         // If it is a service request the user has recently accepted, add it to accepted array:
-        if(request.status == 1 && request.serverId == uid) this.setState({accepted:[request].concat(this.state.accepted)});
+        if(request.status == 1 && request.serverId == uid && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
         // Else, find it in the arrays and replace it with the new information.
-        else
+        else if(this._isMounted)
         {
           let req = [];//this.state.requested;
           let acc = [];//this.state.accepted;

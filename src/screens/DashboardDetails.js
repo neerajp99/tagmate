@@ -9,7 +9,6 @@ import {getAllServices, getWhatsapp} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
-// Test
 class DashboardDetails extends Component {
   constructor(props) {
     super(props);
@@ -24,11 +23,17 @@ class DashboardDetails extends Component {
   }
 
   componentDidMount(){
+    this._isMounted = true;
     getAllServices().then(services => // Get list of all services, then:
     {
       this.setState({services}); // Make services list available to the screen
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
+  }
+
+  componentWillUnmount()
+  {
+    this._isMounted = false;
   }
 
   liveUpdates = () => {
@@ -38,34 +43,37 @@ class DashboardDetails extends Component {
     // Listen for changes in service request {this.state.item.id}
     firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
-      var item = snapshot.val();
-      this.setState({fetching:false});
-      if(item.clientId == uid) item.isClient = true; // The user is requester
-      else if(item.serverId == uid) item.isClient = false; // The user is acceptor
-      else
+      if(this._isMounted)
       {
-        // The user is neither requester nor acceptor
-        this.setState({hide:true});
-        return;
-      }
-      item.serviceTitle = '';
-      // Fetching service's title:
-      this.state.services.map(service =>
-      {
-        if(item.serviceId == service.id) item.serviceTitle = service.title;
-      })
-      item.whatsapp = this.state.item.whatsapp;
-      this.setState({item:item});
-      // If whatsapp number is not available yet:
-      if(!this.state.whatsappAvailable)
-      {
-        // Get whatsapp number of the other person involved in this service request:
-        getWhatsapp((item.isClient)?item.serverId:item.clientId).then(whatsapp=>
+        var item = snapshot.val();
+        this.setState({fetching:false});
+        if(item.clientId == uid) item.isClient = true; // The user is requester
+        else if(item.serverId == uid) item.isClient = false; // The user is acceptor
+        else
         {
-          // Then, update the whatsapp number:
-          item.whatsapp = whatsapp;
-          this.setState({item:item, whatsappAvailable:true});
-        });
+          // The user is neither requester nor acceptor
+          this.setState({hide:true});
+          return;
+        }
+        item.serviceTitle = '';
+        // Fetching service's title:
+        this.state.services.map(service =>
+        {
+          if(item.serviceId == service.id) item.serviceTitle = service.title;
+        })
+        item.whatsapp = this.state.item.whatsapp;
+        this.setState({item:item});
+        // If whatsapp number is not available yet:
+        if(!this.state.whatsappAvailable)
+        {
+          // Get whatsapp number of the other person involved in this service request:
+          getWhatsapp((item.isClient)?item.serverId:item.clientId).then(whatsapp=>
+          {
+            // Then, update the whatsapp number:
+            item.whatsapp = whatsapp;
+            this.setState({item:item, whatsappAvailable:true});
+          });
+        }
       }
     }.bind(this));
 
