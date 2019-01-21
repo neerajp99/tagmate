@@ -163,7 +163,7 @@ class ProfileScreen extends Component{
             }}
           />
         </Card>
-
+        <View style={{marginTop: 25}} />
       </View>
       </ScrollView>
     )
