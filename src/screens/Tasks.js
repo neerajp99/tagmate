@@ -42,6 +42,18 @@ class TaskScreen extends Component {
     {
         this._isMounted = false;
     }
+
+    userGuideContainer = () =>
+    {
+      if(this.state.myTasks.length == 0) {
+          return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
+                <Text style={adourStyle.guideText}>
+                No tasks available at this time. Check back later! {"\n"} {"\n"}We only display tasks that you've agreed to offer. Please update your preferences to see more tasks by going to Profile -> Edit Details or tap the button below.
+                </Text>
+                <Button title="Update My Preferences" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('EditProfileDetails')}}/>
+                </View>
+          }
+    }
     /*
     * get all the task requests that this user can perform
     * */
@@ -70,9 +82,9 @@ class TaskScreen extends Component {
                     && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
-                    this.setState({myTasks:[request].concat(this.state.myTasks)});   
+                    this.setState({myTasks:[request].concat(this.state.myTasks)});
             }
-            
+
         });
 
         // If a service request object is removed from the realtime database:
@@ -91,7 +103,7 @@ class TaskScreen extends Component {
                     || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
-                this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});   
+                this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
             }
         });
 
@@ -113,7 +125,7 @@ class TaskScreen extends Component {
                         )
                         toRemove.push(request.id);
                 });
-                this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});   
+                this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
             }
         })
 
@@ -222,6 +234,7 @@ class TaskScreen extends Component {
         const {fetching, myTasks} = this.state
         return (
             <View style={styles.mainContainer}>
+            {!fetching && this.userGuideContainer()}
                 <FlatList
                     data={myTasks}
                     extraData={myTasks}
@@ -233,6 +246,7 @@ class TaskScreen extends Component {
                         <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
                     </View>
                 }
+
             </View>
         )
     }

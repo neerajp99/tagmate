@@ -30,7 +30,7 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
 // Updates the Adour coin balance of the corresponding user to 3.
 export const creditCoins = (userId) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`/users/${userId}`).update({coins:3}).then(res=>{resolve(true)});
+        firebase.database().ref(`/users/${userId}`).update({coins:5}).then(res=>{resolve(true)});
     } catch (e) {
         reject(e)
     }
