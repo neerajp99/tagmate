@@ -170,9 +170,6 @@ class Login extends Component {
 
 
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
-        <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
-          Onboarding screen (Debug)
-        </Text>
       </View>
       </ImageBackground>
     )
