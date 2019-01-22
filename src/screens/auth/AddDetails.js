@@ -40,6 +40,7 @@ class AddDetails extends Component {
         {
             this.props.submitUserUpdates(myServices, mobile); // Finalling updating profile.
             if(typeof this.props.onboarding != "undefined") this.props.onboarding.navigate('MainStack');
+            if(typeof this.props.onboarding == "undefined") alert('Changes Saved');
         }
     }
 

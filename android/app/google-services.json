@@ -39,6 +39,14 @@
           }
         },
         {
+          "client_id": "768462231622-ss1rj5me9ve1urt1kb9hhvbet18cv4vg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.adourapp",
+            "certificate_hash": "a8770e6635378ec1ce7326e9599c1c79c0292a22"
+          }
+        },
+        {
           "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
           "client_type": 3
         }
