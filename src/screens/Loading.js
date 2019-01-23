@@ -47,18 +47,27 @@ class Loading extends Component {
                 if(!user) this.props.navigation.navigate('Login');
                 else
                 {
-                    const {currentUser: {uid} = {}} = firebase.auth();
-                    firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
+                    const {currentUser} = firebase.auth();
+                    var uid = currentUser.uid;
+                    var allow = (currentUser.email.slice(-14) === '@ashoka.edu.in');
+                    if(!allow)
                     {
-                        var vals = snapshot.val();
-                        if(vals != null){
-                            if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
-                            else this.props.navigation.navigate('MainStack');
-                        }
-                        else{
-                            this.props.navigation.navigate('Onboarding');
-                        }
-                    })
+                        this.props.navigation.navigate('Login');
+                    }
+                    else
+                    {
+                        firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
+                        {
+                            var vals = snapshot.val();
+                            if(vals != null){
+                                if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
+                                else this.props.navigation.navigate('MainStack');
+                            }
+                            else{
+                                this.props.navigation.navigate('Onboarding');
+                            }
+                        })
+                    }
                 }
             }
             // If the user has to go to OnboardingSplash, revert `stay` to false

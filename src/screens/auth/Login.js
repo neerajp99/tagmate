@@ -30,6 +30,7 @@ class Login extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
       /*
@@ -46,6 +47,11 @@ class Login extends Component {
     });
   }
 
+  componentWillUnmount()
+  {
+    this._isMounted = false;
+  }
+
   _signOut = async () => {
     try {
       await GoogleSignin.revokeAccess();
@@ -59,7 +65,7 @@ class Login extends Component {
   _signIn = async () => {
     if(this.state.loading) return;
     try {
-      this.setState({loading:true});
+      this.setState({loading:true, invalid_email:false});
       await GoogleSignin.hasPlayServices({
         //Check if device has Google Play Services installed.
         //Always resolves to true on iOS.
@@ -78,8 +84,17 @@ class Login extends Component {
       const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);
-      await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
-      this.setState({loading:false});
+      var allow = (currentUser.user.email.slice(-14) === '@ashoka.edu.in');
+      if(allow)
+      {
+        await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
+        if(this._isMounted) this.setState({loading:false});
+      }
+      else if(this._isMounted)
+      {
+        this.setState({loading:false, invalid_email:true,});
+        this._signOut();
+      }
     } catch (error) {
       this.setState({loading:false});
       console.log('Message', error.message);
@@ -122,6 +137,12 @@ class Login extends Component {
           <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
             {this.props.error}
           </Text>
+          {
+            this.state.invalid_email &&
+            <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
+              Please use your Ashoka email.
+            </Text>
+          }
           {/*
         <View style={styles.inputContainer}>
         <Icon name={'email'} size={25} color={'rgba(255, 255, 255, 0.7)'} style={styles.inputIcon} />
