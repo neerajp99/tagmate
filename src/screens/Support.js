@@ -9,7 +9,7 @@ class SupportScreen extends Component{
 
   launchEmail = () =>
   {
-      Linking.openURL('mailto:shivam@getadour.com?subject=Adour Customer Support&body=Please type your feedback/question here. ')
+      Linking.openURL('mailto:support@getadour.com?subject=Adour Customer Support&body=Please type your feedback/question below: ')
   }
 
   launchPhone = () =>

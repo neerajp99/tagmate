@@ -27,7 +27,7 @@ class RequestScreen extends Component {
     addCustomService = () =>
     {
          // Trigger default email app to open "Compose email" box preloaded with an Adour rep's email and a subject line.
-        Linking.openURL('mailto:shivam@getadour.com?subject=New Service Suggestion&body=Hey there, please add this service: ')
+        Linking.openURL('mailto:support@getadour.com?subject=New Service Suggestion&body=Hey there, please add this service: ')
     }
 
     render() {
