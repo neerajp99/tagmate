@@ -10,6 +10,7 @@ import {adourStyle} from './style/AdourStyle'
 import * as _ from 'lodash'
 
 class Loading extends Component {
+
     componentWillMount(){
         firebase.database().goOnline()
         const {fetchAllServices} = this.props
@@ -17,33 +18,22 @@ class Loading extends Component {
         fetchAllServices()
     }
     async componentDidMount() {
-        // variable `stay` tells whether user should go to OnboardingSplash or not. Initialized as false.
-        let stay = false;
-        await AsyncStorage.getItem('56', (err, result) => {
-          console.log('inside async storage 1')
-          if (err) {
-          } else {
-            if(result == null) {
-                // The user has to go to Onboarding splash if it's user's first time on the app.
-                console.log('inside async storage 2')
-                stay = true;
-             }else {
-              console.log("result", result);
+
+      //We only need to check if it's user's first time if user is not signed in
+      AsyncStorage.getItem("alreadyLaunched").then(value => {
+            if(value == null){
+                 AsyncStorage.setItem('alreadyLaunched', "true"); // No need to wait for `setItem` to finish, although you might want to handle errors
+                 this.props.navigation.navigate('OnboardingSplash');
             }
-          }
-        });
-
-        // Setting a value in the AsyncStorage so that the user is never redirected to OnboardSplash again.
-
-        AsyncStorage.setItem('56', JSON.stringify({"value":"true"}), (err,result) => {
-            console.log("error",err,"result",result);
-        });
+            else{
+                 console.log('Not showing onboarding since this is not the first launch')
+            }}) // Add some error handling, also you can simply do this.setState({fistLaunch: value == null})
 
 
         const {setDeviceToken} = this.props
         let {currentUser} = await firebase.auth();
         // If the user exists and does not have to go to OnboardingSplash:
-        if(currentUser && (!stay))
+        if(currentUser)
         {
                     firebase.auth().onAuthStateChanged(user => {
                     //Remove after testing
@@ -51,7 +41,6 @@ class Loading extends Component {
                     let allow = (currentUser.email.slice(-14) === '@ashoka.edu.in');
                     if(!allow)
                     {
-                        // stay = false means the user does not have to go through the onboarding screen again
                         this.props.navigation.navigate('Login');
                     }
                     else
@@ -72,6 +61,7 @@ class Loading extends Component {
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })
       } else {
+        //Else do the following if the user is not signed In
         this.props.navigation.navigate('Login');
       }
 
