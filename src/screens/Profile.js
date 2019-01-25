@@ -21,7 +21,9 @@ class ProfileScreen extends Component{
   handleSignout = () => {
       firebase
         .auth()
-        .signOut()
+        .signOut().then(
+          this.props.navigation.navigate('Login')
+        )
   }
 
   componentDidMount(){
@@ -154,6 +156,7 @@ class ProfileScreen extends Component{
                 const isSignedIn = await GoogleSignin.isSignedIn();
                 if(isSignedIn == true){
                   await GoogleSignin.signOut();
+                  this.props.navigation.navigate('Login')
                 }
                 firebase.auth().signOut();
               }

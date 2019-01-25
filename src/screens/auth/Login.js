@@ -84,11 +84,15 @@ class Login extends Component {
       const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);
-      var allow = (currentUser.user.email.slice(-14) === '@ashoka.edu.in');
+      let allow = (currentUser.user.email.slice(-14) === '@ashoka.edu.in');
       if(allow)
       {
         await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
-        if(this._isMounted) this.setState({loading:false});
+        if(this._isMounted)
+        {
+          this.setState({loading:false});
+          this.props.navigation.navigate('MainStack')
+        }
       }
       else if(this._isMounted)
       {

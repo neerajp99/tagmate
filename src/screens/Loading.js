@@ -18,14 +18,15 @@ class Loading extends Component {
     }
     async componentDidMount() {
         // variable `stay` tells whether user should go to OnboardingSplash or not. Initialized as false.
-        var stay = false;
+        let stay = false;
         await AsyncStorage.getItem('56', (err, result) => {
+          console.log('inside async storage 1')
           if (err) {
           } else {
             if(result == null) {
                 // The user has to go to Onboarding splash if it's user's first time on the app.
+                console.log('inside async storage 2')
                 stay = true;
-                this.props.navigation.navigate('OnboardingSplash')
              }else {
               console.log("result", result);
             }
@@ -40,25 +41,24 @@ class Loading extends Component {
 
 
         const {setDeviceToken} = this.props
-        firebase.auth().onAuthStateChanged(user => {
-            // If the user does not have to go to OnboardingSplash:
-            if(!stay)
-            {
-                if(!user) this.props.navigation.navigate('Login');
-                else
-                {
-                    const {currentUser} = firebase.auth();
-                    var uid = currentUser.uid;
-                    var allow = (currentUser.email.slice(-14) === '@ashoka.edu.in');
+        let {currentUser} = await firebase.auth();
+        // If the user exists and does not have to go to OnboardingSplash:
+        if(currentUser && (!stay))
+        {
+                    firebase.auth().onAuthStateChanged(user => {
+                    //Remove after testing
+                    let uid = currentUser.uid;
+                    let allow = (currentUser.email.slice(-14) === '@ashoka.edu.in');
                     if(!allow)
                     {
+                        // stay = false means the user does not have to go through the onboarding screen again
                         this.props.navigation.navigate('Login');
                     }
                     else
                     {
                         firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
                         {
-                            var vals = snapshot.val();
+                            let vals = snapshot.val();
                             if(vals != null){
                                 if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
                                 else this.props.navigation.navigate('MainStack');
@@ -68,50 +68,49 @@ class Loading extends Component {
                             }
                         })
                     }
-                }
-            }
-            // If the user has to go to OnboardingSplash, revert `stay` to false
-            // so that he/she can go to MainStack upon AuthStateChange next time.
-            else stay = false;
+
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
         })
-        // configure push notification capability & get deviceToken
-        Notification.configure((token) => {
-            setDeviceToken(token)
-        })
+      } else {
+        this.props.navigation.navigate('Login');
+      }
 
-        //listener to listen token refresh
-        this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(token => {
-            Notification.onTokenRefresh(token)
-            setDeviceToken(token)
-        })
+      // configure push notification capability & get deviceToken
+      Notification.configure((token) => {
+        if(currentUser) setDeviceToken(token)
+      })
 
-        //listener to listen for push notifications
-        this.notificationListener = firebase.notifications().onNotification((notification) => {
-            this.handlePushNotification(notification, false)
-        })
+      //listener to listen token refresh
+      this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(token => {
+          Notification.onTokenRefresh(token)
+          if(currentUser) setDeviceToken(token)
+      })
 
-        //called when a notification is opened.
-        this.notificationOpenListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-            this.handlePushNotification(notificationOpen.notification, false)
-        })
+      //listener to listen for push notifications
+      this.notificationListener = firebase.notifications().onNotification((notification) => {
+          this.handlePushNotification(notification, false, currentUser)
+      })
 
-        // in case app was closed and opened by
-        const notificationOpen = await firebase.notifications().getInitialNotification()
-        if (notificationOpen) {
-            // App was opened by a notification
-            // Get the action triggered by the notification being opened
-            const action = notificationOpen.action
-            // Get information about the notification that was opened
-            this.handlePushNotification(notificationOpen.notification, true)
-        }
+      //called when a notification is opened.
+      this.notificationOpenListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
+          this.handlePushNotification(notificationOpen.notification, false, currentUser)
+      })
+
+      // in case app was closed and opened by
+      const notificationOpen = await firebase.notifications().getInitialNotification()
+      if (notificationOpen) {
+          // App was opened by a notification
+          // Get the action triggered by the notification being opened
+          const action = notificationOpen.action
+          // Get information about the notification that was opened
+          this.handlePushNotification(notificationOpen.notification, true, currentUser)
+      }
     }
 
-    handlePushNotification = (notification, wasAppClosed) => {
+    handlePushNotification = (notification, wasAppClosed, currentUser) => {
         // Process your notification as required
         setTimeout(() => {
             const {authToken = ''} = this.props
-            const {currentUser} = firebase.auth()
             const {notifType} = notification
             if(wasAppClosed && !_.isEmpty(currentUser)) {
                 if(notifType == 'SERVICE_REQUEST') this.props.navigation.navigate('Tasks')
