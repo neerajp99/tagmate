@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking} from 'react-native'
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking, ScrollView} from 'react-native'
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
@@ -33,6 +33,7 @@ class RequestScreen extends Component {
     render() {
         const {services = [], fetching} = this.props
         return (
+          <ScrollView>
             <View style={styles.mainContainer}>
                 <Card>
                     {
@@ -63,6 +64,7 @@ class RequestScreen extends Component {
                     />
                 </Card>
             </View>
+            </ScrollView>
         )
     }
 }

@@ -1,7 +1,7 @@
 // SignUp.js
 import React, {Component} from 'react';
 import firebase from 'react-native-firebase';
-import {StyleSheet, Text, TextInput, View, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView} from 'react-native';
 import {CheckBox, Card, Divider} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {submitUserUpdates} from '../../actions';
@@ -90,6 +90,7 @@ class AddDetails extends Component {
     render() {
         const {services} = this.props
         return (
+            <ScrollView>
             <Card>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
                 <Text style={adourStyle.defaultText}>Your 10-digit Indian Mobile Number</Text>
@@ -101,6 +102,7 @@ class AddDetails extends Component {
                   <Text style={adourStyle.btnText}>Save Preferences</Text>
                 </TouchableOpacity>
             </Card>
+            </ScrollView>
         )
     }
 }
