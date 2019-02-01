@@ -55,7 +55,7 @@ class RequestDetails extends Component{
       	<View style={styles.backgroundContainer}>
 	        <Card title={title} titleStyle={adourStyle.cardTitle} >
           <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>You are about to request a task. We will notify you once someone accepts your request. Please provide additional details if you need to. </Text>
+          <Text style={adourStyle.cardSubtitle}>You are about to request a task. We will notify you once someone accepts your request. Please provide additional details if needed.</Text>
           </View>
 
           {/* DISABLED FOR LATER. DO NOT REMOVE
