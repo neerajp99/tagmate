@@ -1,4 +1,4 @@
-package com.palpy;
+package com.fondly;
 
 import android.app.Application;
 
