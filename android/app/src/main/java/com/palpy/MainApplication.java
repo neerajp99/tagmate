@@ -1,4 +1,4 @@
-package com.adourapp;
+package com.palpy;
 
 import android.app.Application;
 

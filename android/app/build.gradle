@@ -98,10 +98,10 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.adourapp"
+        applicationId "com.palpy"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
+        versionCode 1
         versionName "1.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"

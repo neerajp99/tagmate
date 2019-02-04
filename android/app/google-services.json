@@ -1,59 +1,35 @@
 {
   "project_info": {
-    "project_number": "768462231622",
-    "firebase_url": "https://adour-e0abf.firebaseio.com",
-    "project_id": "adour-e0abf",
-    "storage_bucket": "adour-e0abf.appspot.com"
+    "project_number": "322941570161",
+    "firebase_url": "https://palpy-a9125.firebaseio.com",
+    "project_id": "palpy-a9125",
+    "storage_bucket": "palpy-a9125.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:768462231622:android:ae08e05f8ca75d6c",
+        "mobilesdk_app_id": "1:322941570161:android:59ea9c9487185fe4",
         "android_client_info": {
-          "package_name": "com.adourapp"
+          "package_name": "com.palpy"
         }
       },
       "oauth_client": [
         {
-          "client_id": "768462231622-vgtvu6tdm250dsnub832gl9gutk5167i.apps.googleusercontent.com",
+          "client_id": "322941570161-0gir37nht46ne0484ljdltric1eul8in.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.adourapp",
-            "certificate_hash": "850943d8a6faec4b8a2ddb2c7b3e3e05724163f2"
-          }
-        },
-        {
-          "client_id": "768462231622-m8aigguis4phg74j44are8rnoqkfrjp6.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.adourapp",
+            "package_name": "com.palpy",
             "certificate_hash": "11b32bb143103a50319c2c5928bd8755efdcb0c6"
           }
         },
         {
-          "client_id": "768462231622-s1a96margkmp43duhbh8tlgd7m5g4kfj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.adourapp",
-            "certificate_hash": "7c08feb2c56c4842c6eb5e7ec67d7d251f76eb6f"
-          }
-        },
-        {
-          "client_id": "768462231622-ss1rj5me9ve1urt1kb9hhvbet18cv4vg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.adourapp",
-            "certificate_hash": "a8770e6635378ec1ce7326e9599c1c79c0292a22"
-          }
-        },
-        {
-          "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
+          "client_id": "322941570161-9oucdsn4ti52291qe7ncdvqa19r4rv5j.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB2YWyHwL7Qx2BLNW0t0InYIaDdzrSDuJc"
+          "current_key": "AIzaSyCOle8RQrwog1JrT1O3xm9NuuOz0sJx-rk"
         }
       ],
       "services": {
@@ -64,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com",
+              "client_id": "322941570161-9oucdsn4ti52291qe7ncdvqa19r4rv5j.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
