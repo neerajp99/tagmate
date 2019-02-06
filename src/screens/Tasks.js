@@ -48,7 +48,7 @@ class TaskScreen extends Component {
       if(this.state.myTasks.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                 <Text style={adourStyle.guideText}>
-                No tasks available at this time. Check back later! {"\n"} {"\n"}We only display tasks that you've agreed to offer. Please update your preferences to see more tasks by going to Profile -> Edit Details or tap the button below.
+                No activity to show. Check back later! {"\n"} {"\n"}We only display activities that you're interested in. Please update your preferences to see more activities by going to Profile -> Edit Details or tap the button below.
                 </Text>
                 <Button title="Update My Preferences" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('EditProfileDetails')}}/>
                 </View>
@@ -183,18 +183,21 @@ class TaskScreen extends Component {
             if(service.id == serviceId)
             {
                 serviceTitle = service.title;
+                serviceImg = service.img;
             }
         });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
         return (
           <View key={id}>
-          <Card>
+          <Card image={{uri: serviceImg}}>
               <ListItem
               title={serviceTitle}
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              rightTitle={<TimeAgo key={id} time={created_at} />}
+              subtitle={ "Scheduled for: "+(when) }
+              subtitleStyle={adourStyle.listItemText}
+              rightTitle={['Posted ', <TimeAgo key={id} time={created_at} />]}
               subtitleNumberOfLines={2}
             />
             {
@@ -206,9 +209,6 @@ class TaskScreen extends Component {
                   subtitleNumberOfLines={2}
                 />
             }
-            {/* HIDING WHEN TEXT BY DISABLING THE FOLLOWING CODE */}
-            {/* subtitle={ "Needed by: "+(when) }  subtitleStyle={adourStyle.listItemText} */}
-            {/*rightTitle={['Created ', <TimeAgo key={id} time={created_at} />]} */}
               <View>
               </View>
               <View style={styles.buttonsContainer}>

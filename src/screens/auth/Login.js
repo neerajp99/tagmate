@@ -7,8 +7,10 @@ import {loginUser, loginGoogleUser,addNewGoogleUser} from '../../actions';
 import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import Video from 'react-native-video'
 import bgImage from '../../img/background.jpg'
 import logo from '../../img/logo.png'
+import bgVideo from '../../vid/vid.mp4'
 import {adourStyle} from '../style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window')
@@ -40,7 +42,7 @@ class Login extends Component {
       scopes: [],
       // Repleace with your webClientId generated from Firebase console
       webClientId:
-        '189546660636-qt54p4arutqriiv8sltekvfpnl6vf5qj.apps.googleusercontent.com',//'768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
+        '522194578751-bobqbcmj48345s6klfkpi07rjkoni7a6.apps.googleusercontent.com',//'768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
       hostedDomain: '', // specifies a hosted domain restriction
       loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
       forceConsentPrompt: true, // [Android] if you want to show the authorization prompt at each login. Test
@@ -132,11 +134,12 @@ class Login extends Component {
 
   render() {
     return (
-      <ImageBackground source={bgImage} style={styles.backgroundContainer}>
+      <View style={styles.backgroundContainer}>
+      <Video source={bgVideo} repeat resizeMode="cover" style={StyleSheet.absoluteFill} />
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <View style={styles.logoContainer}>
           <Image source={logo} style={styles.logo} />
-          <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text>
+          {/* TAGLINE DISABLED <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text> */}
         </View>
           <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
             {this.props.error}
@@ -194,9 +197,12 @@ class Login extends Component {
         }
 
 
-        <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Dark} onPress={this._signIn}/>
+        <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Light} onPress={this._signIn}/>
+        <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
+          Debug Splash
+        </Text>
       </View>
-      </ImageBackground>
+      </View>
     )
   }
 }
@@ -205,8 +211,9 @@ const styles = StyleSheet.create({
     flex: 1,
     width: null,
     height: null,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    backgroundColor: 'purple'
   },
   textInput: {
     height: 45,
@@ -221,8 +228,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   logo: {
-    height: 47,
-    width: 150,
+    height: 61,
+    width: 250,
     marginBottom: 8
   },
   inputIcon: {
@@ -243,7 +250,8 @@ const styles = StyleSheet.create({
   },
   btnGoogleLogin: {
     width: 312,
-    height: 48
+    height: 48,
+    marginBottom: 50
   },
   btnEye: {
     position: 'absolute',

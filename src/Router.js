@@ -1,4 +1,5 @@
 import React from 'react';
+import {Image} from 'react-native';
 import { Icon } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
@@ -66,7 +67,7 @@ export const RequestStack = createStackNavigator(
       screen: RequestScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Request',
+          headerTitle: 'Create',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -90,7 +91,7 @@ export const TaskStack = createStackNavigator(
       screen: TaskScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Tasks',
+          headerTitle: (<Image source={require('./img/logo_black.png')}/>),
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -114,7 +115,7 @@ export const DashboardStack = createStackNavigator(
       screen: DashboardDetails,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Task Details',
+          headerTitle: 'Activity Details',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -125,27 +126,27 @@ export const DashboardStack = createStackNavigator(
 // Bottom Tab Navigator connecting all the above navigators as siblings:
 export const MainTabNav = createBottomTabNavigator(
   {
+    Home: {
+      screen: TaskStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='home' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    },
+    Create: {
+      screen: RequestStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='edit' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    },
     Dashboard: {
       screen: DashboardStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='chat-bubble' size={horizontal ? 20 : 25} color={tintColor} />
-        ),
-      },
-    },
-    Request: {
-      screen: RequestStack,
-      navigationOptions: {
-        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
           <Icon name='dashboard' size={horizontal ? 20 : 25} color={tintColor} />
-        ),
-      },
-    },
-    Tasks: {
-      screen: TaskStack,
-      navigationOptions: {
-        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='view-list' size={horizontal ? 20 : 25} color={tintColor} />
         ),
       },
     },

@@ -6,16 +6,16 @@ import {StyleSheet, Dimensions} from 'react-native';
 //TODO: Separate Router related style to another file so that Hot Reloading starts working
 
 //Light Blue
-export const BRAND_COLOR_ONE = '#5C7AFF';
-export const BRAND_COLOR_TWO = '#4A8FE7';
+export const BRAND_COLOR_ONE = '#944bbb';
+export const BRAND_COLOR_TWO = '#aa7bc3';
 
 //Light Purple
-export const BRAND_COLOR_THREE = '#845BFF';
+export const BRAND_COLOR_THREE = '#cc92c2';
 //Dark Blue
-export const BRAND_COLOR_FOUR = '#215596';
+export const BRAND_COLOR_FOUR = '#531cb3';
 
 //Cyan
-export const BRAND_COLOR_FIVE = '#73FBD3'
+export const BRAND_COLOR_FIVE = '#aa7bc3'
 
 const { width: WIDTH } = Dimensions.get('window');
 

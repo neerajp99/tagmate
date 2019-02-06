@@ -6,7 +6,7 @@ import {StyleSheet} from 'react-native';
 
 //TODO: Separate Router related style to another file so that Hot Reloading starts working
 
-export const BRAND_COLOR_TWO = '#4A8FE7';
+export const BRAND_COLOR_TWO = '#944bbb';
 
 export const routerStyle = StyleSheet.create({
   headerText: {

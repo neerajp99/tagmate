@@ -98,7 +98,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.fondly"
+        applicationId "com.chillmate"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -145,9 +145,14 @@ android {
             }
         }
     }
+
+    compileOptions {
+    targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
+    compile project(':react-native-video')
     compile project(':react-native-google-signin')
     compile project(':react-native-firebase')
     compile project(':react-native-gesture-handler')

@@ -156,15 +156,14 @@ class DashboardDetails extends Component {
 
         <Divider />
           {/* Task Timing and details */ }
-          {/* DISABLED WHEN TEMPORARILY
           <ListItem
-              title={item.when}
+              title={ "Scheduled for: "+(item.when) }  subtitleStyle={adourStyle.listItemText}
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
             />
-          */}
+
           {
             item.details != "" &&
                 <ListItem
@@ -179,7 +178,7 @@ class DashboardDetails extends Component {
           {/* Timestamp */ }
           <View style={styles.subContent}>
           <ListItem
-              title={<TimeAgo time={item.created_at} />}
+              title={['Posted ', <TimeAgo key={id} time={created_at} />]}
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}

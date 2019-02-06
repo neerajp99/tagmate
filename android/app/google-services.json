@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "189546660636",
-    "firebase_url": "https://fondly-e4de9.firebaseio.com",
-    "project_id": "fondly-e4de9",
-    "storage_bucket": "fondly-e4de9.appspot.com"
+    "project_number": "522194578751",
+    "firebase_url": "https://chillmate-241a3.firebaseio.com",
+    "project_id": "chillmate-241a3",
+    "storage_bucket": "chillmate-241a3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:189546660636:android:2fb45f7c54be90f1",
+        "mobilesdk_app_id": "1:522194578751:android:b69b8f24c3ac0e9e",
         "android_client_info": {
-          "package_name": "com.fondly"
+          "package_name": "com.chillmate"
         }
       },
       "oauth_client": [
         {
-          "client_id": "189546660636-ldmhsl3cd3dgtepluqe4vo7jni1ogu0b.apps.googleusercontent.com",
+          "client_id": "522194578751-o1j3c1kk04m7jo4ck1up9i5uu5bkhiae.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.fondly",
+            "package_name": "com.chillmate",
             "certificate_hash": "11b32bb143103a50319c2c5928bd8755efdcb0c6"
           }
         },
         {
-          "client_id": "189546660636-qt54p4arutqriiv8sltekvfpnl6vf5qj.apps.googleusercontent.com",
+          "client_id": "522194578751-bobqbcmj48345s6klfkpi07rjkoni7a6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDo61bSNTWFAnp2Lv1hma6lkgR-38OnyA0"
+          "current_key": "AIzaSyBFH_-Ty9e-DepqlcDCMB0UYL8pbZuJ-2g"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "189546660636-qt54p4arutqriiv8sltekvfpnl6vf5qj.apps.googleusercontent.com",
+              "client_id": "522194578751-bobqbcmj48345s6klfkpi07rjkoni7a6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

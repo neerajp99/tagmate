@@ -55,30 +55,29 @@ class RequestDetails extends Component{
       	<View style={styles.backgroundContainer}>
 	        <Card title={title} titleStyle={adourStyle.cardTitle} >
           <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>You are about to request a task. We will notify you once someone accepts your request. Please provide additional details if needed.</Text>
+          <Text style={adourStyle.cardSubtitle}>Specify a time & date when you're available for the chosen activity: </Text>
           </View>
 
-          {/* DISABLED FOR LATER. DO NOT REMOVE
               <TextInput
                 style={adourStyle.textInput}
                 autoCapitalize="none"
-                placeholder="When do you want it? (Required)"
+                placeholder="Time & Date"
                 placeholderStyle={adourStyle.placeholderStyle}
                 placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
                 underlineColorAndroid='transparent'
                 onChangeText={when => this.setState({ when: when })}
               />
-            */}
+
               <TextInput
                 style={adourStyle.textInput}
                 autoCapitalize="none"
-                placeholder="Additional Details (Optional)"
+                placeholder="Conversation Topic (Optional)"
                 placeholderStyle={adourStyle.placeholderStyle}
                 placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
                 underlineColorAndroid='transparent'
                 onChangeText={details => this.setState({ details: details })}
               />
-	            <Button title="Request" buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
+	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
     )

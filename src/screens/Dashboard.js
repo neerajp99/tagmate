@@ -13,7 +13,7 @@ class DashboardScreen extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        active:1, // Determines active tab: Requested Tasks or Accepted Tasks. Default: Accepted.
+        active:0, // Determines active tab: Requested Tasks or Accepted Tasks. Default: Accepted.
         fetching:false,
         requested:[], // Array of requested services
         accepted:[], // Array of accepted tasks
@@ -108,18 +108,19 @@ class DashboardScreen extends Component {
             const {currentUser: {displayName} = {}} = firebase.auth();
             return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                       <Text style={adourStyle.guideText}>
-                      Hello {displayName} {"\n"}It's lonely in here! {"\n"} {"\n"}You haven't accepted any tasks yet. Start doing something for others and earn Adour coins!
+                      Hello {displayName} {"\n"} {"\n"}You haven't accepted any conversation requests yet. {"\n"} {"\n"}
+                      "Twenty years from now, you will be more disappointed by the things you didn't do than by the ones you did do." - Mark Twain
                       </Text>
-                      <Button title="Help someone out" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Tasks')}}/>
+                      <Button title="Meet Someone New" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Tasks')}}/>
                     </View>
           }
       } else {
         if(this.state.requested.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                     <Text style={adourStyle.guideText}>
-                    It's pitch white in here! {"\n"} {"\n"}You have haven't requested anything yet. Start your Adour journey by requesting a task. {"\n"}{"\n"}Remember to Mark As Done when your request is completed.
+                    It's pitch white in here! {"\n"} {"\n"} Magic lies outside your comfort zone. {"\n"}{"\n"}
                     </Text>
-                    <Button title="Request A Task" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Request')}}/>
+                    <Button title="Meet Someone New" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Request')}}/>
                   </View>
         }
       }
@@ -144,11 +145,11 @@ class DashboardScreen extends Component {
         var statusStr = 'Not available';
         switch(item.status)
         {
-          case 0: statusStr = 'Looking for your savior.'; break;
-          case 1: statusStr = 'Ongoing task.'; break;
-          case 2: statusStr = 'Task completed.'; break;
+          case 0: statusStr = 'Looking for a match'; break;
+          case 1: statusStr = 'Matched'; break;
+          case 2: statusStr = 'Meetup completed.'; break;
           case 3:
-          case 4: statusStr = 'Task cancelled.'; break;
+          case 4: statusStr = 'Meetup cancelled.'; break;
         }
         return (
           <View key={id}>
@@ -170,7 +171,7 @@ class DashboardScreen extends Component {
 
     render() {
         const {fetching, accepted, requested, active} = this.state
-        const buttons = ['Requested Tasks', 'Accepted Tasks']
+        const buttons = ['My Activities', 'Accepted Activities']
 
         return (
           <View style={styles.mainContainer}>
@@ -193,6 +194,9 @@ class DashboardScreen extends Component {
                     keyExtractor={(item, index) => item.id}
                 />
               }
+              <View style={{marginBottom:30}}>
+              <Button title="Meet Someone New" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
+              </View>
 
               {
                   fetching && <View style={styles.progressContainer}>
