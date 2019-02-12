@@ -56,7 +56,7 @@ class ProfileScreen extends Component{
   loadWhatsapp = () =>
   {
     // Triggering the app to open whatsapp with a preloaded message.
-    Linking.openURL('whatsapp://send?text=Hey, checkout Adour. I use it to ask for stuff from people near me. : http://getadour.com/dl')
+    Linking.openURL('whatsapp://send?text=Hey, checkout Chillmate.')
   }
 
   // This functions expects the user to be logged in.
@@ -93,7 +93,7 @@ class ProfileScreen extends Component{
           <ListItem
             title={this.state.coins}
             titleStyle={adourStyle.listItemText}
-            subtitle='Adour Coins'
+            subtitle='Reputation'
             subtitleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'coins', type:'material-community' }}
             hideChevron={true}

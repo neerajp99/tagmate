@@ -157,7 +157,8 @@ class DashboardDetails extends Component {
         <Divider />
           {/* Task Timing and details */ }
           <ListItem
-              title={ "Scheduled for: "+(item.when) }  subtitleStyle={adourStyle.listItemText}
+              title={ "Scheduled for: "+ (item.when) }
+              subtitleStyle={adourStyle.listItemText}
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
@@ -175,16 +176,18 @@ class DashboardDetails extends Component {
                   />
           }
 
-          {/* Timestamp */ }
-          <View style={styles.subContent}>
+          {/* Timestamp DISABLED - throwing error
+          <View style={styles.subContent} key={item.id}>
           <ListItem
-              title={['Posted ', <TimeAgo key={id} time={created_at} />]}
+              title={['Posted ', <TimeAgo key={item.id} time={item.created_at} />]}
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
             />
           </View>
+
+           */ }
 
             {/* Contact Number */ }
           {
