@@ -165,6 +165,19 @@ class DashboardDetails extends Component {
               leftIcon={{ name: 'access-time'}}
             />
 
+
+                          <Button
+                            icon={{name: 'chat'}}
+                            disabled={!this.state.whatsappAvailable}
+                            onPress={() =>
+                                      this.props.navigation.navigate("Chat", {
+                                        name: 'Shivam',
+                                        taskId: item.id
+                                      })}
+                            buttonStyle={adourStyle.btnGeneral}
+                            textStyle={adourStyle.btnText}
+                            title="Chat Here" />
+
           {
             item.details != "" &&
                 <ListItem
@@ -217,6 +230,7 @@ class DashboardDetails extends Component {
               textStyle={adourStyle.btnText}
               title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
           }
+
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}

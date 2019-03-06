@@ -6,6 +6,7 @@ import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, cr
 import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
+import ActivityChat from './screens/ActivityChat';
 import {routerStyle, BRAND_COLOR_TWO} from './screens/style/RouterStyle';
 
 
@@ -119,7 +120,16 @@ export const DashboardStack = createStackNavigator(
           headerTitleStyle: routerStyle.headerText
         }
       }
-    }
+    },
+    Chat: {
+      screen: ActivityChat,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Chat',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
   }
 )
 
