@@ -48,9 +48,9 @@ class TaskScreen extends Component {
       if(this.state.myTasks.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                 <Text style={adourStyle.guideText}>
-                No activity to show. Check back later! {"\n"} {"\n"}We only display activities that you're interested in. Please update your preferences to see more activities by going to Profile -> Edit Details or tap the button below.
+                No activity to show. Check back later! {"\n"} {"\n"}
                 </Text>
-                <Button title="Update My Preferences" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('EditProfileDetails')}}/>
+                <Button title="Create A Chillmate Activity" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Request')}}/>
                 </View>
           }
     }
