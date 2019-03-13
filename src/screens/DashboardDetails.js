@@ -17,9 +17,11 @@ class DashboardDetails extends Component {
       fetching:true,
       item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
+      chillmateName: 'No Chillmate',
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
+    this.getChillmateName = this.getChillmateName.bind(this);
   }
 
   componentDidMount(){
@@ -29,11 +31,33 @@ class DashboardDetails extends Component {
       this.setState({services}); // Make services list available to the screen
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
+    this.getChillmateName();
   }
 
   componentWillUnmount()
   {
     this._isMounted = false;
+  }
+
+  getChillmateName = () => {
+    console.log('Inside getChillmateName')
+    //if(this.state.item.status != 1) return console.log('Cant get Chillmate name')
+    const getChillmateIdPromise = firebase.database().ref(`/servicesRequests/${this.state.item.id}`).once('value')
+    return Promise.all([getChillmateIdPromise])
+        .then(results => {
+          var item = results[0].val()
+          const {serverId} = item
+          if(!serverId) {
+            console.log('No Chillmate yet')
+            return
+          }
+          const serverNamePromise = firebase.database().ref(`/users/${serverId}/firstName`).once('value')
+          return Promise.all([serverNamePromise])
+              .then(finResults => {
+                const serverName = finResults[0].val()
+                this.setState({chillmateName:serverName});
+              })
+    });
   }
 
   liveUpdates = () => {
@@ -94,7 +118,7 @@ class DashboardDetails extends Component {
   confirmCancel = (item) => {
     Alert.alert(
       'Confirmation',
-      'Are you sure you want to cancel this task? Frequent cancellations may affect your Adour reputation.',
+      'Are you sure you want to cancel? You will have to create a new post to find a new Chillmate.',
       [
         {text: 'No', onPress: () => console.log('Cancellation Revoked')},
         {text: 'Yes', onPress: () => this.markCancelled(item)}
@@ -119,8 +143,8 @@ class DashboardDetails extends Component {
     {
       switch(item.status)
       {
-        case 0: statusStr = 'Looking for your Chillmate'; break;
-        case 1: statusStr = (item.isClient)?'Upcoming Chillmate session':'Upcoming Chillmate session'; break;
+        case 0: statusStr = 'Looking for a Chillmate'; break;
+        case 1: statusStr = (item.isClient)?'Upcoming activity':'Upcoming activity'; break;
         case 2: statusStr = 'Completed'; break;
         case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by requester'; break;
         case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break;
@@ -134,7 +158,20 @@ class DashboardDetails extends Component {
           <Text style={adourStyle.cardSubtitle}>{statusStr}</Text>
           </View>
 
+
         <Divider />
+
+        {
+          item.status == 1 &&
+              <ListItem
+                  title={"Chillmate: "+ (this.state.chillmateName)}
+                  titleStyle={adourStyle.listItemText}
+                  hideChevron={true}
+                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                  leftIcon={{ name: 'info-outline'}}
+                />
+        }
+
           {/* Task Timing and details */ }
           <ListItem
               title={ "Scheduled for: "+ (item.when) }
@@ -144,20 +181,6 @@ class DashboardDetails extends Component {
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
             />
-
-
-                          <Button
-                            icon={{name: 'chat'}}
-                            disabled={!this.state.whatsappAvailable}
-                            onPress={() =>
-                                      this.props.navigation.navigate("Chat", {
-                                        name: 'Shivam',
-                                        taskId: item.id
-                                      })}
-                            buttonStyle={adourStyle.btnGeneral}
-                            textStyle={adourStyle.btnText}
-                            title="Chat" />
-
           {
             item.details != "" &&
                 <ListItem
@@ -182,7 +205,17 @@ class DashboardDetails extends Component {
 
            */ }
 
-
+           <Button
+             icon={{name: 'chat'}}
+             disabled={!this.state.whatsappAvailable}
+             onPress={() =>
+                       this.props.navigation.navigate("Chat", {
+                         name: 'Shivam',
+                         taskId: item.id
+                       })}
+             buttonStyle={adourStyle.btnGeneral}
+             textStyle={adourStyle.btnText}
+             title="Chat" />
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}
@@ -198,7 +231,7 @@ class DashboardDetails extends Component {
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     textStyle={adourStyle.btnText}
-                    title="Unmatch"
+                    title="Cancel"
                 />
           }
         </Card>
