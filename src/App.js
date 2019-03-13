@@ -49,6 +49,13 @@ class App extends Component {
         				NavigationActions.navigate({ routeName: 'DashboardDetails', params: {taskId: notifData.taskId}})
       					);
                 }
+                // If the notification asked to open Chat screen:
+                else if(notifType == 'OPEN_CHAT')
+                {
+                    this.navigator.dispatch(
+        				NavigationActions.navigate({ routeName: 'Chat', params: {taskId: notifData.taskId}})
+      					);
+                }
             }
         }, 1000)
     }

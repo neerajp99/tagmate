@@ -46,8 +46,8 @@ exports.sendPushNotification = functions.database
                 // Notification details.
                 const payload = {
                     notification: {
-                        title: 'New Service Requested',
-                        body: `A new request is there for ${serviceObj.title} service.`
+                        title: `Interested in ${serviceObj.title}?`,
+                        body: `Tap to meet someone new :)`
                     },
                     data: {
                         notifType: 'SERVICE_REQUEST', // To tell the app what kind of notification this is.
@@ -84,18 +84,17 @@ exports.sendPushNotification = functions.database
                 const serverWhatsappPromise = admin.database().ref(`/users/${serverId}`).once('value')
                 // Once we have device IDs of client (requester) and Whatsapp number of server (acceptor)
                 return Promise.all([clientDevicesPromise, serverWhatsappPromise])
-                .then(finResults => 
+                .then(finResults =>
                 {
                     const client = finResults[0].val()
                     const server = finResults[1].val()
                     // Terminate here if the client does not have any device IDs.
                     if(!client.hasOwnProperty('deviceTokens') || !client.deviceTokens.length) return console.log('No clients.')
-                    // Terminate here if the server does not have any Whatsapp number.
-                    if(!server.hasOwnProperty('whatsapp')) return console.log('Server does not have Whatsapp.')
+
                     const payload = {
                         notification: {
-                            title: 'Your savior is here!',
-                            body: `Open to contact your request's acceptor.`
+                            title: 'You have a new Chillmate!',
+                            body: `Tap to find out more`
                         },
                         data: {
                             taskId: item.id,
@@ -107,6 +106,49 @@ exports.sendPushNotification = functions.database
             })
     });
 
+    // WIP This function sends push notifications related to chat and messaging.
+        exports.sendChatPushNotification = functions.database
+        .ref('/messages/{pushId}/{newMessage}')
+        .onCreate((snapshot, context) => {
+            const pushId = context.params.pushId;
+            if (!pushId) {
+                return console.log('missing mandatory params for sending push.')
+            }
+            const serviceRequestPromise = admin.database().ref(`/servicesRequests/${pushId}`).once('value')
+            let deviceTokens = []
+            //const requestPromise = snapshot.ref.parent.once('value')
+            // Once we have clientId and serverId:
+            return Promise.all([serviceRequestPromise])
+                .then(results => {
+                    var item = results[0].val()
+                    // Terminate here if there is no server
+                    if(!item.hasOwnProperty('serverId')) return console.log('No server')
+
+                    const {serverId, clientId} = item
+                    const clientDevicePromise = admin.database().ref(`/users/${clientId}`).once('value')
+                    const serverDevicePromise = admin.database().ref(`/users/${serverId}`).once('value')
+                    // Once we have device IDs of client (requester) and Whatsapp number of server (acceptor)
+                    return Promise.all([clientDevicePromise, serverDevicePromise])
+                    .then(finResults =>
+                    {
+                        const client = finResults[0].val()
+                        const server = finResults[1].val()
+                        // Terminate here if the client does not have any device IDs.
+                        if(!client.hasOwnProperty('deviceTokens') || !client.deviceTokens.length) return console.log('No clients.')
+                        const payload = {
+                            notification: {
+                                title: 'You have a new message!',
+                                body: `Tap to respond`
+                            },
+                            data: {
+                                taskId: item.id,
+                                notifType: 'OPEN_CHAT', // To tell the app what kind of notification this is.
+                            }
+                        };
+                        return admin.messaging().sendToDevice(client.deviceTokens, payload);
+                    })
+                })
+        });
 
 
     exports.sendCancellationPushNotification = functions.database
@@ -126,15 +168,15 @@ exports.sendPushNotification = functions.database
                 if(!user.hasOwnProperty('deviceTokens') || !user.deviceTokens.length) return console.log('No device tokens.')
                 const payload = {
                         notification: {
-                            title: (status == 3)?'Requester cancelled the task!':'Your savior ditched you!',
-                            body: `Tap to view the cancelled task.`
+                            title: (status == 3)?'Requester cancelled the task!':'Activity cancelled!',
+                            body: `Tap to view the cancelled activity.`
                         },
                         data: {
                             taskId: pushId,
                             notifType: 'OPEN_DASHBOARD_DETAILS', // To tell the app what kind of notification this is.
                         }
                     };
-                    return admin.messaging().sendToDevice(user.deviceTokens, payload);                
-                
+                    return admin.messaging().sendToDevice(user.deviceTokens, payload);
+
             })
     });

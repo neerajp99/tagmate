@@ -139,11 +139,11 @@ class DashboardDetails extends Component {
     {
       switch(item.status)
       {
-        case 0: statusStr = 'Looking for your savior'; break;
-        case 1: statusStr = (item.isClient)?'Waiting for savior to complete task':'Waiting for you to complete task'; break;
+        case 0: statusStr = 'Looking for your Chillmate'; break;
+        case 1: statusStr = (item.isClient)?'Upcoming Chillmate session':'Upcoming Chillmate session'; break;
         case 2: statusStr = 'Completed'; break;
         case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by requester'; break;
-        case 4: statusStr = (item.isClient)?'Cancelled by your (ex)savior':'Cancelled by you';break;
+        case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break;
       }
     }
     return (
@@ -164,6 +164,19 @@ class DashboardDetails extends Component {
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               leftIcon={{ name: 'access-time'}}
             />
+
+
+                          <Button
+                            icon={{name: 'chat'}}
+                            disabled={!this.state.whatsappAvailable}
+                            onPress={() =>
+                                      this.props.navigation.navigate("Chat", {
+                                        name: 'Shivam',
+                                        taskId: item.id
+                                      })}
+                            buttonStyle={adourStyle.btnGeneral}
+                            textStyle={adourStyle.btnText}
+                            title="Chat Here" />
 
           {
             item.details != "" &&
@@ -217,6 +230,7 @@ class DashboardDetails extends Component {
               textStyle={adourStyle.btnText}
               title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
           }
+
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}
