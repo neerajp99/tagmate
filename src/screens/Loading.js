@@ -49,11 +49,11 @@ class Loading extends Component {
                         {
                             let vals = snapshot.val();
                             if(vals != null){
-                                if((vals.whatsapp || "0").length != 10 || (vals.services || []).length == 0) this.props.navigation.navigate('Onboarding');
+                                if( (vals.services || []).length == 0) this.populateUserServices();
                                 else this.props.navigation.navigate('MainStack');
                             }
                             else{
-                                this.props.navigation.navigate('Onboarding');
+                                this.populateUserServices();
                             }
                         })
                     }
@@ -96,6 +96,11 @@ class Loading extends Component {
           this.handlePushNotification(notificationOpen.notification, true, currentUser)
       }
     }
+
+    populateUserServices = () => {
+      console.log('TODO')
+    }
+
 
     handlePushNotification = (notification, wasAppClosed, currentUser) => {
         // Process your notification as required

@@ -8,13 +8,12 @@ import * as _ from 'lodash'
 {/* Function parameters should be scalable, not hardcoded like this. */
 }
 
-export const submitUserUpdates = (myServices, whatsapp) => {
+export const submitUserUpdates = (myServices) => {
     const {currentUser} = firebase.auth();
     return () => {
         var ref = firebase.database().ref(`/users/${currentUser.uid}`);
         // Updating services offered and whatsapp number:
         ref.child(`services`).set(myServices);
-        ref.child(`whatsapp`).set(whatsapp);
     };
 }
 
