@@ -50,7 +50,7 @@ class TaskScreen extends Component {
                 <Text style={adourStyle.guideText}>
                 No activity to show. Check back later! {"\n"} {"\n"}
                 </Text>
-                <Button title="Create A Chillmate Activity" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Request')}}/>
+                <Button title="Create A Chillmate Activity" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                 </View>
           }
     }

@@ -13,7 +13,7 @@ class RequestDetails extends Component{
         super(props);
         this.state = {
             disabledBtn:false, // Check if service request button is disabeld or not. Default: not disabled.
-            when:'', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
+            when:'Time & Date', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
             isDateTimePickerVisible: false,
         }
@@ -24,9 +24,19 @@ class RequestDetails extends Component{
    _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
    _handleDatePicked = date => {
-     this.setState({ when: date.toLocaleString('en-us', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) });
+     this.setState({ when: this.formatDate(date) });
      this._hideDateTimePicker();
    };
+
+   formatDate = (d) => {
+     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+     var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+     let weekday = weekdays[d.getDay()];
+     let month = months[d.getMonth()];
+     let formattedDate = weekday+', '+ month+ ' ' + d.getDate() + ' at ' + d.getHours() + ':' + d.getMinutes();
+     console.log(formattedDate)
+     return formattedDate
+   }
 
   	sendRequest = () =>
     {
@@ -36,7 +46,7 @@ class RequestDetails extends Component{
             this.setState({disabledBtn:true}); // Disable button while function is running.
             const {currentUser: {uid} = {}} = firebase.auth();
             const {when, details} = this.state;
-            if(when.length == 0) return this.erred('Please input when.');
+            if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
             canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
@@ -46,7 +56,7 @@ class RequestDetails extends Component{
             });
                 else
                 {
-                    return this.erred('Sorry, you do not have enough Adour coins. Contact customer support for help.');
+                    return this.erred('Sorry, you do not have enough reputation coins. Contact customer support for help.');
                     // user has as many ongoing requests as their Adour coin balance.
                 }
             });
@@ -73,17 +83,7 @@ class RequestDetails extends Component{
           <Text style={adourStyle.cardSubtitle}>Specify a time & date when you're available for the chosen activity: </Text>
           </View>
 
-              <TextInput
-                style={adourStyle.textInput}
-                autoCapitalize="none"
-                placeholder="Time & Date"
-                placeholderStyle={adourStyle.placeholderStyle}
-                placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
-                underlineColorAndroid='transparent'
-                onChangeText={when => this.setState({ when: when })}
-              />
-
-              <Button title={when} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
+              <Button title={when} buttonStyle={styles.dateTimeStyle} textStyle={adourStyle.placeholderStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
               <DateTimePicker
                 isVisible={isDateTimePickerVisible}
                 mode='datetime'
@@ -103,7 +103,7 @@ class RequestDetails extends Component{
                 underlineColorAndroid='transparent'
                 onChangeText={details => this.setState({ details: details })}
               />
-	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
+	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} textStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
     )
@@ -124,6 +124,13 @@ const styles = StyleSheet.create({
 	},
     mainContainer: {
         flex: 1,
+    },
+    dateTimeStyle: {
+      borderRadius: 25,
+      height: 45,
+      backgroundColor: 'rgba(54, 105, 169, 0.2)',
+      justifyContent: 'center',
+      marginBottom: 20,
     },
     progressContainer: {
         left: '50%',
