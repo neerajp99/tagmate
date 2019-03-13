@@ -79,26 +79,6 @@ class DashboardDetails extends Component {
 
   }
 
-  loadPhone = () =>
-  {
-      Linking.openURL('tel://+91'+this.state.item.whatsapp)
-  }
-
-  // Expects a valid mobile number in this.state.item.whatsapp
-  // Changes nothing, opens Whatsapp.
-  loadWhatsapp = () =>
-  {
-    if(this.state.whatsappAvailable)
-    {
-      if(this.state.item.isClient)
-      {
-        Linking.openURL('whatsapp://send?text=Hey, thanks for accepting my Adour request for '+ this.state.item.serviceTitle +'.&phone=+91'+this.state.item.whatsapp)
-      } else {
-        Linking.openURL('whatsapp://send?text=Hey, I accepted your Adour request for '+ this.state.item.serviceTitle +'.&phone=+91'+this.state.item.whatsapp)
-      }
-
-    }
-  }
 
   // Expects {id} parameter to be a valid service request ID
   // Changes service request's status to 2 (Complete) in Firebase realtime database
@@ -176,7 +156,7 @@ class DashboardDetails extends Component {
                                       })}
                             buttonStyle={adourStyle.btnGeneral}
                             textStyle={adourStyle.btnText}
-                            title="Chat Here" />
+                            title="Chat" />
 
           {
             item.details != "" &&
@@ -202,34 +182,6 @@ class DashboardDetails extends Component {
 
            */ }
 
-            {/* Contact Number */ }
-          {
-            //Do not show phone number if status is looking for savior or task is cancelled
-            item.status != 0 && item.status != 3 && item.status != 4 &&
-            <View style={styles.subContent}>
-            <ListItem
-                title={item.whatsapp}
-                titleStyle={adourStyle.listItemText}
-                hideChevron={true}
-                onPress={()=>{this.loadPhone()}}
-                containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                leftIcon={{ name: 'contact-phone'}}
-              />
-            </View>
-          }
-            {/* Whatsapp Chat button */ }
-          <View style={styles.subContent}>
-          {
-            //Do not show Whatsapp button if status is looking for savior or task is cancelled
-            item.status != 0 && item.status != 3 && item.status != 4 &&
-            <Button
-              icon={{name: 'chat'}}
-              disabled={!this.state.whatsappAvailable}
-              onPress={()=>{this.loadWhatsapp()}}
-              buttonStyle={adourStyle.btnGeneral}
-              textStyle={adourStyle.btnText}
-              title={(this.state.whatsappAvailable)?'Chat on Whatsapp':'Loading Whatsapp...'} />
-          }
 
           {
             item.isClient && item.status == 1 &&
@@ -246,10 +198,9 @@ class DashboardDetails extends Component {
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     textStyle={adourStyle.btnText}
-                    title="Cancel"
+                    title="Unmatch"
                 />
           }
-          </View>
         </Card>
       </View>
     )
