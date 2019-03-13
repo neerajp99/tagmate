@@ -93,10 +93,7 @@ class AddDetails extends Component {
             <ScrollView>
             <Card>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
-                <Text style={adourStyle.defaultText}>Your 10-digit Indian Mobile Number</Text>
-                {this.renderWhatsapp()}
-                <Divider />
-                <Text style={adourStyle.defaultText}>What can you offer?</Text>
+                <Text style={adourStyle.defaultText}>What are you interested in?</Text>
                 {this.renderServices()}
                 <TouchableOpacity style={adourStyle.btnGeneral} onPress={this.onButtonPress.bind(this)}>
                   <Text style={adourStyle.btnText}>Save Preferences</Text>
