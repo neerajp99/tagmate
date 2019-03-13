@@ -13,10 +13,20 @@ class RequestDetails extends Component{
         super(props);
         this.state = {
             disabledBtn:false, // Check if service request button is disabeld or not. Default: not disabled.
-            when:'ASAP', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
+            when:'', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
+            isDateTimePickerVisible: false,
         }
     }
+
+    _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+
+   _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+
+   _handleDatePicked = date => {
+     this.setState({ when: date.toLocaleString('en-us', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) });
+     this._hideDateTimePicker();
+   };
 
   	sendRequest = () =>
     {
@@ -27,7 +37,7 @@ class RequestDetails extends Component{
             const {currentUser: {uid} = {}} = firebase.auth();
             const {when, details} = this.state;
             if(when.length == 0) return this.erred('Please input when.');
-            if(when.length > 20) return this.erred('When should not exceed 20 characters.');
+            //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
             canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
                 if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
@@ -51,7 +61,11 @@ class RequestDetails extends Component{
     }
 
   render(){
+    const { isDateTimePickerVisible, when } = this.state;
   	const { title } = this.props.navigation.state.params.item;
+    var today = new Date();
+    date=today.getDate() + "/"+ parseInt(today.getMonth()+1) +"/"+ today.getFullYear();
+
     return(
       	<View style={styles.backgroundContainer}>
 	        <Card title={title} titleStyle={adourStyle.cardTitle} >
@@ -67,6 +81,17 @@ class RequestDetails extends Component{
                 placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
                 underlineColorAndroid='transparent'
                 onChangeText={when => this.setState({ when: when })}
+              />
+
+              <Button title={when} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
+              <DateTimePicker
+                isVisible={isDateTimePickerVisible}
+                mode='datetime'
+                date={today}
+                minimumDate={today}
+                is24Hour={false}
+                onConfirm={this._handleDatePicked}
+                onCancel={this._hideDateTimePicker}
               />
 
               <TextInput
