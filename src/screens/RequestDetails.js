@@ -51,7 +51,9 @@ class RequestDetails extends Component{
             if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
-            canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
+
+            /* PREVENTS USER FROM CREATING POSTS IF USER DOES NOT HAVE ENOUGH COINS - DISABLED TEMPORARILY
+              canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
                 if(requestMore) postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
                 this.setState({disabledBtn:false}); // Enable the button again
                 this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
@@ -62,6 +64,14 @@ class RequestDetails extends Component{
                     // user has as many ongoing requests as their Adour coin balance.
                 }
             });
+          */
+
+          //If you enable the currently disabled coin system again, delete below code
+          postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
+          this.setState({disabledBtn:false}); // Enable the button again
+          this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
+          });
+          
         }
     }
 

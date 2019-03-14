@@ -17,11 +17,18 @@ class RequestScreen extends Component {
     // This function expects a valid service object to be passed to it as parameter.
     onItemPress = (item) => {
         if(!item.id) return;
-        const {currentUser: {uid} = {}} = firebase.auth();
+
+
+        /* PREVENTS USER FROM CREATING POSTS IF USER DOES NOT HAVE ENOUGH COINS - DISABLED TEMPORARILY
+          const {currentUser: {uid} = {}} = firebase.auth();
         canRequestMore(uid).then(requestMore => { // Check if the user is permitted to create more service requests:
             if(requestMore) this.props.navigation.navigate('RequestDetails', {item:item});
             else return alert('Sorry, you have as many ongoing requests as your Adour coin balance.');
         });
+      */
+
+      //If you enable the currently disabled coin system again, delete below code
+      this.props.navigation.navigate('RequestDetails', {item:item});
     }
 
     addCustomService = () =>
