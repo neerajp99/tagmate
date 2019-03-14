@@ -248,6 +248,18 @@ export const getWhatsapp = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+// Expects user ID in parameters
+// Returns firstname of the user
+export const getName = (userId) => new Promise((resolve, reject) => {
+    try {
+        const {currentUser} = firebase.auth();
+        var nameRef = firebase.database().ref(`/users/${userId}/firstName`);
+        nameRef.once("value", function(firstName){resolve(firstName.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // To note in database that user {userId} has rejected task {serviceId}
 export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
     try {

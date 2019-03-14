@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
-import {getAllServices, getWhatsapp} from '../lib/firebaseUtils.js';
+import {getAllServices, getWhatsapp, getName} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
@@ -17,11 +17,10 @@ class DashboardDetails extends Component {
       fetching:true,
       item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
-      chillmateName: 'No Chillmate',
+      nameAvailable:false,
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
-    this.getChillmateName = this.getChillmateName.bind(this);
   }
 
   componentDidMount(){
@@ -31,33 +30,11 @@ class DashboardDetails extends Component {
       this.setState({services}); // Make services list available to the screen
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
-    this.getChillmateName();
   }
 
   componentWillUnmount()
   {
     this._isMounted = false;
-  }
-
-  getChillmateName = () => {
-    console.log('Inside getChillmateName')
-    //if(this.state.item.status != 1) return console.log('Cant get Chillmate name')
-    const getChillmateIdPromise = firebase.database().ref(`/servicesRequests/${this.state.item.id}`).once('value')
-    return Promise.all([getChillmateIdPromise])
-        .then(results => {
-          var item = results[0].val()
-          const {serverId} = item
-          if(!serverId) {
-            console.log('No Chillmate yet')
-            return
-          }
-          const serverNamePromise = firebase.database().ref(`/users/${serverId}/firstName`).once('value')
-          return Promise.all([serverNamePromise])
-              .then(finResults => {
-                const serverName = finResults[0].val()
-                this.setState({chillmateName:serverName});
-              })
-    });
   }
 
   liveUpdates = () => {
@@ -87,6 +64,17 @@ class DashboardDetails extends Component {
         })
         item.whatsapp = this.state.item.whatsapp;
         this.setState({item:item});
+        // If name is not available yet:
+        if(!this.state.nameAvailable)
+        {
+          // Get whatsapp number of the other person involved in this service request:
+          getName((item.isClient)?item.serverId:item.clientId).then(name=>
+          {
+            // Then, update the whatsapp number:
+            item.name = name;
+            this.setState({item:item, nameAvailable:true});
+          });
+        }
         // If whatsapp number is not available yet:
         if(!this.state.whatsappAvailable)
         {
@@ -164,7 +152,7 @@ class DashboardDetails extends Component {
         {
           item.status == 1 &&
               <ListItem
-                  title={"Chillmate: "+ (this.state.chillmateName)}
+                  title={"Chillmate: "+ (item.name)}
                   titleStyle={adourStyle.listItemText}
                   hideChevron={true}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}

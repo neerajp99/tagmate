@@ -33,7 +33,9 @@ class RequestDetails extends Component{
      var weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
      let weekday = weekdays[d.getDay()];
      let month = months[d.getMonth()];
-     let formattedDate = weekday+', '+ month+ ' ' + d.getDate() + ' at ' + d.getHours() + ':' + d.getMinutes();
+     let minutes = d.getMinutes();
+     if (minutes < 10)  minutes = '0'+minutes;
+     let formattedDate = weekday+', '+ month+ ' ' + d.getDate() + ' at ' + d.getHours() + ':' + minutes;
      console.log(formattedDate)
      return formattedDate
    }
