@@ -208,17 +208,21 @@ class DashboardDetails extends Component {
 
            */ }
 
-           <Button
+           {
+             item.status < 3 &&
+             <Button
              icon={{name: 'chat'}}
              disabled={!this.state.whatsappAvailable}
              onPress={() =>
                        this.props.navigation.navigate("Chat", {
-                         name: 'Shivam',
+                         name: item.name,
                          taskId: item.id
                        })}
              buttonStyle={adourStyle.btnGeneral}
              textStyle={adourStyle.btnText}
              title="Chat" />
+           }
+
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}
