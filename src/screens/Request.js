@@ -34,7 +34,7 @@ class RequestScreen extends Component {
     addCustomService = () =>
     {
          // Trigger default email app to open "Compose email" box preloaded with an Adour rep's email and a subject line.
-        Linking.openURL('mailto:support@getadour.com?subject=New Service Suggestion&body=Hey there, please add this service: ')
+        Linking.openURL('mailto:support@chillmateapp.com?subject=New Activity Suggestion&body=Please add this activity: ')
     }
 
     render() {
@@ -63,7 +63,7 @@ class RequestScreen extends Component {
 
                 <Card>
                     <ListItem
-                        title='Add a custom service'
+                        title='Add a custom activity'
                         titleStyle={adourStyle.listItemText}
                         leftIcon={{name: 'add-circle-outline'}}
                         containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}

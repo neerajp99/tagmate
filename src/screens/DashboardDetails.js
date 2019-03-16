@@ -64,6 +64,15 @@ class DashboardDetails extends Component {
         })
         item.whatsapp = this.state.item.whatsapp;
         this.setState({item:item});
+
+        // Get name of the user involved in this service request:
+        getName(uid).then(selfName=>
+        {
+          // Then, update the name:
+          item.selfName = selfName;
+          this.setState({item:item});
+        });
+
         // If name is not available yet:
         if(!this.state.nameAvailable)
         {
@@ -75,6 +84,7 @@ class DashboardDetails extends Component {
             this.setState({item:item, nameAvailable:true});
           });
         }
+
 
         // Get reputation coins of the other person involved in this service request:
         getCoins((item.isClient)?item.serverId:item.clientId).then(coins=>
@@ -212,10 +222,9 @@ class DashboardDetails extends Component {
              item.status < 3 &&
              <Button
              icon={{name: 'chat'}}
-             disabled={!this.state.whatsappAvailable}
              onPress={() =>
                        this.props.navigation.navigate("Chat", {
-                         name: item.name,
+                         name: item.selfName,
                          taskId: item.id
                        })}
              buttonStyle={adourStyle.btnGeneral}
