@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "522194578751-vbi2h0saa3ogge9cmr20c9guuful442f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chillmate",
+            "certificate_hash": "437a0d5ed6d7bb3ce6ce550a3189ff6978ee3704"
+          }
+        },
+        {
           "client_id": "522194578751-bobqbcmj48345s6klfkpi07rjkoni7a6.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -6,9 +6,8 @@ import logo from '../img/logo.png'
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE} from './style/AdourStyle';
 
 const FIRST_SLIDE_DESCRIPTION = 'What you create out of that conversation is up to you. A great conversation can lead to a date, a friend, a career opportunity or it can just be a conversation.';
-const SECOND_SLIDE_DESCRIPTION = 'We believe that a 10 minute offline conversation is more valuable than a 1 hour online chat. Thats why our goal is to enable two people to meet offline as soon as possible.';
-const THIRD_SLIDE_DESCRIPTION = 'All profiles are verified Ashoka profiles. Your identity is only revealed to your Chillmate and no one else.';
-const FOURTH_SLIDE_DESCRIPTION = 'Chillmate is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
+const SECOND_SLIDE_DESCRIPTION = 'All profiles are verified Ashoka profiles. Your identity is only revealed to your Chillmate and no one else.';
+const THIRD_SLIDE_DESCRIPTION = 'Chillmate is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
 
 
 class OnboardingSplash extends Component {
@@ -47,12 +46,12 @@ render() {
             backgroundColor: BRAND_COLOR_ONE,
             image: (
                     <Icon
-                      name="handshake-o"
+                      name="star-o"
                       size={100}
                       color="white"
                     />
                   ),
-            title: 'Offline > Online',
+            title: 'Zero Fake Profiles',
             titleStyles: adourStyle.onboardingTitle,
             subtitle: SECOND_SLIDE_DESCRIPTION,
             subTitleStyles: adourStyle.onboardingSubtitle,
@@ -66,23 +65,9 @@ render() {
                       color="white"
                     />
                   ),
-            title: 'Zero Fake Profiles',
-            titleStyles: adourStyle.onboardingTitle,
-            subtitle: THIRD_SLIDE_DESCRIPTION,
-            subTitleStyles: adourStyle.onboardingSubtitle,
-          },
-          {
-            backgroundColor: BRAND_COLOR_THREE,
-            image: (
-                    <Icon
-                      name="star-o"
-                      size={100}
-                      color="white"
-                    />
-                  ),
             title: 'Safe',
             titleStyles: adourStyle.onboardingTitle,
-            subtitle: FOURTH_SLIDE_DESCRIPTION,
+            subtitle: THIRD_SLIDE_DESCRIPTION,
             subTitleStyles: adourStyle.onboardingSubtitle,
           },
 

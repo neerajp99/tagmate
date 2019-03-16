@@ -17,6 +17,7 @@ class Loading extends Component {
         console.log('fetching all services in loading screen.')
         fetchAllServices()
     }
+
     async componentDidMount() {
 
       //We only need to check if it's user's first time if user is not signed in
@@ -50,7 +51,9 @@ class Loading extends Component {
                             let vals = snapshot.val();
                             if(vals != null){
                                 if( (vals.services || []).length == 0) this.populateUserServices();
-                                else this.props.navigation.navigate('MainStack');
+                                else {
+                                  this.props.navigation.navigate('MainStack');
+                                }
                             }
                             else{
                                 this.populateUserServices();
@@ -152,7 +155,7 @@ class Loading extends Component {
           <ImageBackground source={bgImage} style={styles.backgroundContainer}>
             <View style={styles.logoContainer}>
               <Image source={logo} style={styles.logo} />
-              <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text>
+              {/* <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text> */}
             </View>
             <View style={{marginTop: 10, marginBottom: 10}}>
                 <ActivityIndicator size="large" color="white"/>

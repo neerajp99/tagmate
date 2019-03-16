@@ -26,7 +26,7 @@ class PrivacyPolicyScreen extends Component{
           <WebView
             onLoad={() => this.hideSpinner()}
             style={{ flex: 1 }}
-            source={{ uri: 'http://getadour.com/app/privacypolicy.html' }}
+            source={{ uri: 'http://chillmateapp.com/legal/privacypolicy.html' }}
           />
         </View>
       )

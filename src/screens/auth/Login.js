@@ -199,7 +199,7 @@ class Login extends Component {
 
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Light} onPress={this._signIn}/>
         <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
-          Debug Splash
+          Intro
         </Text>
       </View>
       </View>
@@ -264,10 +264,11 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   clickableText: {
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.35)',
+    fontSize: 12,
     textAlign: 'center',
-    marginTop: 8
+    marginTop: 8,
+    marginBottom: 8
   }
 })
 

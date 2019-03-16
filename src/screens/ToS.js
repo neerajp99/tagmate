@@ -7,7 +7,7 @@ class ToS extends Component{
       return (
         <View style={{ flex: 1 }}>
           <WebView
-              source={{uri: 'http://getadour.com/app/tos.html'}}
+              source={{uri: 'http://chillmateapp.com/legal/tos.html'}}
               style={{ flex: 1 }}
           />
         </View>

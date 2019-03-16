@@ -2,10 +2,11 @@ import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {serverExists, addServer, appendRejectedTask, getRelatedServices} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
+import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {connect} from "react-redux";
-import {fetchAllServices} from "../actions";
+import {setDeviceToken} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
@@ -37,10 +38,26 @@ class TaskScreen extends Component {
             // Keep updating tasks
             this.getMyTasks();
         });
+        this.tokenFunc();
     }
     componentWillUnmount()
     {
         this._isMounted = false;
+    }
+
+    async tokenFunc() {
+      const {setDeviceToken} = this.props
+      let {currentUser} = await firebase.auth();
+      // configure push notification capability & get deviceToken
+      Notification.configure((token) => {
+        if(currentUser) setDeviceToken(token)
+      })
+
+      //listener to listen token refresh
+      this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(token => {
+          Notification.onTokenRefresh(token)
+          if(currentUser) setDeviceToken(token)
+      })
     }
 
     userGuideContainer = () =>
@@ -48,9 +65,9 @@ class TaskScreen extends Component {
       if(this.state.myTasks.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                 <Text style={adourStyle.guideText}>
-                No activity to show. Check back later! {"\n"} {"\n"}
+                You will see other people's Chillmate meetup posts here. Your posts are on your Dashboard. {"\n"} {"\n"}
                 </Text>
-                <Button title="Create A Chillmate Activity" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
+                <Button title="Create A Chillmate Meetup" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                 </View>
           }
     }
@@ -254,7 +271,7 @@ class TaskScreen extends Component {
 
 }
 
-export {TaskScreen};
+export default connect(null, {setDeviceToken}) (TaskScreen);
 
 /*
 * Styles used in this screen

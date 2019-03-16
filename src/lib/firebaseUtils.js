@@ -202,8 +202,8 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
 })
 
 // Expects service request ID in parameter
-// Marks request as done and deducts Adour coins from requester
-// and credits to the acceptor
+// Marks request as done and CREDITS coins to requester
+// as well as to the acceptor
 export const markRequestDone = (id) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
@@ -211,7 +211,8 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
         ref.once("value", function(snapshot) {
             const {clientId, serverId} = snapshot.val();
             firebase.database().ref(`/users/${clientId}/coins`).transaction(function(coins){
-              return (coins || 0) - 1;
+              return (coins || 0) + 1;
+              //previously was return (coins || 0) - 1;
             });
             firebase.database().ref(`/users/${serverId}/coins`).transaction(function(coins){
               return (coins || 0) + 1;

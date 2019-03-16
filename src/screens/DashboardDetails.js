@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
-import {getAllServices, getWhatsapp, getName} from '../lib/firebaseUtils.js';
+import {getAllServices, getWhatsapp, getName, getCoins} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
@@ -67,14 +67,24 @@ class DashboardDetails extends Component {
         // If name is not available yet:
         if(!this.state.nameAvailable)
         {
-          // Get whatsapp number of the other person involved in this service request:
+          // Get name of the other person involved in this service request:
           getName((item.isClient)?item.serverId:item.clientId).then(name=>
           {
-            // Then, update the whatsapp number:
+            // Then, update the name:
             item.name = name;
             this.setState({item:item, nameAvailable:true});
           });
         }
+
+        // Get reputation coins of the other person involved in this service request:
+        getCoins((item.isClient)?item.serverId:item.clientId).then(coins=>
+        {
+          // Then, update the coins:
+          item.coins = coins;
+          this.setState({item:item});
+        });
+
+
         // If whatsapp number is not available yet:
         if(!this.state.whatsappAvailable)
         {
@@ -99,7 +109,10 @@ class DashboardDetails extends Component {
     else // Only if the button is not disabled:
     {
       this.setState({disabledDone:true});
-      markRequestDone(id).then(resp=>{this.props.navigation.navigate('DashboardScreen')})
+      markRequestDone(id).then(resp=>{
+        alert('Your reputation points increased!')
+        this.props.navigation.navigate('DashboardScreen')
+      })
     }
   }
 
@@ -154,6 +167,8 @@ class DashboardDetails extends Component {
               <ListItem
                   title={"Chillmate: "+ (item.name)}
                   titleStyle={adourStyle.listItemText}
+                  subtitle={"Reputation: " + (item.coins)}
+                  subtitleStyle={adourStyle.listItemText}
                   hideChevron={true}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                   leftIcon={{ name: 'info-outline'}}

@@ -5,7 +5,7 @@ export * from './PrivacyPolicy'
 export * from './ToS'
 export RequestScreen from './Request';
 export * from './RequestDetails';
-export * from './Tasks';
+export TaskScreen from './Tasks';
 export * from './Dashboard';
 export * from './DashboardDetails';
 export Loading from './Loading';
