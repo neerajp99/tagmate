@@ -111,7 +111,6 @@ class DashboardScreen extends Component {
                       Hello {displayName} {"\n"} {"\n"}You haven't accepted any conversation requests yet. {"\n"} {"\n"}
                       "Twenty years from now, you will be more disappointed by the things you didn't do than by the ones you did do." - Mark Twain
                       </Text>
-                      <Button title="Meet Someone New" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Tasks')}}/>
                     </View>
           }
       } else {
@@ -120,7 +119,6 @@ class DashboardScreen extends Component {
                     <Text style={adourStyle.guideText}>
                     It's pitch white in here! {"\n"} {"\n"} Magic lies outside your comfort zone. {"\n"}{"\n"}
                     </Text>
-                    <Button title="Meet Someone New" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                   </View>
         }
       }

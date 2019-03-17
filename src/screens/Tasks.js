@@ -65,7 +65,7 @@ class TaskScreen extends Component {
       if(this.state.myTasks.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                 <Text style={adourStyle.guideText}>
-                You will see other people's Chillmate meetup posts here. Your posts are on your Dashboard. {"\n"} {"\n"}
+                Your posts are on your Dashboard. Other's meetup requests appear here. {"\n"} {"\n"}
                 </Text>
                 <Button title="Create A Chillmate Meetup" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                 </View>
