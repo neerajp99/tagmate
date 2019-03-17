@@ -104,7 +104,7 @@ class ProfileScreen extends Component{
 
         <Card title="Account" titleStyle={adourStyle.cardTitleSmall}>
           <ListItem
-            title='Edit Details'
+            title='My Interests'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'mode-edit' }}
             containerStyle={{borderBottomColor: '#e6e6e6'}}

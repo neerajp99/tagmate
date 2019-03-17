@@ -26,7 +26,7 @@ export const ProfileStack = createStackNavigator(
       screen: EditProfileDetails,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Edit Details',
+          headerTitle: 'My Interests',
           headerTitleStyle: routerStyle.headerText
         }
       }

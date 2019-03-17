@@ -121,9 +121,6 @@ class Loading extends Component {
         // The callback failed.
         console.error(error);
     });
-
-
-
   }
 
 

@@ -93,6 +93,7 @@ class Login extends Component {
         if(this._isMounted)
         {
           this.setState({loading:false});
+          this.populateUserServices();
           this.props.navigation.navigate('MainStack')
         }
       }
@@ -115,6 +116,29 @@ class Login extends Component {
       }
     }
   }
+
+  populateUserServices = () => {
+    let servicesCount = 0
+    let services = []
+    console.log('Inside populate user services in Loading js')
+    const {currentUser} = firebase.auth();
+    //userRef.child(`services`).set(myServices);
+
+    //Get the count of all available services
+    firebase.database().ref('/services').once('value', function(snapshot) {
+       servicesCount = snapshot.numChildren();
+       for(i = 1; i<servicesCount+1; i++){
+         services.push('service' + i)
+       }
+       console.log('Populating new user object with all services by default')
+       var ref = firebase.database().ref(`/users/${currentUser.uid}`);
+       ref.child(`services`).set(services);
+     },
+     function(error) {
+      // The callback failed.
+      console.error(error);
+  });
+}
 
   handleLoading = () => {
     if(this.props.loading){
