@@ -117,26 +117,32 @@ class Login extends Component {
     }
   }
 
+
   populateUserServices = () => {
     let servicesCount = 0
     let services = []
-    console.log('Inside populate user services in Loading js')
     const {currentUser} = firebase.auth();
+    console.log('Inside populate user services in Login js')
     //userRef.child(`services`).set(myServices);
+    firebase.database().ref(`/users/${currentUser.uid}/services`).once('value').then(snapshot => {
+    if (snapshot.val() === null ) {
+      //Get the count of all available services
+      firebase.database().ref('/services').once('value', function(snapshot) {
+         servicesCount = snapshot.numChildren();
+         for(i = 1; i<servicesCount+1; i++){
+           services.push('service' + i)
+         }
+         console.log('Populating new user object with all services by default')
+         var ref = firebase.database().ref(`/users/${currentUser.uid}`);
+         ref.child(`services`).set(services);
 
-    //Get the count of all available services
-    firebase.database().ref('/services').once('value', function(snapshot) {
-       servicesCount = snapshot.numChildren();
-       for(i = 1; i<servicesCount+1; i++){
-         services.push('service' + i)
-       }
-       console.log('Populating new user object with all services by default')
-       var ref = firebase.database().ref(`/users/${currentUser.uid}`);
-       ref.child(`services`).set(services);
-     },
-     function(error) {
-      // The callback failed.
-      console.error(error);
+
+       },
+       function(error) {
+        // The callback failed.
+        console.error(error);
+      });
+    }
   });
 }
 

@@ -46,6 +46,8 @@ class Loading extends Component {
                     }
                     else
                     {
+                      this.props.navigation.navigate('MainStack');
+                      /* IF YOU WANT TO CHECK IF THE USER HAS FILLED CERTAIN PROFILE DETAILS BEFORE ALLOWING ACCESS INTO THE APP ENABLE THIS
                         firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
                         {
                             let vals = snapshot.val();
@@ -57,8 +59,10 @@ class Loading extends Component {
                             }
                             else{
                                 this.populateUserServices();
+                                this.props.navigation.navigate('MainStack');
                             }
                         })
+                        */
                     }
 
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
