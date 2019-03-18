@@ -5,9 +5,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import logo from '../img/logo.png'
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE} from './style/AdourStyle';
 
-const FIRST_SLIDE_DESCRIPTION = 'What you create out of that conversation is up to you. A great conversation can lead to a date, a friend, a career opportunity or it can just be a conversation.';
-const SECOND_SLIDE_DESCRIPTION = 'All profiles are verified Ashoka profiles. Your identity is only revealed to your Chillmate and no one else.';
-const THIRD_SLIDE_DESCRIPTION = 'Chillmate is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
+const FIRST_SLIDE_DESCRIPTION = 'All profiles are verified Ashoka profiles. Your identity is only revealed to your Chillmate and no one else.';
+const SECOND_SLIDE_DESCRIPTION = 'Go on a walk, get chai, or smoke a cig with someone new. Want to play foosball, tennis or chess at a particular time? Find someone to play with you!';
+//const THIRD_SLIDE_DESCRIPTION = 'Chillmate is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
 
 
 class OnboardingSplash extends Component {
@@ -25,50 +25,36 @@ render() {
                   ),
             title: 'Hi',
             titleStyles: adourStyle.onboardingTitle,
-            subtitle: 'Chillmate is about creating amazing conversations, one connection at a time.',
-            subTitleStyles: adourStyle.onboardingSubtitle
-          },
-          {
-            backgroundColor: BRAND_COLOR_THREE,
-            image: (
-                    <Icon
-                      name="heart-o"
-                      size={120}
-                      color="white"
-                    />
-                  ),
-            title: 'A Great Conversation',
-            titleStyles: adourStyle.onboardingTitle,
-            subtitle: FIRST_SLIDE_DESCRIPTION,
+            subtitle: 'Chillmate is your tool to meet new people over activities you enjoy.',
             subTitleStyles: adourStyle.onboardingSubtitle
           },
           {
             backgroundColor: BRAND_COLOR_ONE,
             image: (
                     <Icon
-                      name="star-o"
+                      name="thumbs-o-up"
                       size={100}
                       color="white"
                     />
                   ),
             title: 'Zero Fake Profiles',
             titleStyles: adourStyle.onboardingTitle,
-            subtitle: SECOND_SLIDE_DESCRIPTION,
+            subtitle: FIRST_SLIDE_DESCRIPTION,
             subTitleStyles: adourStyle.onboardingSubtitle,
           },
           {
             backgroundColor: BRAND_COLOR_THREE,
             image: (
                     <Icon
-                      name="star-o"
-                      size={100}
+                      name="smile-o"
+                      size={120}
                       color="white"
                     />
                   ),
-            title: 'Safe',
+            title: 'Make your life an epic adventure!',
             titleStyles: adourStyle.onboardingTitle,
-            subtitle: THIRD_SLIDE_DESCRIPTION,
-            subTitleStyles: adourStyle.onboardingSubtitle,
+            subtitle: SECOND_SLIDE_DESCRIPTION,
+            subTitleStyles: adourStyle.onboardingSubtitle
           },
 
         ]}

@@ -71,7 +71,7 @@ class RequestDetails extends Component{
           this.setState({disabledBtn:false}); // Enable the button again
           this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
           });
-          
+
         }
     }
 
@@ -92,7 +92,8 @@ class RequestDetails extends Component{
       	<View style={styles.backgroundContainer}>
 	        <Card title={title} titleStyle={adourStyle.cardTitle} >
           <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>Specify a time & date when you're available for the chosen activity: </Text>
+          <Text style={adourStyle.cardSubtitle}>Specify a time & date when you're available for the chosen activity. </Text>
+          <Text style={adourStyle.cardSubtitle}>Only the person who accepts your post can see your name. Your post does not contain your name. </Text>
           </View>
 
               <Button title={when} buttonStyle={styles.dateTimeStyle} textStyle={adourStyle.placeholderStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>

@@ -131,7 +131,8 @@ export const adourStyle = StyleSheet.create({
   cardSubtitle: {
     fontFamily:'OpenSans-Regular',
     fontSize: 16,
-    fontWeight: '100'
+    fontWeight: '100',
+    marginBottom: 8
   },
   btnGeneral: {
     borderRadius: 25,

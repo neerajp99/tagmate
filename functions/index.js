@@ -12,7 +12,7 @@ exports.helloWorld = functions.https.onRequest((req, res) => {
   res.send("Hello from a Serverless Database!");
 });
 
-// This function pushes notification every time a new service request is created to those who offer that service.
+// DELETED FROM FIREBASE This function pushes notification every time a new service request is created to those who offer that service.
 exports.sendPushNotification = functions.database
     .ref('/servicesRequests/{pushId}')
     .onCreate((snapshot, context) => {

@@ -129,7 +129,7 @@ class DashboardDetails extends Component {
   confirmCancel = (item) => {
     Alert.alert(
       'Confirmation',
-      'Are you sure you want to cancel? You will have to create a new post to find a new Chillmate.',
+      'Are you sure you want to unmatch? You will have to create a new post to find a new Chillmate.',
       [
         {text: 'No', onPress: () => console.log('Cancellation Revoked')},
         {text: 'Yes', onPress: () => this.markCancelled(item)}
@@ -247,7 +247,7 @@ class DashboardDetails extends Component {
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     textStyle={adourStyle.btnText}
-                    title="Cancel"
+                    title="Unmatch"
                 />
           }
         </Card>
