@@ -212,7 +212,7 @@ class TaskScreen extends Component {
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              subtitle={ "Scheduled for: "+(when) }
+              subtitle={(when == '')? ("Scheduled for: "+(when)):("") }
               subtitleStyle={adourStyle.listItemText}
               rightTitle={['Posted ', <TimeAgo key={id} time={created_at} />]}
               subtitleNumberOfLines={2}

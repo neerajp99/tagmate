@@ -13,8 +13,9 @@ class RequestDetails extends Component{
         super(props);
         this.state = {
             disabledBtn:false, // Check if service request button is disabeld or not. Default: not disabled.
-            when:'Time & Date', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
+            when:'', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
+            dtPlaceholder: 'Date & Time (Optional)',
             isDateTimePickerVisible: false,
         }
     }
@@ -24,7 +25,7 @@ class RequestDetails extends Component{
    _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
    _handleDatePicked = date => {
-     this.setState({ when: this.formatDate(date) });
+     this.setState({ when: this.formatDate(date), dtPlaceholder: this.formatDate(date) });
      this._hideDateTimePicker();
    };
 
@@ -48,7 +49,7 @@ class RequestDetails extends Component{
             this.setState({disabledBtn:true}); // Disable button while function is running.
             const {currentUser: {uid} = {}} = firebase.auth();
             const {when, details} = this.state;
-            if(when == 'Time & Date') return this.erred('Please select time & date');
+            //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
 
@@ -83,18 +84,18 @@ class RequestDetails extends Component{
     }
 
   render(){
-    const { isDateTimePickerVisible, when } = this.state;
-  	const { title } = this.props.navigation.state.params.item;
+    const { isDateTimePickerVisible, when, dtPlaceholder } = this.state;
+  	const { title, img } = this.props.navigation.state.params.item;
     var today = new Date();
     date=today.getDate() + "/"+ parseInt(today.getMonth()+1) +"/"+ today.getFullYear();
 
     return(
       	<View style={styles.backgroundContainer}>
-	        <Card title={title} titleStyle={adourStyle.cardTitle} >
+	        <Card title={title} titleStyle={adourStyle.cardTitle} image={{uri: img}} >
           <View style={styles.cardSubtitle}>
           <Text style={adourStyle.cardSubtitle}>Specify a time & date when you're available for the chosen activity. </Text>
           </View>
-              <Button title={when} buttonStyle={styles.dateTimeStyle} textStyle={adourStyle.placeholderStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
+              <Button title={dtPlaceholder} buttonStyle={styles.dateTimeStyle} textStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
               <DateTimePicker
                 isVisible={isDateTimePickerVisible}
                 mode='datetime'
@@ -106,11 +107,11 @@ class RequestDetails extends Component{
               />
 
               <TextInput
-                style={adourStyle.textInput}
+                style={adourStyle.textInputCenter}
                 autoCapitalize="none"
-                placeholder="Conversation Topic (Optional)"
+                placeholder="Additional Details"
                 placeholderStyle={adourStyle.placeholderStyle}
-                placeholderTextColor={'rgba(255, 255, 255, 0.9)'}
+                placeholderTextColor={'rgba(255, 255, 255, 1)'}
                 underlineColorAndroid='transparent'
                 onChangeText={details => this.setState({ details: details })}
               />
@@ -142,6 +143,12 @@ const styles = StyleSheet.create({
       backgroundColor: 'rgba(54, 105, 169, 0.2)',
       justifyContent: 'center',
       marginBottom: 20,
+    },
+    buttonTextStyle: {
+      fontFamily:'OpenSans-Semibold',
+      fontSize: 16,
+      fontWeight: '800',
+      color: 'rgba(255, 255, 255, 1)'
     },
     progressContainer: {
         left: '50%',

@@ -154,7 +154,7 @@ class DashboardScreen extends Component {
             <View>
 
                 {
-                  item.status <3 &&
+                  item.status == 1 && item.status == 2 && 
                   <ListItem
                     title={serviceTitle}
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}

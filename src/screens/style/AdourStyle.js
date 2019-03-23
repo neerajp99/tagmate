@@ -91,6 +91,19 @@ export const adourStyle = StyleSheet.create({
     backgroundColor: 'rgba(54, 105, 169, 0.2)',
     color: 'rgba(0, 0, 0, 0.35)'
   },
+  textInputCenter: {
+    height: 45,
+    width: WIDTH -108,
+    borderRadius: 25,
+    marginLeft: 15,
+    marginBottom: 15,
+    fontSize: 16,
+    fontFamily:'OpenSans-Semibold',
+    paddingLeft: 25,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    color: 'rgba(0, 0, 0, 0.35)',
+    textAlign: 'center'
+  },
   picker: {
     fontFamily:'OpenSans-Semibold',
     paddingLeft: 25,

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert} from 'react-native';
+import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollView} from 'react-native';
 import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -60,7 +60,10 @@ class DashboardDetails extends Component {
         // Fetching service's title:
         this.state.services.map(service =>
         {
-          if(item.serviceId == service.id) item.serviceTitle = service.title;
+          if(item.serviceId == service.id){
+            item.serviceTitle = service.title;
+            item.serviceImg = service.img;
+          }
         })
         item.whatsapp = this.state.item.whatsapp;
         this.setState({item:item});
@@ -177,8 +180,9 @@ class DashboardDetails extends Component {
       }
     }
     return (
+      <ScrollView>
       <View style={styles.mainContainer}>
-      <Card title={item.serviceTitle} titleStyle={adourStyle.cardTitle}>
+      <Card title={item.serviceTitle} titleStyle={adourStyle.cardTitle} image={{uri: item.serviceImg}}>
           {/* Task Status */ }
           <View style={styles.cardSubtitle}>
           <Text style={adourStyle.cardSubtitle}>{statusStr}</Text>
@@ -201,14 +205,18 @@ class DashboardDetails extends Component {
         }
 
           {/* Task Timing and details */ }
-          <ListItem
-              title={ "Scheduled for: "+ (item.when) }
-              subtitleStyle={adourStyle.listItemText}
-              titleStyle={adourStyle.listItemText}
-              hideChevron={true}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              leftIcon={{ name: 'access-time'}}
-            />
+          {
+            item.when != "" &&
+                <ListItem
+                  title={ "Scheduled for: "+ (item.when) }
+                  subtitleStyle={adourStyle.listItemText}
+                  titleStyle={adourStyle.listItemText}
+                  hideChevron={true}
+                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                  leftIcon={{ name: 'access-time'}}
+                />
+          }
+
           {
             item.details != "" &&
                 <ListItem
@@ -267,6 +275,7 @@ class DashboardDetails extends Component {
           }
         </Card>
       </View>
+      </ScrollView>
     )
   }
 }
