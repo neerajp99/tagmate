@@ -127,22 +127,37 @@ class DashboardDetails extends Component {
   }
 
   confirmCancel = (item) => {
-    Alert.alert(
+    if(item.status ==1)
+    {
+      Alert.alert(
       'Confirmation',
-      'Are you sure you want to unmatch? You will have to create a new post to find a new Chillmate.',
+      'Are you sure you want to unmatch?',
       [
         {text: 'No', onPress: () => console.log('Cancellation Revoked')},
         {text: 'Yes', onPress: () => this.markCancelled(item)}
       ]
     );
+  } else {
+    Alert.alert(
+    'Confirmation',
+    'Are you sure you want to remove this activity? You cannot undo this action.',
+    [
+      {text: 'No', onPress: () => console.log('Cancellation Revoked')},
+      {text: 'Yes', onPress: () => this.markCancelled(item)}
+    ]
+  );
+  }
+
   }
   // Expects {item} parameter to be an object with two valid properties: id (of service request) and isClient
   // Changes service request's status to cancelled in Firebase realtime database
   markCancelled = (item) => {
-    markRequestCancelled(item.id, item.isClient).then(resp =>
+    const {currentUser: {uid} = {}} = firebase.auth()
+
+    markRequestCancelled(uid, item.id, item.isClient).then(resp =>
     {
       this.props.navigation.navigate('DashboardScreen')
-    })
+    });
   }
 
   render()
@@ -219,7 +234,7 @@ class DashboardDetails extends Component {
            */ }
 
            {
-             item.status < 3 &&
+             item.status == 1 &&
              <Button
              icon={{name: 'chat'}}
              onPress={() =>
@@ -247,7 +262,7 @@ class DashboardDetails extends Component {
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     textStyle={adourStyle.btnText}
-                    title="Unmatch"
+                    title={(item.status == 1)?"Unmatch":"Remove"}
                 />
           }
         </Card>

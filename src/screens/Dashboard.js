@@ -152,7 +152,10 @@ class DashboardScreen extends Component {
         return (
           <View key={id}>
             <View>
-                <ListItem
+
+                {
+                  item.status <3 &&
+                  <ListItem
                     title={serviceTitle}
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
                     subtitle={statusStr}
@@ -162,6 +165,7 @@ class DashboardScreen extends Component {
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
                   />
+                }
             </View>
           </View>
         )

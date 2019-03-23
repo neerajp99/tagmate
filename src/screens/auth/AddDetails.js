@@ -2,35 +2,40 @@
 import React, {Component} from 'react';
 import firebase from 'react-native-firebase';
 import {StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView} from 'react-native';
-import {CheckBox, Card, Divider} from 'react-native-elements';
+import {CheckBox, Card, Divider, ButtonGroup} from 'react-native-elements';
 import {connect} from 'react-redux';
-import {submitUserUpdates} from '../../actions';
+import {submitUserUpdates, submitUserGender} from '../../actions';
 import {getMyServices, getWhatsapp} from '../../lib/firebaseUtils';
 import * as _ from 'lodash'
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from '../style/AdourStyle'
 
 class AddDetails extends Component {
-    state = {myServices: []};
+    state = {myServices: [], genderActive: 0};
 
     async componentDidMount()
     {
         // Loading services already offered:
         var myServicess = await getMyServices(this.props.userId);
-        this.setState({myServices: myServicess,});
+        this.setState({myServices: myServicess});
     }
 
     onButtonPress() {
-        const {myServices} = this.state;
+        const {myServices, genderActive} = this.state;
 
         // Validating user inputs:
         if(_.isEmpty(myServices))
         {
             alert('You must select atleast one activity you are interested in');
             return;
+        } else if (genderActive == 0)
+        {
+          alert('Please select your gender');
+          return;
         }
         else
         {
             this.props.submitUserUpdates(myServices); // Finalling updating profile.
+            this.props.submitUserGender(genderActive);
             if(typeof this.props.onboarding != "undefined") this.props.onboarding.navigate('MainStack');
             if(typeof this.props.onboarding == "undefined") alert('Changes Saved');
         }
@@ -69,14 +74,34 @@ class AddDetails extends Component {
         this.setState({myServices: newServices})
     }
 
+    updateIndex = (genderActive) => {
+      console.log(genderActive)
+      this.setState({genderActive: genderActive})
+    }
+
     render() {
-        const {services} = this.props
+        const {services, genderActive} = this.props
+        const genderToggle = ['Not Specified', 'Male', 'Female']
+
         return (
             <ScrollView>
             <Card>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
+                <Text style={adourStyle.defaultText}>My Gender</Text>
+                <ButtonGroup
+                  onPress={this.updateIndex}
+                  selectedIndex={genderActive}
+                  buttons={genderToggle}
+                  textStyle={adourStyle.buttonText}
+                  containerStyle={{height: 45}}
+                />
+            </Card>
+            <Card>
+                {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
                 <Text style={adourStyle.defaultText}>What are you interested in?</Text>
                 {this.renderServices()}
+            </Card>
+            <Card>
                 <TouchableOpacity style={adourStyle.btnGeneral} onPress={this.onButtonPress.bind(this)}>
                   <Text style={adourStyle.btnText}>Save Preferences</Text>
                 </TouchableOpacity>
@@ -115,4 +140,4 @@ const mapStateToProps = ({auth: {loading, error} = {}, profile: {fetching, servi
     };
 };
 
-export default connect(mapStateToProps, {submitUserUpdates})(AddDetails);
+export default connect(mapStateToProps, {submitUserUpdates, submitUserGender})(AddDetails);

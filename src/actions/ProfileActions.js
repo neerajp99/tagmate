@@ -17,6 +17,15 @@ export const submitUserUpdates = (myServices) => {
     };
 }
 
+export const submitUserGender = (gender) => {
+    const {currentUser} = firebase.auth();
+    return () => {
+        var ref = firebase.database().ref(`/users/${currentUser.uid}`);
+        // Updating services offered and whatsapp number:
+        ref.child(`gender`).set(gender);
+    };
+}
+
 export const fetchAllServices = () => {
     return (dispatch) => {
         try {

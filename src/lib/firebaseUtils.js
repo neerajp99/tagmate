@@ -224,13 +224,20 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
     }
 })
 
-// Expects service request ID and isClient boolean value in parameters
+// Expects current user ID UID, Task id ID and whether the user is a client boolean isClient
 // Marks service request cancelled
-export const markRequestCancelled = (id, isClient) => new Promise((resolve, reject) => {
+export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
         if(isClient) ref.update({status:3});
-        else         ref.update({status:4});
+        else{
+          //Accepter is cancelling, put the activity back into the main pool and remove msgs
+          ref.update({status:0, serverId: null});
+          var msgRef = firebase.database().ref(`/messages/${id}`);
+          msgRef.remove();
+          //Also add it to the users rejected list
+          appendRejectedTask(uid, id);
+        }
         resolve(true);
     } catch (e) {
         reject(e)
