@@ -174,9 +174,11 @@ class DashboardScreen extends Component {
     render() {
         const {fetching, accepted, requested, active} = this.state
         const buttons = ['My Activities', 'Accepted Activities']
+        const allMyActivities = accepted.concat(requested)
 
         return (
           <View style={styles.mainContainer}>
+          {/*}
               <View>
                 <ButtonGroup
                   onPress={this.updateIndex}
@@ -186,12 +188,13 @@ class DashboardScreen extends Component {
                   containerStyle={{height: 45}}
                 />
             </View>
+            */}
               {!fetching && this.userGuideContainer(active)}
 
               {
                 !fetching &&  <FlatList
-                    data={(active == 0)?requested:accepted}
-                    extraData={(active == 0)?requested:accepted}
+                    data={allMyActivities}
+                    extraData={allMyActivities}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />
