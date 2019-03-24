@@ -50,10 +50,10 @@ class DashboardScreen extends Component {
       ref.on('child_added', (snapshot) => {
         if(this._isMounted) this.setState({fetching:false});
         var request = snapshot.val();
-        //If the user is the requester, add to requested array:
-        if(request.clientId == uid && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
+        //If the user is the requester, and it is not a cancelled activity add to requested array:
+        if(request.clientId == uid && (request.status < 3) && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
         //If the user is the accepter, add to accepted array:
-        else if(request.serverId == uid && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+        else if(request.serverId == uid && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
       });
 
       // When an existing service request object is removed:
@@ -69,8 +69,14 @@ class DashboardScreen extends Component {
       // When contents of an existing service request object are changed:
       ref.on('child_changed', (snapshot) => {
         var request = snapshot.val();
+        // If it is a service request the user has recently unmatched, it means the user is neither the server or the client anymore. Remove it from the accepted array:
+        if(request.serverId != uid && request.clientId != uid && this._isMounted){
+          this.setState({accepted: this.state.accepted.filter(function(element) {
+              return element.id !== request.id
+          })});
+        }
         // Do nothing if the service request was not related to the user:
-        if(request.clientId != uid && request.serverId != uid) return;
+        //if(request.clientId != uid && request.serverId != uid) return;
         // If it is a service request the user has recently accepted, add it to accepted array:
         if(request.status == 1 && request.serverId == uid && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
         // Else, find it in the arrays and replace it with the new information.
@@ -152,9 +158,6 @@ class DashboardScreen extends Component {
         return (
           <View key={id}>
             <View>
-
-                {
-                  item.status == 1 && item.status == 2 && 
                   <ListItem
                     title={serviceTitle}
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
@@ -165,7 +168,6 @@ class DashboardScreen extends Component {
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
                   />
-                }
             </View>
           </View>
         )
@@ -174,11 +176,9 @@ class DashboardScreen extends Component {
     render() {
         const {fetching, accepted, requested, active} = this.state
         const buttons = ['My Activities', 'Accepted Activities']
-        const allMyActivities = accepted.concat(requested)
 
         return (
           <View style={styles.mainContainer}>
-          {/*}
               <View>
                 <ButtonGroup
                   onPress={this.updateIndex}
@@ -188,13 +188,12 @@ class DashboardScreen extends Component {
                   containerStyle={{height: 45}}
                 />
             </View>
-            */}
               {!fetching && this.userGuideContainer(active)}
 
               {
                 !fetching &&  <FlatList
-                    data={allMyActivities}
-                    extraData={allMyActivities}
+                    data={(active == 0)?requested:accepted}
+                    extraData={(active == 0)?requested:accepted}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />

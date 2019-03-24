@@ -68,7 +68,7 @@ export const RequestStack = createStackNavigator(
       screen: RequestScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Create',
+          headerTitle: (<Image source={require('./img/logo_black.png')}/>),
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -92,7 +92,7 @@ export const TaskStack = createStackNavigator(
       screen: TaskScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: (<Image source={require('./img/logo_black.png')}/>),
+          headerTitle: 'Current Requests',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -136,19 +136,19 @@ export const DashboardStack = createStackNavigator(
 // Bottom Tab Navigator connecting all the above navigators as siblings:
 export const MainTabNav = createBottomTabNavigator(
   {
-    Home: {
-      screen: TaskStack,
-      navigationOptions: {
-        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='home' size={horizontal ? 20 : 25} color={tintColor} />
-        ),
-      },
-    },
-    Create: {
+    Chillmate: {
       screen: RequestStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='edit' size={horizontal ? 20 : 25} color={tintColor} />
+          <Icon name='call-to-action' size={horizontal ? 20 : 25} color={tintColor} />
+        ),
+      },
+    },
+    Requests: {
+      screen: TaskStack,
+      navigationOptions: {
+        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <Icon name='dehaze' size={horizontal ? 20 : 25} color={tintColor} />
         ),
       },
     },
