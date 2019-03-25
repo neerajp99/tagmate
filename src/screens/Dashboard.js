@@ -199,7 +199,7 @@ class DashboardScreen extends Component {
                 />
               }
               <View style={{marginBottom:30}}>
-              <Button title="Meet Someone New" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
+              <Button title="Create A Post" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
               </View>
 
               {

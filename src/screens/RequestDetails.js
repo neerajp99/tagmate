@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions} from 'react-native';
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -90,6 +90,7 @@ class RequestDetails extends Component{
     date=today.getDate() + "/"+ parseInt(today.getMonth()+1) +"/"+ today.getFullYear();
 
     return(
+      <ScrollView>
       	<View style={styles.backgroundContainer}>
 	        <Card title={title} titleStyle={adourStyle.cardTitle} image={{uri: img}} >
           <View style={styles.cardSubtitle}>
@@ -118,6 +119,7 @@ class RequestDetails extends Component{
 	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} textStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
+      </ScrollView>
     )
   }
 }

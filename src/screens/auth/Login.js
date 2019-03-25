@@ -87,7 +87,8 @@ class Login extends Component {
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);
       let allow = (currentUser.user.email.slice(-14) === '@ashoka.edu.in');
-      if(allow)
+      let allowYC = (currentUser.user.email.slice(-16) === '@ycombinator.com');
+      if(allow || allowYC)
       {
         await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
         if(this._isMounted)

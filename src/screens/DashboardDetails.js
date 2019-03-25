@@ -208,7 +208,7 @@ class DashboardDetails extends Component {
           {
             item.when != "" &&
                 <ListItem
-                  title={ "Scheduled for: "+ (item.when) }
+                  title={"Scheduled for: "+(item.when) }
                   subtitleStyle={adourStyle.listItemText}
                   titleStyle={adourStyle.listItemText}
                   hideChevron={true}
