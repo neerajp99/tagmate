@@ -296,24 +296,29 @@ export const countServicesRequests = () => {
   let countDone = 0;
   let countProg = 0;
   let countOpen = 0;
+  let openPostUsers = [];
 
   //Count various statuses
   var srRef = firebase.database().ref("servicesRequests");
   srRef.once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
-      const {status} = childSnapshot.val();
+      const {status, clientId} = childSnapshot.val();
       if(status == 4) countAcc++;
       else if (status == 3) countReq++;
       else if (status == 2) countDone++;
       else if (status == 1) countProg++;
-      else if (status == 0) countOpen++;
+      else if (status == 0) {
+        countOpen++;
+        openPostUsers.push(clientId);
+      }
     });
     console.log('number of activities cancelled by acceptor: ', countAcc);
     console.log('number of activities cancelled by requester: ', countReq);
     console.log('number of activities  marked as done: ', countDone);
     console.log('number of activities in progress: ', countProg);
     console.log('number of open activities: ', countOpen);
+    console.log('list of users who currently have open activities: ', openPostUsers);
   });
 
   //Count number of unique users created activities
