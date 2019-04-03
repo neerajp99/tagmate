@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp, getAllServices} from "../lib/firebaseUtils";
+import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
@@ -29,6 +29,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
+      //countServicesRequests(); THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});

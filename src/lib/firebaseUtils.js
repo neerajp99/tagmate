@@ -287,6 +287,76 @@ export const getCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+//Stats
+
+// Count number of serviceRequests
+export const countServicesRequests = () => {
+  let countAcc = 0;
+  let countReq = 0;
+  let countDone = 0;
+  let countProg = 0;
+  let countOpen = 0;
+
+  //Count various statuses
+  var srRef = firebase.database().ref("servicesRequests");
+  srRef.once("value")
+  .then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const {status} = childSnapshot.val();
+      if(status == 4) countAcc++;
+      else if (status == 3) countReq++;
+      else if (status == 2) countDone++;
+      else if (status == 1) countProg++;
+      else if (status == 0) countOpen++;
+    });
+    console.log('number of activities cancelled by acceptor: ', countAcc);
+    console.log('number of activities cancelled by requester: ', countReq);
+    console.log('number of activities  marked as done: ', countDone);
+    console.log('number of activities in progress: ', countProg);
+    console.log('number of open activities: ', countOpen);
+  });
+
+  //Count number of unique users created activities
+  var userPostCounted = [];
+
+  srRef.once("value")
+  .then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const {clientId} = childSnapshot.val();
+      if (!userPostCounted.includes(clientId)){
+        userPostCounted.push(clientId);
+      }
+    });
+    console.log('number of activity posts created by unique users: ', userPostCounted.length);
+    console.log('list of users who has ever created a post: ', userPostCounted);
+  });
+
+
+
+  srRef.once("value")
+  .then(function(snapshot) {
+    var servicesReqCount = snapshot.numChildren();
+    console.log('number of servicesRequests: ', servicesReqCount);
+  });
+
+  var msgsRef = firebase.database().ref("messages");
+  msgsRef.once("value")
+  .then(function(snapshot) {
+    var msgsNum = snapshot.numChildren();
+    console.log('number of message heads : ', msgsNum);
+  });
+
+  //Count users
+
+  var usersRef = firebase.database().ref("users");
+  usersRef.once("value")
+  .then(function(snapshot) {
+    var usersNum = snapshot.numChildren();
+    console.log('number of legitimate users : ', usersNum);
+  });
+
+
+}
 
 /*
 * kept firebase reference in one place
