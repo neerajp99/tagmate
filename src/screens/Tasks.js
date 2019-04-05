@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
+//Test commit
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -65,9 +66,9 @@ class TaskScreen extends Component {
       if(this.state.myTasks.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                 <Text style={adourStyle.guideText}>
-                There are no live requests matching your interests. Check back later! Your posts are on your Dashboard. {"\n"} {"\n"}
+                You will see other people's Chillmate meetup posts here. Your posts are on your Dashboard. {"\n"} {"\n"}
                 </Text>
-                <Button title="Create A Post" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
+                <Button title="Create A Chillmate Meetup" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                 </View>
           }
     }
@@ -96,7 +97,7 @@ class TaskScreen extends Component {
                 if(
                     request.clientId != uid // This request is not made by same user.
                     && request.status == 0 // This request is still not taken by anyone
-                    && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                    //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
                     this.setState({myTasks:[request].concat(this.state.myTasks)});
@@ -117,18 +118,10 @@ class TaskScreen extends Component {
                 if(
                     request.clientId == uid // This request is not made by same user.
                     || request.status != 0 // This request is still not taken by anyone
-                    || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                    //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
                 this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
-
-                if(
-                    request.clientId != uid // This request is not made by same user.
-                    && request.status == 0 // This request is still not taken by anyone
-                    && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                    && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )
-                    this.setState({myTasks:[request].concat(this.state.myTasks)});
             }
         });
 
@@ -145,7 +138,7 @@ class TaskScreen extends Component {
                     if(
                         request.clientId == uid // This request is not made by same user.
                         || request.status != 0 // This request is still not taken by anyone
-                        || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                        //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                         || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                         )
                         toRemove.push(request.id);
@@ -220,7 +213,7 @@ class TaskScreen extends Component {
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              subtitle={(when === '')? (""):("Scheduled for: "+(when)) }
+              subtitle={ "Scheduled for: "+(when) }
               subtitleStyle={adourStyle.listItemText}
               rightTitle={['Posted ', <TimeAgo key={id} time={created_at} />]}
               subtitleNumberOfLines={2}
