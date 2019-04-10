@@ -228,11 +228,17 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
 
 export const finalizeGuestList = (taskId) => new Promise((resolve, reject) => {
   try {
-    var ref = firebase.database().ref(`/servicesRequests/${taskId}`);
-    const {acceptorIds} = snapshot.val();
-    let allGuests = Object.values(acceptorIds);
-    let confirmedGuests = allGuests.filter(guest => guest.guestStatus == 1);
-    console.log('confirmedGuests: ', confirmedGuests);
+    let ref = firebase.database().ref(`/servicesRequests/${taskId}/acceptorIds`);
+    ref.once("value", function(snapshot){
+      let data = snapshot.val();
+      let allGuests = Object.values(data);
+      let confirmedGuests = allGuests.filter(guest => guest.guestStatus == 1);
+      console.log('confirmedGuests: ', confirmedGuests);
+      let confirmedRef = firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`);
+      confirmedGuests.map(guest => confirmedRef.child(guest.id).set(guest) )
+      firebase.database().ref(`/servicesRequests/${taskId}`).update({status: 1});
+      resolve(confirmedGuests)
+    } )
 
   } catch(e) {
     reject(e)

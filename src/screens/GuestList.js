@@ -36,22 +36,25 @@ class GuestList extends Component {
 
     // Home to all the listeners for the guest list object for this serviceRequest ID
     getGuestList = () => {
-      var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds`);
-      console.log('inside getGuestList');
-      ref.on('value', (snapshot) => {
-        console.log('snapshot.val(): ', snapshot.val());
-        let data = snapshot.val();
-        let guestItems = Object.values(data);
-        this.setState({ guestList: guestItems, fetching:false });
-        console.log('guestList state: ', this.state.guestList);
-      });
+      if(this._isMounted)
+      {
+          var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds`);
+          console.log('inside getGuestList');
+          ref.on('value', (snapshot) => {
+          console.log('snapshot.val(): ', snapshot.val());
+          let data = snapshot.val();
+          let guestItems = Object.values(data);
+          this.setState({ guestList: guestItems, fetching:false });
+          console.log('guestList state: ', this.state.guestList);
+        });
 
-      //Update when something changes in realtime
-      ref.on('child_changed', (snapshot) => {
-        let data = snapshot.val();
-        let guestItems = Object.values(data);
-        this.setState({ guestList: guestItems });
-      });
+        //Update when something changes in realtime
+        ref.on('child_changed', (snapshot) => {
+          let data = snapshot.val();
+          let guestItems = Object.values(data);
+          this.setState({ guestList: guestItems });
+        });
+      }
 
     }
 
@@ -66,11 +69,24 @@ class GuestList extends Component {
     }
 
     confirmGuestList = () => {
-      //TODO
+      let incomplete = false;
+      let undecidedGuests = this.state.guestList.filter(guest => guest.guestStatus == 0);
+      if(undecidedGuests.length > 0){
+        incomplete = true;
+      }
+      if(incomplete){
+        alert('Please make allow/disallow all potential guests');
+        return;
+      }
+      if(!incomplete){
+        finalizeGuestList(this.state.item.id);
+        alert('Guest List Finalised');
+        this.props.navigation.navigate('DashboardDetails',{taskId: this.state.item.id});
+      }
     }
 
     goBack = () => {
-      //TODO
+      this.props.navigation.navigate('Dashboard');
     }
 
     /*
@@ -127,6 +143,7 @@ class GuestList extends Component {
             </ScrollView>
 
             <Button
+                onPress={()=>this.confirmGuestList()}
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
                 disabled={this.state.disabledDone}
@@ -134,6 +151,7 @@ class GuestList extends Component {
             />
 
             <Button
+                onPress={()=>this.goBack()}
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
                 disabled={this.state.disabledDone}
