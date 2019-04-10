@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, appendRejectedTask, getRelatedServices} from "../lib/firebaseUtils";
+import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -31,7 +31,18 @@ class TaskScreen extends Component {
         this._isMounted = true;
         this.setState({fetching:true});
         const {currentUser: {uid} = {}} = firebase.auth()
-        // Keep updating tasks
+        // TEMPORARY
+        getAcceptors("testServiceRequest").then(response => {
+          console.log("Returned from getAcceptors: ", response);
+        })
+        alreadyAccepted("ShivamGupta500", "testServiceRequest").then(accptBool => {
+          console.log('Returned from alreadyAccepted (expected true): ', accptBool)
+        })
+        addAcceptor("ShivamGupta500", "testServiceRequest"); //TEMPORARY
+        addAcceptor("SSG1", "testServiceRequest"); //TEMPORARY
+        addAcceptor("ShivamSai20", "testServiceRequest"); //TEMPORARY
+        addAcceptor("VineetNand500", "testServiceRequest"); //TEMPORARY
+
         getRelatedServices(uid).then(services =>
         {
             this.setState(services);
@@ -94,13 +105,16 @@ class TaskScreen extends Component {
                 // To hide activity indicator:
                 this.setState({fetching:false});
                 var request = snapshot.val();
-                if(
-                    request.clientId != uid // This request is not made by same user.
-                    && request.status == 0 // This request is still not taken by anyone
-                    //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                    && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )
-                    this.setState({myTasks:[request].concat(this.state.myTasks)});
+                alreadyAccepted(uid, request.id).then(alreadyAcc => {
+                  if(
+                      request.clientId != uid // This request is not made by same user.
+                      && request.status == 0 // This request is still not set as CONFIRMED by the host
+                      && !alreadyAcc // This user has not already accepted this request
+                      //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                      && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                      )
+                      this.setState({myTasks:[request].concat(this.state.myTasks)});
+                })
             }
 
         });
@@ -117,7 +131,7 @@ class TaskScreen extends Component {
                 var request = snapshot.val();
                 if(
                     request.clientId == uid // This request is not made by same user.
-                    || request.status != 0 // This request is still not taken by anyone
+                    || request.status != 0 // This request is still not set as CONFIRMED by the host
                     //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
@@ -175,14 +189,14 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
-            serverExists(item.id).then(exists => // Check if someone has already accepted the task {id}.
+            alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
             {
                 this.hideTask(item.id);
-                if(!exists) // If the task is still not accepted by anyone, assign it to user {uid}.
+                if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                    addServer(uid, item.id).then(whatsapp =>
+                    addAcceptor(uid, item.id).then(o =>
                     {
-                        this.props.navigation.navigate('DashboardDetails', {taskId: item.id});
+                        this.hideTask(item.id);
                     });
                 }
             });

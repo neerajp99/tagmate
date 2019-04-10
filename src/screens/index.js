@@ -6,6 +6,7 @@ export * from './ToS'
 export RequestScreen from './Request';
 export * from './RequestDetails';
 export TaskScreen from './Tasks';
+export GuestList from './GuestList';
 export * from './Dashboard';
 export * from './DashboardDetails';
 export Loading from './Loading';

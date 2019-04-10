@@ -129,6 +129,12 @@ class DashboardDetails extends Component {
     }
   }
 
+  // Open Guest List Page: this page has the list of everyone who is interested in this activity
+  openGuestList = (itemId) =>
+  {
+    this.props.navigation.navigate('GuestList',{taskId: itemId})
+  }
+
   confirmCancel = (item) => {
     if(item.status ==1)
     {
@@ -264,6 +270,17 @@ class DashboardDetails extends Component {
                       title="Mark as Done"
                   />
           }
+
+          {
+            item.isClient && item.status == 1 &&
+                  <Button onPress={()=>this.openGuestList(item.id)}
+                      buttonStyle={adourStyle.btnGeneral}
+                      textStyle={adourStyle.btnText}
+                      disabled={this.state.disabledDone}
+                      title="Guest List"
+                  />
+          }
+
           {
            item.status < 2 &&
                 <Button

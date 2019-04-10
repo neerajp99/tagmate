@@ -174,7 +174,7 @@ export const getRelatedServices = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-// Check if given task has already been accepted by someone.
+// Check if given task has already been accepted by someone returns boolean
 export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     try {
         firebase.database().ref(`/servicesRequests/${serviceId}/serverId`).once('value', (snapshot) => {
@@ -186,7 +186,32 @@ export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     }
 })
 
-// Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester.
+// gets the list of all acceptors who have accepted this particular activity with serviceId
+export const getAcceptors = (serviceId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds`).once('value', (snapshot) => {
+            const acceptorIds = snapshot.val() || []
+            resolve(acceptorIds || [])
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// has this user already accepted this activity? returns a boolean if yes
+//Checks if uid exists in the acceptorIds array of serviceId servicesRequests
+export const alreadyAccepted = (uid, serviceId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds`).once('value', (snapshot) => {
+            resolve(snapshot.child(uid).exists());
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
+
+// Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester. No one being used
 export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
@@ -196,6 +221,45 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
         ref.child(`clientId`).once("value", function(snapshot) {
             resolve(getWhatsapp(snapshot.val()));
         });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const finalizeGuestList = (taskId) => new Promise((resolve, reject) => {
+  try {
+    var ref = firebase.database().ref(`/servicesRequests/${taskId}`);
+    const {acceptorIds} = snapshot.val();
+    let allGuests = Object.values(acceptorIds);
+    let confirmedGuests = allGuests.filter(guest => guest.guestStatus == 1);
+    console.log('confirmedGuests: ', confirmedGuests);
+
+  } catch(e) {
+    reject(e)
+  }
+})
+
+// Push this user to the list of acceptors
+export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) => {
+    try {
+        const {currentUser} = firebase.auth();
+
+        var ref = firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds/${userId}`);
+        ref.update({id: userId, guestStatus:0});
+        //Get first name of this particular acceptor
+        getName(userId).then(firstName=>
+        {
+          const first = firstName;
+          //Get last name of this particular acceptor
+          getLastName(userId).then(lastName=>
+          {
+            const fullName = `${firstName} ${lastName}`;
+            ref.update({fullName: fullName})
+          });
+        });
+
+
+        console.log('pushed user to acceptor list')
     } catch (e) {
         reject(e)
     }
@@ -263,6 +327,18 @@ export const getName = (userId) => new Promise((resolve, reject) => {
         const {currentUser} = firebase.auth();
         var nameRef = firebase.database().ref(`/users/${userId}/firstName`);
         nameRef.once("value", function(firstName){resolve(firstName.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// Expects user ID in parameters
+// Returns lastname of the user
+export const getLastName = (userId) => new Promise((resolve, reject) => {
+    try {
+        const {currentUser} = firebase.auth();
+        var nameRef = firebase.database().ref(`/users/${userId}/lastName`);
+        nameRef.once("value", function(lastName){resolve(lastName.val());})
     } catch (e) {
         reject(e)
     }

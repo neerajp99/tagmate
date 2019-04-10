@@ -3,7 +3,7 @@ import {Image} from 'react-native';
 import { Icon } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import ActivityChat from './screens/ActivityChat';
@@ -117,6 +117,15 @@ export const DashboardStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Activity Details',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    GuestList: {
+      screen: GuestList,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Guest List',
           headerTitleStyle: routerStyle.headerText
         }
       }
