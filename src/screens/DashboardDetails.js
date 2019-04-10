@@ -18,6 +18,7 @@ class DashboardDetails extends Component {
       item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
       nameAvailable:false,
+      confirmedGuestList: [],
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
@@ -30,11 +31,25 @@ class DashboardDetails extends Component {
       this.setState({services}); // Make services list available to the screen
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
+    this.getConfirmedGuests();
   }
 
   componentWillUnmount()
   {
     this._isMounted = false;
+  }
+
+  //Returns the react native component list with names of confirmed guests
+  getConfirmedGuests = () => {
+      var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/confirmedGuests`);
+      console.log('inside getConfirmedGuests');
+      ref.on('value', (snapshot) => {
+      console.log('snapshot.val(): ', snapshot.val());
+      let data = snapshot.val();
+      let guestItems = Object.values(data);
+      this.setState({ confirmedGuestList: guestItems});
+      console.log('confirmedGuestList state: ', this.state.confirmedGuestList);
+    })
   }
 
   liveUpdates = () => {
@@ -65,6 +80,7 @@ class DashboardDetails extends Component {
             item.serviceImg = service.img;
           }
         })
+
         item.whatsapp = this.state.item.whatsapp;
         this.setState({item:item});
 
@@ -169,9 +185,25 @@ class DashboardDetails extends Component {
     });
   }
 
+  renderGuests = ({item}) => {
+      const {id, fullName} = item;
+
+      return (
+        <View>
+        <ListItem
+          title={fullName}
+          titleStyle={adourStyle.listItemText}
+          hideChevron={true}
+          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+          leftIcon={{ name: 'access-time'}}
+        />
+        </View>
+      )
+  }
+
   render()
   {
-    const {item} = this.state;
+    const {item, confirmedGuestList} = this.state;
     console.log(item);
     var statusStr = 'Not available';
     if(typeof item.status != 'undefined')
@@ -196,19 +228,13 @@ class DashboardDetails extends Component {
 
 
         <Divider />
-
-        {
-          item.status == 1 &&
-              <ListItem
-                  title={"Chillmate: "+ (item.name)}
-                  titleStyle={adourStyle.listItemText}
-                  subtitle={"Reputation: " + (item.coins)}
-                  subtitleStyle={adourStyle.listItemText}
-                  hideChevron={true}
-                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  leftIcon={{ name: 'info-outline'}}
-                />
-        }
+        <Text style={adourStyle.cardSubtitle}>Guest List</Text>
+        <FlatList
+            data={confirmedGuestList}
+            extraData={confirmedGuestList}
+            renderItem={this.renderGuests}
+            keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
+        />
 
           {/* Task Timing and details */ }
           {
@@ -261,6 +287,16 @@ class DashboardDetails extends Component {
              title="Chat" />
            }
 
+           {
+             item.isClient && item.status == 0 &&
+                   <Button onPress={()=>this.openGuestList(item.id)}
+                       buttonStyle={adourStyle.btnGeneral}
+                       textStyle={adourStyle.btnText}
+                       disabled={this.state.disabledDone}
+                       title="Guest List"
+                   />
+           }
+
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}
@@ -268,16 +304,6 @@ class DashboardDetails extends Component {
                       textStyle={adourStyle.btnText}
                       disabled={this.state.disabledDone}
                       title="Mark as Done"
-                  />
-          }
-
-          {
-            item.isClient && item.status == 1 &&
-                  <Button onPress={()=>this.openGuestList(item.id)}
-                      buttonStyle={adourStyle.btnGeneral}
-                      textStyle={adourStyle.btnText}
-                      disabled={this.state.disabledDone}
-                      title="Guest List"
                   />
           }
 

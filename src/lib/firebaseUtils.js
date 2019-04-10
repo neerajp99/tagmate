@@ -210,7 +210,6 @@ export const alreadyAccepted = (uid, serviceId) => new Promise((resolve, reject)
     }
 })
 
-
 // Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester. No one being used
 export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
@@ -239,7 +238,6 @@ export const finalizeGuestList = (taskId) => new Promise((resolve, reject) => {
       firebase.database().ref(`/servicesRequests/${taskId}`).update({status: 1});
       resolve(confirmedGuests)
     } )
-
   } catch(e) {
     reject(e)
   }
