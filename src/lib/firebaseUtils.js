@@ -210,6 +210,17 @@ export const alreadyAccepted = (uid, serviceId) => new Promise((resolve, reject)
     }
 })
 
+// expects an acceptors UID and task ID. Checks if the host has confirmed this acceptor, if yes then return true
+export const isConfirmedAcceptor = (uid, taskId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`).once('value', (snapshot) => {
+            resolve(snapshot.child(uid).exists());
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester. No one being used
 export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
     try {

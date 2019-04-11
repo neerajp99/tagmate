@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests} from "../lib/firebaseUtils";
+import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import { Button, ButtonGroup, ListItem } from 'react-native-elements';
 import * as _ from 'lodash';
@@ -53,8 +53,10 @@ class DashboardScreen extends Component {
         var request = snapshot.val();
         //If the user is the requester, and it is not a cancelled activity add to requested array:
         if(request.clientId == uid && (request.status < 3) && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
-        //If the user is the accepter, add to accepted array:
-        else if(request.serverId == uid && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+        //If the user is the confirmed accepter, add to accepted array:
+        isConfirmedAcceptor(uid, request.id).then(result => {
+          if( result && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+        })
       });
 
       // When an existing service request object is removed:
@@ -76,6 +78,12 @@ class DashboardScreen extends Component {
               return element.id !== request.id
           })});
         }
+
+        //If the user is the confirmed accepter, add to accepted array:
+        isConfirmedAcceptor(uid, request.id).then(result => {
+          if( result && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+        })
+
         // Do nothing if the service request was not related to the user:
         //if(request.clientId != uid && request.serverId != uid) return;
         // If it is a service request the user has recently accepted, add it to accepted array:
