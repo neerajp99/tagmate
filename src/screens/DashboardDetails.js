@@ -156,7 +156,7 @@ class DashboardDetails extends Component {
     {
       Alert.alert(
       'Confirmation',
-      'Are you sure you want to unmatch?',
+      'Are you sure you want to opt out of this activity?',
       [
         {text: 'No', onPress: () => console.log('Cancellation Revoked')},
         {text: 'Yes', onPress: () => this.markCancelled(item)}
@@ -206,6 +206,9 @@ class DashboardDetails extends Component {
     const {item, confirmedGuestList} = this.state;
     console.log(item);
     var statusStr = 'Not available';
+    let host = 'Anonymous';
+    if(!item.anonymous) host = item.hostName;
+
     if(typeof item.status != 'undefined')
     {
       switch(item.status)
@@ -220,72 +223,80 @@ class DashboardDetails extends Component {
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
-      <Card title={item.serviceTitle} titleStyle={adourStyle.cardTitle} image={{uri: item.serviceImg}}>
-          {/* Task Status */ }
-          <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>{statusStr}</Text>
-          </View>
+      <Card featuredTitle={item.serviceTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: item.serviceImg}}>
+          <ListItem
+              title={host}
+              titleStyle={adourStyle.listItemText}
+              subtitle="Host"
+              subtitleStyle={adourStyle.listItemText}
+              rightTitle={statusStr}
+              rightTitleStyle={adourStyle.listItemText}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+            />
+                  {/* Task Timing and details */ }
+                  {
+                    item.when != "" &&
+                        <ListItem
+                          title={"Scheduled for: "+(item.when) }
+                          subtitleStyle={adourStyle.listItemText}
+                          titleStyle={adourStyle.listItemText}
+                          hideChevron={true}
+                          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                          leftIcon={{ name: 'access-time'}}
+                        />
+                  }
+
+                  {
+                    item.details != "" &&
+                        <ListItem
+                            title={item.details}
+                            titleStyle={adourStyle.listItemText}
+                            hideChevron={true}
+                            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                            leftIcon={{ name: 'info-outline'}}
+                          />
+                  }
+
+                  {/* Timestamp DISABLED - throwing error
+                  <View style={styles.subContent} key={item.id}>
+                  <ListItem
+                      title={['Posted ', <TimeAgo key={item.id} time={item.created_at} />]}
+                      titleStyle={adourStyle.listItemText}
+                      hideChevron={true}
+                      containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                      leftIcon={{ name: 'access-time'}}
+                    />
+                  </View>
+
+                   */ }
+
+      </Card>
 
 
-        <Divider />
-        <Text style={adourStyle.cardSubtitle}>Guest List</Text>
+      <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
         <FlatList
             data={confirmedGuestList}
             extraData={confirmedGuestList}
             renderItem={this.renderGuests}
             keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
         />
+        {
+          item.status == 1 &&
+          <Button
+          icon={{name: 'chat'}}
+          onPress={() =>
+                    this.props.navigation.navigate("Chat", {
+                      name: item.selfName,
+                      taskId: item.id
+                    })}
+          buttonStyle={adourStyle.btnGeneral}
+          textStyle={adourStyle.btnText}
+          title="Chat" />
+        }
+      </Card>
 
-          {/* Task Timing and details */ }
-          {
-            item.when != "" &&
-                <ListItem
-                  title={"Scheduled for: "+(item.when) }
-                  subtitleStyle={adourStyle.listItemText}
-                  titleStyle={adourStyle.listItemText}
-                  hideChevron={true}
-                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  leftIcon={{ name: 'access-time'}}
-                />
-          }
-
-          {
-            item.details != "" &&
-                <ListItem
-                    title={item.details}
-                    titleStyle={adourStyle.listItemText}
-                    hideChevron={true}
-                    containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                    leftIcon={{ name: 'info-outline'}}
-                  />
-          }
-
-          {/* Timestamp DISABLED - throwing error
-          <View style={styles.subContent} key={item.id}>
-          <ListItem
-              title={['Posted ', <TimeAgo key={item.id} time={item.created_at} />]}
-              titleStyle={adourStyle.listItemText}
-              hideChevron={true}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              leftIcon={{ name: 'access-time'}}
-            />
-          </View>
-
-           */ }
-
-           {
-             item.status == 1 &&
-             <Button
-             icon={{name: 'chat'}}
-             onPress={() =>
-                       this.props.navigation.navigate("Chat", {
-                         name: item.selfName,
-                         taskId: item.id
-                       })}
-             buttonStyle={adourStyle.btnGeneral}
-             textStyle={adourStyle.btnText}
-             title="Chat" />
-           }
+      <Card>
 
            {
              item.isClient && item.status == 0 &&
@@ -313,7 +324,7 @@ class DashboardDetails extends Component {
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     textStyle={adourStyle.btnText}
-                    title={(item.status == 1)?"Unmatch":"Remove"}
+                    title={(item.isClient)?"Remove":"Opt Out"}
                 />
           }
         </Card>
@@ -342,7 +353,7 @@ const styles = StyleSheet.create({
       marginBottom: 10
     },
     cardSubtitle: {
-      marginBottom: 16,
+      marginBottom: 10,
       marginLeft: 18
     },
     cardSubtitleText: {
