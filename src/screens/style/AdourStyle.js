@@ -6,16 +6,16 @@ import {StyleSheet, Dimensions} from 'react-native';
 //TODO: Separate Router related style to another file so that Hot Reloading starts working
 
 //Light Blue
-export const BRAND_COLOR_ONE = '#944bbb';
-export const BRAND_COLOR_TWO = '#aa7bc3';
+export const BRAND_COLOR_ONE = '#5C7AFF';
+export const BRAND_COLOR_TWO = '#4A8FE7';
 
 //Light Purple
-export const BRAND_COLOR_THREE = '#cc92c2';
+export const BRAND_COLOR_THREE = '#845BFF';
 //Dark Blue
-export const BRAND_COLOR_FOUR = '#531cb3';
+export const BRAND_COLOR_FOUR = '#215596';
 
 //Cyan
-export const BRAND_COLOR_FIVE = '#aa7bc3'
+export const BRAND_COLOR_FIVE = '#73FBD3'
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -42,6 +42,11 @@ export const adourStyle = StyleSheet.create({
     color: '#bfbfbf',
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid'
+  },
+  greyText: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    color: '#bfbfbf'
   },
   defaultText: {
     fontFamily:'OpenSans-Regular',

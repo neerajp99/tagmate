@@ -186,17 +186,24 @@ class DashboardDetails extends Component {
   }
 
   renderGuests = ({item}) => {
-      const {id, fullName} = item;
+      const {id, fullName, guestStatus} = item;
 
       return (
         <View>
-        <ListItem
+        {guestStatus != 3 && <ListItem
           title={fullName}
           titleStyle={adourStyle.listItemText}
           hideChevron={true}
-          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-          leftIcon={{ name: 'access-time'}}
-        />
+          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
+          leftIcon={{ name: 'person'}}
+        />}
+        {guestStatus == 3 && <ListItem
+          title={fullName + " has left"}
+          titleStyle={adourStyle.greyText}
+          hideChevron={true}
+          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
+          leftIcon={{ name: 'person'}}
+        />}
         </View>
       )
   }
@@ -213,11 +220,11 @@ class DashboardDetails extends Component {
     {
       switch(item.status)
       {
-        case 0: statusStr = 'Looking for a Chillmate'; break;
+        case 0: statusStr = 'Looking for Chillmates'; break;
         case 1: statusStr = (item.isClient)?'Upcoming activity':'Upcoming activity'; break;
         case 2: statusStr = 'Completed'; break;
-        case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by requester'; break;
-        case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break;
+        case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by the host'; break;
+        case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break; //case 4 is useless now
       }
     }
     return (

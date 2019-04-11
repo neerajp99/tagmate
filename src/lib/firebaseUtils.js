@@ -320,12 +320,13 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
 export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve, reject) => {
     try {
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        if(isClient) ref.update({status:3});
-        else{
-          //Accepter is cancelling, put the activity back into the main pool and remove msgs
-          ref.update({status:0, serverId: null});
-          var msgRef = firebase.database().ref(`/messages/${id}`);
-          msgRef.remove();
+        if(isClient){
+          ref.update({status:3});
+          incUserDarkScore(uid, 2);
+        }else{
+          //Guest is cancelling
+          ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3})
+          incUserDarkScore(uid, 1);
           //Also add it to the users rejected list
           appendRejectedTask(uid, id);
         }
@@ -396,6 +397,15 @@ export const getFullName = (userId) => new Promise((resolve, reject) => {
 export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
         resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// user has done some malicious behavior. Increase their Dark Score by score
+export const incUserDarkScore = (userId, score) => new Promise((resolve, reject) => {
+    try {
+        resolve(firebase.database().ref(`/users/${userId}`).update({darkScore: score}));
     } catch (e) {
         reject(e)
     }
