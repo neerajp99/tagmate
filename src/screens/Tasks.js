@@ -232,6 +232,8 @@ class TaskScreen extends Component {
               <ListItem
               title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
+              subtitle="Host"
+              subtitleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
