@@ -271,6 +271,7 @@ export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) 
     try {
         const {currentUser} = firebase.auth();
 
+
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds/${userId}`);
         ref.update({id: userId, guestStatus:0});
         //Get first name of this particular acceptor

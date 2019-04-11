@@ -113,6 +113,14 @@ class DashboardDetails extends Component {
           this.setState({item:item});
         });
 
+        //Check if the current user is a guest and has recently opted out
+        item.optedOutAsGuest = false;
+
+        this.state.confirmedGuestList.map(guest => {
+          if(guest.id === uid && guest.guestStatus == 3){
+            item.optedOutAsGuest = true;
+          }
+        })
 
         // If whatsapp number is not available yet:
         if(!this.state.whatsappAvailable)
@@ -289,7 +297,7 @@ class DashboardDetails extends Component {
             keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
         />
         {
-          item.status == 1 &&
+          item.status == 1 && !item.optedOutAsGuest &&
           <Button
           icon={{name: 'chat'}}
           onPress={() =>
@@ -326,7 +334,7 @@ class DashboardDetails extends Component {
           }
 
           {
-           item.status < 2 &&
+           item.status < 2 && !item.optedOutAsGuest &&
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
