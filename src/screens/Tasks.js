@@ -207,7 +207,7 @@ class TaskScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {serviceId, id, when, details, created_at} = item;
+        const {serviceId, id, when, details, anonymous, created_at, hostName} = item;
         var detailsAvailable = true;
         const {allServices} = this.state
         var serviceTitle = '---';
@@ -219,19 +219,25 @@ class TaskScreen extends Component {
             }
         });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
+
+        let scheduledFor = "null"
+
+        if(when != ""){
+          scheduledFor = ("Scheduled for " + when);
+        }
+
         return (
           <View key={id}>
-          <Card image={{uri: serviceImg}}>
+          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
               <ListItem
-              title={serviceTitle}
+              title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              subtitle={ "Scheduled for: "+(when) }
-              subtitleStyle={adourStyle.listItemText}
-              rightTitle={['Posted ', <TimeAgo key={id} time={created_at} />]}
-              subtitleNumberOfLines={2}
             />
+            { (scheduledFor != "null") && <Text style={adourStyle.defaultText}>{scheduledFor}</Text> }
+            <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
+
             {
                 detailsAvailable && <ListItem
                   subtitle={ details }

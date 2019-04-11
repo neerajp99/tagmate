@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, ListItem, Button} from 'react-native-elements';
+import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
@@ -15,6 +15,7 @@ class RequestDetails extends Component{
             disabledBtn:false, // Check if service request button is disabeld or not. Default: not disabled.
             when:'', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
+            anonymous: false,
             dtPlaceholder: 'Date & Time (Optional)',
             isDateTimePickerVisible: false,
         }
@@ -48,7 +49,7 @@ class RequestDetails extends Component{
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
             const {currentUser: {uid} = {}} = firebase.auth();
-            const {when, details} = this.state;
+            const {when, details, anonymous} = this.state;
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
@@ -68,7 +69,7 @@ class RequestDetails extends Component{
           */
 
           //If you enable the currently disabled coin system again, delete below code
-          postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details}).then(res => {
+          postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details, anonymous: anonymous}).then(res => {
           this.setState({disabledBtn:false}); // Enable the button again
           this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
           });
@@ -115,6 +116,11 @@ class RequestDetails extends Component{
                 placeholderTextColor={'rgba(255, 255, 255, 1)'}
                 underlineColorAndroid='transparent'
                 onChangeText={details => this.setState({ details: details })}
+              />
+              <CheckBox
+                title='Post As Anonymous'
+                checked={this.state.anonymous}
+                onPress={() => this.setState({anonymous: !this.state.anonymous})}
               />
 	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} textStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>

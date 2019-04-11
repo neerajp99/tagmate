@@ -24,6 +24,14 @@ export const adourStyle = StyleSheet.create({
     fontFamily:'OpenSans-Regular',
     fontWeight:'200'
   },
+  timeAgoText: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    alignSelf:'flex-end',
+    marginBottom: 10,
+    marginRight: 12,
+    color: '#bfbfbf'
+  },
   listItemTextBold: {
     fontFamily:'OpenSans-Semibold',
     fontWeight:'200'
@@ -37,7 +45,7 @@ export const adourStyle = StyleSheet.create({
   },
   defaultText: {
     fontFamily:'OpenSans-Regular',
-    marginLeft: 12,
+    marginLeft: 14,
     marginBottom: 10,
     marginTop: 10,
     fontWeight:'200'

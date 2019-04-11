@@ -5,22 +5,34 @@ import * as _ from 'lodash'
 /*
 * method to post the service request.
 * */
-export const postServiceRequest = ({serviceId: serviceId, when: when, details: details}) => new Promise((resolve, reject) => {
+export const postServiceRequest = ({serviceId: serviceId, when: when, details: details, anonymous: anonymous}) => new Promise((resolve, reject) => {
     try {
         console.log('inside posting Req')
         const {currentUser: {uid} = {}} = firebase.auth()
-        firebaseReferences.SERVICES_REQUESTS.once('value', (snapshot) => {
-            let servicesRequests = snapshot.val()
-            if (_.isEmpty(servicesRequests)) {
-                servicesRequests = {}
-            }
-            const id = uuid.v4()
-            servicesRequests[id] = {id, serviceId, clientId: uid, when: when, details: details, status: 0, created_at:firebase.database.ServerValue.TIMESTAMP}
-            firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
-                Alert.alert('Posted Successfully. You can find it on your Dashboard.')
-                resolve(true)
+          getFullName(uid).then(fullName =>{
+            firebaseReferences.SERVICES_REQUESTS.once('value', (snapshot) => {
+                let servicesRequests = snapshot.val()
+                if (_.isEmpty(servicesRequests)) {
+                    servicesRequests = {}
+                }
+                const id = uuid.v4()
+                servicesRequests[id] = {
+                  id,
+                  serviceId,
+                  clientId: uid,
+                  when: when,
+                  details: details,
+                  anonymous: anonymous,
+                  status: 0,
+                  created_at:firebase.database.ServerValue.TIMESTAMP,
+                  hostName: fullName,
+                }
+                firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
+                    Alert.alert('Posted Successfully. You can find it on your Dashboard.')
+                    resolve(true)
+                })
             })
-        })
+          })
     } catch (e) {
         reject(e)
     }
@@ -359,6 +371,27 @@ export const getLastName = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+// Expects user ID in parameters
+// Returns firstname of the user
+export const getFullName = (userId) => new Promise((resolve, reject) => {
+    try {
+      //Get first name of this user
+      getName(userId).then(firstName=>
+      {
+        const first = firstName;
+        //Get last name of this user
+        getLastName(userId).then(lastName=>
+        {
+          const fullName = `${firstName} ${lastName}`;
+          resolve(fullName);
+        });
+      });
+
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // To note in database that user {userId} has rejected task {serviceId}
 export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
@@ -388,13 +421,14 @@ export const countServicesRequests = () => {
   let countProg = 0;
   let countOpen = 0;
   let openPostUsers = [];
+  let openPosts = [];
 
   //Count various statuses
   var srRef = firebase.database().ref("servicesRequests");
   srRef.once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
-      const {status, clientId} = childSnapshot.val();
+      const {status, clientId, id} = childSnapshot.val();
       if(status == 4) countAcc++;
       else if (status == 3) countReq++;
       else if (status == 2) countDone++;
@@ -402,6 +436,7 @@ export const countServicesRequests = () => {
       else if (status == 0) {
         countOpen++;
         openPostUsers.push(clientId);
+        openPosts.push(id)
       }
     });
     console.log('number of activities cancelled by acceptor: ', countAcc);
@@ -410,6 +445,7 @@ export const countServicesRequests = () => {
     console.log('number of activities in progress: ', countProg);
     console.log('number of open activities: ', countOpen);
     console.log('list of users who currently have open activities: ', openPostUsers);
+    console.log('list of open activities: ', openPosts);
   });
 
   //Count number of unique users created activities
