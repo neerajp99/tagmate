@@ -32,16 +32,13 @@ class TaskScreen extends Component {
         this.setState({fetching:true});
         const {currentUser: {uid} = {}} = firebase.auth()
         // TEMPORARY
-        getAcceptors("testServiceRequest").then(response => {
-          console.log("Returned from getAcceptors: ", response);
-        })
-        alreadyAccepted("ShivamGupta500", "testServiceRequest").then(accptBool => {
-          console.log('Returned from alreadyAccepted (expected true): ', accptBool)
-        })
-        addAcceptor("ShivamGupta500", "testServiceRequest"); //TEMPORARY
-        addAcceptor("SSG1", "testServiceRequest"); //TEMPORARY
-        addAcceptor("ShivamSai20", "testServiceRequest"); //TEMPORARY
-        addAcceptor("VineetNand500", "testServiceRequest"); //TEMPORARY
+        //getAcceptors("testServiceRequest").then(response => {
+        //  console.log("Returned from getAcceptors: ", response);
+        //})
+        //alreadyAccepted("ShivamGupta500", "testServiceRequest").then(accptBool => {
+        //  console.log('Returned from alreadyAccepted (expected true): ', accptBool)
+        //})
+        //addAcceptor("VineetNand999", "testServiceRequest"); //TEMPORARY
 
         getRelatedServices(uid).then(services =>
         {
@@ -207,7 +204,7 @@ class TaskScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {serviceId, id, when, details, anonymous, created_at, hostName} = item;
+        const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
         const {allServices} = this.state
         var serviceTitle = '---';
@@ -219,6 +216,14 @@ class TaskScreen extends Component {
             }
         });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
+
+        let interestAvailable = false;
+        let interestNumText = '';
+
+        if(interestedCount > 0){
+          interestNumText = `${interestedCount}+ interested`;
+          interestAvailable = true;
+        }
 
         let scheduledFor = "null"
 
@@ -237,7 +242,9 @@ class TaskScreen extends Component {
               hideChevron={true}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
+
             { (scheduledFor != "null") && <Text style={adourStyle.defaultText}>{scheduledFor}</Text> }
+            {interestAvailable && <Text style={adourStyle.defaultText}>{interestNumText}</Text>}
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
 
             {
@@ -252,17 +259,16 @@ class TaskScreen extends Component {
               <View>
               </View>
               <View style={styles.buttonsContainer}>
+              <View>
+                <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
+                  <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                </TouchableOpacity>
+              </View>
                 <View>
                   <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>
                     <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
                   </TouchableOpacity>
                 </View>
-                <View>
-                  <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
-                    <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
-                  </TouchableOpacity>
-                </View>
-
               </View>
 
               </Card>

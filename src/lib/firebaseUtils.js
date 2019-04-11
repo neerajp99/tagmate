@@ -271,7 +271,6 @@ export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) 
     try {
         const {currentUser} = firebase.auth();
 
-
         var ref = firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds/${userId}`);
         ref.update({id: userId, guestStatus:0});
         //Get first name of this particular acceptor
@@ -286,7 +285,11 @@ export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) 
           });
         });
 
-
+        //Increment interested count for this task
+        firebase.database().ref(`/servicesRequests/${serviceId}/interestedCount`).transaction(function(interestedCount){
+          return (interestedCount || 0) + 1;
+        });
+        
         console.log('pushed user to acceptor list')
     } catch (e) {
         reject(e)
