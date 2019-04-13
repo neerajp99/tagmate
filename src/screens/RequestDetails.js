@@ -2,11 +2,15 @@ import React, {Component} from 'react';
 import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
-import {postServiceRequest,canRequestMore} from "../lib/firebaseUtils";
+import {fetchAllServices} from "../actions";
+import {postServiceRequest,canRequestMore, getServiceItem, getFullName, createCustomService} from "../lib/firebaseUtils";
+import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window');
+
+const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
 class RequestDetails extends Component{
   	constructor(props) {
@@ -16,9 +20,27 @@ class RequestDetails extends Component{
             when:'', //Added DEFAULT VALUE to ASAP. Originally, it was empty string
             details:'',
             anonymous: false,
+            selfName:'',
+            customTitle: '',
+            selectedServiceId: 'service1',
+            selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',
             isDateTimePickerVisible: false,
         }
+    }
+
+    componentWillMount() {
+        const {fetchAllServices} = this.props
+        setTimeout(fetchAllServices, 1000)
+    }
+
+    componentDidMount() {
+      const {currentUser: {uid} = {}} = firebase.auth();
+      // Get name of the user
+      getFullName(uid).then(selfName=>
+      {
+        this.setState({selfName:selfName});
+      });
     }
 
     _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
@@ -42,6 +64,14 @@ class RequestDetails extends Component{
      return formattedDate
    }
 
+   postAsAnonymous = () => {
+     if(this.state.selectedServiceId === "custom"){
+       alert("You cannot be Anonymous if you are creating a custom activity")
+     } else {
+       this.setState({anonymous: !this.state.anonymous})
+     }
+   }
+
   	sendRequest = () =>
     {
         if(this.state.disabledBtn == true) return;
@@ -49,10 +79,15 @@ class RequestDetails extends Component{
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
             const {currentUser: {uid} = {}} = firebase.auth();
-            const {when, details, anonymous} = this.state;
+            const {when, details, anonymous, selectedServiceId, selectedServiceItem, customTitle} = this.state;
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
+            if(selectedServiceId === 'custom' && customTitle == ''){
+              this.erred('You must put a post title');
+              this.setState({disabledBtn:false});
+              return
+            }
 
             /* PREVENTS USER FROM CREATING POSTS IF USER DOES NOT HAVE ENOUGH COINS - DISABLED TEMPORARILY
               canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
@@ -68,11 +103,20 @@ class RequestDetails extends Component{
             });
           */
 
-          //If you enable the currently disabled coin system again, delete below code
-          postServiceRequest({serviceId:this.props.navigation.state.params.item.id,when:when,details:details, anonymous: anonymous}).then(res => {
-          this.setState({disabledBtn:false}); // Enable the button again
-          this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
-          });
+          if(selectedServiceId === 'custom'){
+            createCustomService(customTitle).then(newServiceId => {
+              postServiceRequest({serviceId:newServiceId, when:when,details:details, anonymous: anonymous}).then(res => {
+              this.setState({disabledBtn:false}); // Enable the button again
+              this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
+              });
+            })
+          } else {
+            //If you enable the currently disabled coin system again, delete below code
+            postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous}).then(res => {
+            this.setState({disabledBtn:false}); // Enable the button again
+            this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
+            });
+          }
 
         }
     }
@@ -85,18 +129,76 @@ class RequestDetails extends Component{
     }
 
   render(){
-    const { isDateTimePickerVisible, when, dtPlaceholder } = this.state;
-  	const { title, img } = this.props.navigation.state.params.item;
+    const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, selfName, customService } = this.state;
+    const {services = [], fetching} = this.props;
+
+
+    //Get the service item of the selected service ID so that we can update the title and image in realtime
+    if(selectedServiceId != "custom")
+    {
+      getServiceItem(selectedServiceId).then(serviceItem => {
+      this.setState({selectedServiceItem: serviceItem})
+      })
+    } else {
+      //the user has selected custom service, populate title and image with custom service ones
+      selectedServiceItem.img = CUSTOM_IMG;
+      selectedServiceItem.title = this.state.customTitle;
+    }
+
     var today = new Date();
     date=today.getDate() + "/"+ parseInt(today.getMonth()+1) +"/"+ today.getFullYear();
 
     return(
       <ScrollView>
       	<View style={styles.backgroundContainer}>
-	        <Card title={title} titleStyle={adourStyle.cardTitle} image={{uri: img}} >
+	        <Card featuredTitle={selectedServiceItem.title} featuredTitleStyle={adourStyle.listItemText} image={{uri: selectedServiceItem.img}} >
+          <ListItem
+            title={this.state.anonymous? "Anonymous": selfName}
+            titleStyle={adourStyle.listItemText}
+            subtitle="Host"
+            subtitleStyle={adourStyle.listItemText}
+            hideChevron={true}
+            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+          />
+
           <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>Specify a time & date when you're available for the chosen activity. </Text>
+
           </View>
+          <Picker
+            selectedValue={selectedServiceId}
+            style={adourStyle.pickerStyle}
+            onValueChange={(itemValue, itemIndex) =>
+              this.setState({selectedServiceId: itemValue})
+            }>
+            {
+                services.map((item, i) => (
+                    <Picker.Item label={item.description} key={i} value={item.id} />
+                ))
+            }
+            <Picker.Item label="Custom" value={"custom"} />
+          </Picker>
+
+          { selectedServiceId === "custom" &&
+            <TextInput
+            style={adourStyle.textInputCenter}
+            autoCapitalize="none"
+            placeholder="Post Title"
+            placeholderStyle={adourStyle.placeholderStyle}
+            placeholderTextColor={'rgba(255, 255, 255, 1)'}
+            underlineColorAndroid='transparent'
+            onChangeText={customTitle => this.setState({ customTitle: customTitle })}
+            />}
+
+              <TextInput
+                style={adourStyle.textInputCenter}
+                autoCapitalize="none"
+                placeholder="Additional Details"
+                placeholderStyle={adourStyle.placeholderStyle}
+                placeholderTextColor={'rgba(255, 255, 255, 1)'}
+                underlineColorAndroid='transparent'
+                onChangeText={details => this.setState({ details: details })}
+              />
+
               <Button title={dtPlaceholder} buttonStyle={styles.dateTimeStyle} textStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
               <DateTimePicker
                 isVisible={isDateTimePickerVisible}
@@ -108,19 +210,10 @@ class RequestDetails extends Component{
                 onCancel={this._hideDateTimePicker}
               />
 
-              <TextInput
-                style={adourStyle.textInputCenter}
-                autoCapitalize="none"
-                placeholder="Additional Details"
-                placeholderStyle={adourStyle.placeholderStyle}
-                placeholderTextColor={'rgba(255, 255, 255, 1)'}
-                underlineColorAndroid='transparent'
-                onChangeText={details => this.setState({ details: details })}
-              />
               <CheckBox
                 title='Post As Anonymous'
                 checked={this.state.anonymous}
-                onPress={() => this.setState({anonymous: !this.state.anonymous})}
+                onPress={() => this.postAsAnonymous()}
               />
 	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} textStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
@@ -134,7 +227,13 @@ class RequestDetails extends Component{
     <Text>Provide additional details</Text>
 </View>
 */
-export {RequestDetails};
+const mapStateToProps = ({profile: {fetching, services = []} = {}}, props) => {
+    return {
+        fetching, services
+    }
+}
+
+export default connect(mapStateToProps, {fetchAllServices})(RequestDetails);
 
 const styles = StyleSheet.create({
 		backgroundContainer: {
@@ -146,7 +245,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     dateTimeStyle: {
-      borderRadius: 25,
       height: 45,
       backgroundColor: 'rgba(54, 105, 169, 0.2)',
       justifyContent: 'center',

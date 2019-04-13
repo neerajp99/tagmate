@@ -55,6 +55,14 @@ export const adourStyle = StyleSheet.create({
     marginTop: 10,
     fontWeight:'200'
   },
+  pickerStyle: {
+    marginLeft: 14,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    marginBottom: 10,
+    marginTop: 10,
+    height: 45,
+    width: WIDTH -108,
+  },
   titleText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200',
@@ -95,7 +103,6 @@ export const adourStyle = StyleSheet.create({
   textInput: {
     height: 45,
     width: WIDTH -120,
-    borderRadius: 25,
     marginLeft: 15,
     marginBottom: 15,
     fontSize: 16,
@@ -107,7 +114,6 @@ export const adourStyle = StyleSheet.create({
   textInputCenter: {
     height: 45,
     width: WIDTH -108,
-    borderRadius: 25,
     marginLeft: 15,
     marginBottom: 15,
     fontSize: 16,
@@ -124,7 +130,6 @@ export const adourStyle = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)'
   },
   pickerContainer: {
-    borderRadius: 25,
     borderWidth: 1,
     borderColor: BRAND_COLOR_ONE,
     overflow: 'hidden'

@@ -38,6 +38,31 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
     }
 })
 
+/*
+* method to create a custom service
+* */
+export const createCustomService = (customTitle) => new Promise((resolve, reject) => {
+    try {
+      serviceRef = firebase.database().ref(`/services`);
+
+      serviceRef.once('value', (snapshot) => {
+          servicesCount = snapshot.numChildren();
+          newServiceId = 'service' + (servicesCount+1);
+          serviceRef.child(newServiceId).set({
+            description: customTitle,
+            title: customTitle,
+            id: newServiceId,
+            img: 'http://chillmateapp.com/assets/item_img/custom.jpg',
+            icon: 'av-timer'
+          })
+        });
+        resolve(newServiceId);
+    } catch (e) {
+        reject(e)
+    }
+})
+
+
 // Expects a user object ID in parameters.
 // Updates the Adour coin balance of the corresponding user to 3.
 export const creditCoins = (userId) => new Promise((resolve, reject) => {
@@ -210,6 +235,18 @@ export const getAcceptors = (serviceId) => new Promise((resolve, reject) => {
     }
 })
 
+// gets the list of all acceptors who have accepted this particular activity with serviceId
+export const getServiceItem = (serviceId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/services/${serviceId}`).once('value', (snapshot) => {
+            const serviceItem = snapshot.val() || []
+            resolve(serviceItem || [])
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // has this user already accepted this activity? returns a boolean if yes
 //Checks if uid exists in the acceptorIds array of serviceId servicesRequests
 export const alreadyAccepted = (uid, serviceId) => new Promise((resolve, reject) => {
@@ -289,7 +326,7 @@ export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) 
         firebase.database().ref(`/servicesRequests/${serviceId}/interestedCount`).transaction(function(interestedCount){
           return (interestedCount || 0) + 1;
         });
-        
+
         console.log('pushed user to acceptor list')
     } catch (e) {
         reject(e)
