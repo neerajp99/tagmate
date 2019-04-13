@@ -24,6 +24,12 @@ export const adourStyle = StyleSheet.create({
     fontFamily:'OpenSans-Regular',
     fontWeight:'200'
   },
+  cardOverText:{
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    alignSelf: 'center',
+    justifyContent: 'center'
+  },
   timeAgoText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200',

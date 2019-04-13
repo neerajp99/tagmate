@@ -22,7 +22,7 @@ class RequestDetails extends Component{
             anonymous: false,
             selfName:'',
             customTitle: '',
-            selectedServiceId: 'service1',
+            selectedServiceId: 'custom',
             selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',
             isDateTimePickerVisible: false,

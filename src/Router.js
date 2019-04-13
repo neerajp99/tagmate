@@ -73,15 +73,6 @@ export const RequestStack = createStackNavigator(
         }
       }
     },
-    RequestDetails: {
-      screen: RequestDetails,
-      navigationOptions: ({navigation}) => {
-        return{
-          headerTitle: 'Additional Info',
-          headerTitleStyle: routerStyle.headerText
-        }
-      }
-    }
   }
 )
 
@@ -92,7 +83,16 @@ export const TaskStack = createStackNavigator(
       screen: TaskScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Current Requests',
+          headerTitle: (<Image source={require('./img/logo_black.png')}/>),
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    RequestDetails: {
+      screen: RequestDetails,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Create A Post',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -146,18 +146,10 @@ export const DashboardStack = createStackNavigator(
 export const MainTabNav = createBottomTabNavigator(
   {
     Chillmate: {
-      screen: RequestStack,
-      navigationOptions: {
-        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='call-to-action' size={horizontal ? 20 : 25} color={tintColor} />
-        ),
-      },
-    },
-    Requests: {
       screen: TaskStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='dehaze' size={horizontal ? 20 : 25} color={tintColor} />
+          <Icon name='call-to-action' size={horizontal ? 20 : 25} color={tintColor} />
         ),
       },
     },

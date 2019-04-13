@@ -101,8 +101,6 @@ class TaskScreen extends Component {
         ref.on('child_added', (snapshot) => {
             if(this._isMounted)
             {
-                // To hide activity indicator:
-                this.setState({fetching:false});
                 var request = snapshot.val();
                 alreadyAccepted(uid, request.id).then(alreadyAcc => {
                   if(
@@ -114,6 +112,8 @@ class TaskScreen extends Component {
                       )
                       this.setState({myTasks:[request].concat(this.state.myTasks)});
                 })
+                // To hide activity indicator:
+                if(this.state.fetching) this.setState({fetching:false});
             }
 
         });
@@ -159,7 +159,6 @@ class TaskScreen extends Component {
                 this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
             }
         })
-
     }
 
 
@@ -203,6 +202,7 @@ class TaskScreen extends Component {
     }
 
     swipableRender(myTasks) {
+
       return myTasks.map((item) => {
         const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
@@ -358,20 +358,28 @@ class TaskScreen extends Component {
         const {fetching, myTasks} = this.state
         return (
             <View style={styles.mainContainer}>
+            <Card>
+              <ListItem
+                title="Create A Post"
+                titleStyle={adourStyle.listItemText}
+                leftIcon={{ name: 'mode-edit' }}
+                onPress={() => this.props.navigation.navigate('RequestDetails')}
+                containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              />
+            </Card>
             <CardStack
-                renderNoMoreCards={() => <View></View>}
+                renderNoMoreCards={() => <View style={{marginTop: 50}}>
+                                                  {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}
+                                                  {!fetching && <Text style={adourStyle.cardOverText}>Check back later</Text>}
+                                                  </View>}
+                disableBottomSwipe={true}
+                disableTopSwipe={true}
                 ref={swiper => {
                   this.swiper = swiper
                 }}
               >
               {this.swipableRender(myTasks)}
               </CardStack>
-
-                {
-                    fetching && <View style={styles.progressContainer}>
-                        <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
-                    </View>
-                }
 
             </View>
         )
@@ -390,16 +398,12 @@ const styles = StyleSheet.create({
         flex: 1
     },
     progressContainer: {
-        width: 60,
-        height: 60,
-        backgroundColor: 'transparent',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',
         left: '50%',
         top: '50%',
-        marginLeft: -30,
-        marginTop: -30
+        marginTop: 100
     },
     rowItem: {
         alignSelf: 'stretch',
