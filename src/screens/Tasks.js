@@ -10,6 +10,8 @@ import {setDeviceToken} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
+import CardStack, { Card as SwipableCard } from 'react-native-card-stack-swiper';
+
 
 //Test commit
 
@@ -200,6 +202,82 @@ class TaskScreen extends Component {
         }
     }
 
+    swipableRender(myTasks) {
+      return myTasks.map((item) => {
+        const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
+        var detailsAvailable = true;
+        const {allServices} = this.state
+        var serviceTitle = '---';
+        allServices.map(service => {
+            if(service.id == serviceId)
+            {
+                serviceTitle = service.title;
+                serviceImg = service.img;
+            }
+        });
+        if(details == "" || typeof details == "undefined") detailsAvailable = false
+
+        let interestAvailable = false;
+        let interestNumText = '';
+
+        if(interestedCount > 0){
+          interestNumText = `${interestedCount}+ interested`;
+          interestAvailable = true;
+        }
+
+        let scheduledFor = "null"
+
+        if(when != ""){
+          scheduledFor = ("Scheduled for " + when);
+        }
+
+        return (
+          <SwipableCard onSwipedLeft={() => this.rejectTask(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+              <ListItem
+              title={anonymous? "Anonymous": hostName}
+              titleStyle={adourStyle.listItemText}
+              subtitle="Host"
+              subtitleStyle={adourStyle.listItemText}
+              hideChevron={true}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+            />
+
+            { (scheduledFor != "null") && <Text style={adourStyle.defaultText}>{scheduledFor}</Text> }
+            {interestAvailable && <Text style={adourStyle.defaultText}>{interestNumText}</Text>}
+            <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
+
+            {
+                detailsAvailable && <ListItem
+                  subtitle={ details }
+                  subtitleStyle={adourStyle.listItemText}
+                  hideChevron={true}
+                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                  subtitleNumberOfLines={2}
+                />
+            }
+              <View>
+              </View>
+              <View style={styles.buttonsContainer}>
+              <View>
+                <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
+                  <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                </TouchableOpacity>
+              </View>
+                <View>
+                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>
+                    <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              </Card>
+            </SwipableCard>
+        )
+      })
+
+  }
+
     /*
     * render an item of the list
     * */
@@ -280,13 +358,15 @@ class TaskScreen extends Component {
         const {fetching, myTasks} = this.state
         return (
             <View style={styles.mainContainer}>
-            {!fetching && this.userGuideContainer()}
-                <FlatList
-                    data={myTasks}
-                    extraData={myTasks}
-                    renderItem={this.renderItem}
-                    keyExtractor={(item, index) => item.id}
-                />
+            <CardStack
+                renderNoMoreCards={() => <View></View>}
+                ref={swiper => {
+                  this.swiper = swiper
+                }}
+              >
+              {this.swipableRender(myTasks)}
+              </CardStack>
+
                 {
                     fetching && <View style={styles.progressContainer}>
                         <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
