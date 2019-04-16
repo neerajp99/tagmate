@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors} from "../lib/firebaseUtils";
+import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {connect} from "react-redux";
 import {setDeviceToken} from "../actions";
 import * as _ from 'lodash';
@@ -47,7 +47,11 @@ class TaskScreen extends Component {
             this.setState(services);
             console.log('relatedServices:',services);
             // Keep updating tasks
-            this.getMyTasks();
+            getRejectedTasks(uid).then(rejectedTaskList => {
+              this.setState({rejectedTasks: rejectedTaskList});
+              console.log('rejectedTasks state: ', this.state.rejectedTasks);
+              this.getMyTasks();
+            })
         });
         this.tokenFunc();
     }
@@ -89,11 +93,25 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
 
         // Load the service request IDs for the ones the user has rejected and push them to the state.
+        /*
         firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
             var rejectId = snapshot.val();
             if(this._isMounted) this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
             console.log('triggered',this.state.rejectedTasks);
         });
+
+
+        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
+            var rejectId = snapshot.val();
+            if(this._isMounted){
+              this.setState({
+                myTasks: this.state.myTasks.filter(item => item.id !== rejectId),
+                rejectedTasks: this.state.rejectedTasks.concat([rejectId])
+              });
+            }
+            console.log('triggered',this.state.rejectedTasks);
+        });
+        */
 
         var ref = firebase.database().ref('servicesRequests')
 
@@ -119,9 +137,11 @@ class TaskScreen extends Component {
         });
 
         // If a service request object is removed from the realtime database:
+        /*
         ref.on('child_removed', (snapshot) => {
             if(this._isMounted)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
         });
+        */
 
         // If an existing service request object is changed in the realtime database:
         ref.on('child_changed', (snapshot) => {
@@ -174,7 +194,7 @@ class TaskScreen extends Component {
     // It hides the service request corresponding to the ID and appends the ID to user's list of rejected tasks.
     rejectTask = (id) =>
     {
-        this.hideTask(id);
+        //this.hideTask(id);
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
     }
@@ -189,12 +209,13 @@ class TaskScreen extends Component {
         {
             alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
             {
-                this.hideTask(item.id);
+                //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
                     addAcceptor(uid, item.id).then(o =>
                     {
-                        this.hideTask(item.id);
+                      console.log('added as acceptor')
+                        //this.hideTask(item.id);
                     });
                 }
             });
@@ -260,13 +281,13 @@ class TaskScreen extends Component {
               </View>
               <View style={styles.buttonsContainer}>
               <View>
-                <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
-                  <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                <TouchableOpacity style={styles.btnReject} onPress={() => { this.swiper.swipeLeft() }} >
+                  <Icon name={'thumbs-o-down'} size={25} color={'rgba(255, 255, 255, 1)'} />
                 </TouchableOpacity>
               </View>
                 <View>
-                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>
-                    <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.swiper.swipeRight() }}>
+                    <Icon name={'thumbs-o-up'} size={25} color={'rgba(255, 255, 255, 1)'} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -348,7 +369,7 @@ class TaskScreen extends Component {
               <ListItem
                 title="Create A Post"
                 titleStyle={adourStyle.listItemText}
-                leftIcon={{ name: 'mode-edit' }}
+                leftIcon={{ name: 'edit' }}
                 onPress={() => this.props.navigation.navigate('RequestDetails')}
                 containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               />

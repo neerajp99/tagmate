@@ -73,6 +73,23 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+// get the list of all the task IDs that this user has rejected
+export const getRejectedTasks = (uid) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
+          if(snapshot.val() != undefined){
+            let data = snapshot.val();
+            let rejectedTasks = Object.values(data);
+            resolve(rejectedTasks)
+          } else {
+            resolve([])
+          }
+        });
+    } catch (e) {
+        reject(e)
+    }
+})
+
 /*
 * method toget all the task that user with userId can perform
 * */
