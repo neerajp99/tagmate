@@ -232,7 +232,7 @@ class TaskScreen extends Component {
         }
 
         return (
-          <SwipableCard onSwipedLeft={() => this.rejectTask(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <SwipableCard key={id} onSwipedLeft={() => this.rejectTask(id)} onSwipedRight={() => this.acceptTask(item)}>
           <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
               <ListItem
               title={anonymous? "Anonymous": hostName}
@@ -334,20 +334,6 @@ class TaskScreen extends Component {
                   subtitleNumberOfLines={2}
                 />
             }
-              <View>
-              </View>
-              <View style={styles.buttonsContainer}>
-              <View>
-                <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
-                  <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
-                </TouchableOpacity>
-              </View>
-                <View>
-                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>
-                    <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
-                  </TouchableOpacity>
-                </View>
-              </View>
 
               </Card>
             </View>
@@ -380,6 +366,8 @@ class TaskScreen extends Component {
               >
               {this.swipableRender(myTasks)}
               </CardStack>
+
+
 
             </View>
         )
@@ -423,6 +411,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: BRAND_COLOR_FOUR
+    },
+    footer:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center'
     },
     buttonsContainer: {
     flexDirection: 'row',

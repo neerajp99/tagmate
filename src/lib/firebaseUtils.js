@@ -223,6 +223,17 @@ export const serverExists = (serviceId) => new Promise((resolve, reject) => {
     }
 })
 
+// Check if given task has already been accepted by someone returns boolean
+export const confGuestExists = (taskId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`servicesRequests/${taskId}/confirmedGuest`).once('value', (snapshot) => {
+            resolve(snapshot.exists())
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // gets the list of all acceptors who have accepted this particular activity with serviceId
 export const getAcceptors = (serviceId) => new Promise((resolve, reject) => {
     try {
@@ -461,6 +472,26 @@ export const getCoins = (userId) => new Promise((resolve, reject) => {
         reject(e)
     }
 })
+
+//function presumes the uid is a confirmed acceptor
+//checks if the uid was a confirmed acceptor that has now opted out
+export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject) => {
+    try {
+      let result;
+      let ref = firebase.database().ref(`servicesRequests/${taskId}/confirmedGuests/${uid}/guestStatus`);
+      ref.once("value", function(snapshot){
+        if(snapshot.val() == 3){
+          result = true;
+        } else {
+          result = false;
+        }
+        resolve(result);
+      })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 
 //Stats
 

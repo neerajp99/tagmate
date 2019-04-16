@@ -103,18 +103,19 @@ class RequestDetails extends Component{
             });
           */
 
+          //If you enable the currently disabled coin system again, delete below code
+
           if(selectedServiceId === 'custom'){
             createCustomService(customTitle).then(newServiceId => {
               postServiceRequest({serviceId:newServiceId, when:when,details:details, anonymous: anonymous}).then(res => {
               this.setState({disabledBtn:false}); // Enable the button again
-              this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
+              this.props.navigation.navigate('Tasks');
               });
             })
           } else {
-            //If you enable the currently disabled coin system again, delete below code
             postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous}).then(res => {
             this.setState({disabledBtn:false}); // Enable the button again
-            this.props.navigation.navigate('RequestScreen'); // Redirect user to RequestScreen
+            this.props.navigation.navigate('Tasks'); 
             });
           }
 

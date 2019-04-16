@@ -29,7 +29,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});
@@ -51,12 +51,17 @@ class DashboardScreen extends Component {
       ref.on('child_added', (snapshot) => {
         if(this._isMounted) this.setState({fetching:false});
         var request = snapshot.val();
-        //If the user is the requester, and it is not a cancelled activity add to requested array:
-        if(request.clientId == uid && (request.status < 3) && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
-        //If the user is the confirmed accepter, add to accepted array:
-        isConfirmedAcceptor(uid, request.id).then(result => {
-          if( result && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
-        })
+        //Checking if this task object has the property anonymous. If the task object has the property anonymous that means it is a post from v2 of the app. Posts from old version do not have this property
+        // We do this to ensure we only show posts from the new version of the app
+        if(request.anonymous != undefined)
+        {
+            //If the user is the requester, and it is not a cancelled activity add to requested array:
+          if(request.clientId == uid && (request.status < 3) && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
+          //If the user is the confirmed accepter, add to accepted array:
+          isConfirmedAcceptor(uid, request.id).then(result => {
+            if( result && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+          })
+        }
       });
 
       // When an existing service request object is removed:
@@ -112,6 +117,7 @@ class DashboardScreen extends Component {
     // Open Dashboard Details screen for the task the user has tapped.
     openDetails = (item) =>
     {
+      console.log('openDetails (item): ', item)
       this.props.navigation.navigate('DashboardDetails',{taskId: item.id})
     }
 

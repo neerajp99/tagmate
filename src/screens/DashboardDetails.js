@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
 import * as _ from 'lodash';
-import {getAllServices, getWhatsapp, getName, getCoins} from '../lib/firebaseUtils.js';
+import {getAllServices, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
@@ -19,6 +19,10 @@ class DashboardDetails extends Component {
       hide:false,
       nameAvailable:false,
       confirmedGuestList: [],
+      itemService: [],
+      optedOut: false,
+      serviceTitle: '',
+      serviceImg: 'http://chillmateapp.com/assets/item_img/custom.jpg',
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
@@ -29,9 +33,13 @@ class DashboardDetails extends Component {
     getAllServices().then(services => // Get list of all services, then:
     {
       this.setState({services}); // Make services list available to the screen
+      this.getTaskItem();
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
+
     this.getConfirmedGuests();
+
+    //this.getServiceItem();
   }
 
   componentWillUnmount()
@@ -39,26 +47,55 @@ class DashboardDetails extends Component {
     this._isMounted = false;
   }
 
+  //WIP
+  getTaskItem = () => {
+    var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}`);
+    ref.on('value', (snapshot) => {
+      let data = snapshot.val();
+      this.setState({ item: data});
+      console.log('inside getTaskItem');
+      // Fetching service's title:
+      this.state.services.map(service =>
+      {
+        if(this.state.item.serviceId == service.id){
+          this.setState({serviceTitle: service.title});
+          this.setState({serviceImg: service.img});
+        }
+      })
+    })
+
+
+  }
+
+  getServiceItem = () => {
+    var ref = firebase.database().ref(`services`);
+    ref.on('value', (snapshot) => {
+      let data = snapshot.val();
+      this.setState({ services: data});
+      console.log('inside getServiceItem');
+    })
+  }
+
+
   //Returns the react native component list with names of confirmed guests
   getConfirmedGuests = () => {
       var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/confirmedGuests`);
       console.log('inside getConfirmedGuests');
       ref.on('value', (snapshot) => {
-      console.log('snapshot.val(): ', snapshot.val());
-      let data = snapshot.val();
-      let guestItems = Object.values(data);
-      this.setState({ confirmedGuestList: guestItems});
-      console.log('confirmedGuestList state: ', this.state.confirmedGuestList);
+        let data = snapshot.val();
+        let guestItems = Object.values(data);
+        this.setState({ confirmedGuestList: guestItems});
     })
   }
 
   liveUpdates = () => {
 
     const {currentUser: {uid} = {}} = firebase.auth()
-
+    console.log('liveUpdates func')
     // Listen for changes in service request {this.state.item.id}
     firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
+      console.log('liveUpdates step 2')
       if(this._isMounted)
       {
         var item = snapshot.val();
@@ -83,6 +120,15 @@ class DashboardDetails extends Component {
 
         item.whatsapp = this.state.item.whatsapp;
         this.setState({item:item});
+
+        firebase.database().ref(`/services/${this.state.item.serviceId}`).on('value', (snapshot) => {
+          let serviceData = snapshot.val();
+          let serviceItem = Object.values(serviceData);
+          this.setState({ itemService: serviceItem});
+        })
+
+        console.log('itemService: ', this.state.itemService)
+        console.log('services: ', this.state.services)
 
         // Get name of the user involved in this service request:
         getName(uid).then(selfName=>
@@ -114,13 +160,14 @@ class DashboardDetails extends Component {
         });
 
         //Check if the current user is a guest and has recently opted out
-        item.optedOutAsGuest = false;
-
-        this.state.confirmedGuestList.map(guest => {
-          if(guest.id === uid && guest.guestStatus == 3){
-            item.optedOutAsGuest = true;
-          }
-        })
+        if(!item.isClient)
+        {
+          hasOptedOutAsGuest(uid, item.id).then(result =>{
+          if(result){
+            this.setState({optedOut: true})
+            }
+          })
+        }
 
         // If whatsapp number is not available yet:
         if(!this.state.whatsappAvailable)
@@ -194,6 +241,7 @@ class DashboardDetails extends Component {
   }
 
   renderGuests = ({item}) => {
+    console.log('inside renderGuests');
       const {id, fullName, guestStatus} = item;
 
       return (
@@ -218,8 +266,8 @@ class DashboardDetails extends Component {
 
   render()
   {
-    const {item, confirmedGuestList} = this.state;
-    console.log(item);
+    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg} = this.state;
+    console.log('state: ', this.state);
     var statusStr = 'Not available';
     let host = 'Anonymous';
     if(!item.anonymous) host = item.hostName;
@@ -238,7 +286,7 @@ class DashboardDetails extends Component {
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
-      <Card featuredTitle={item.serviceTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: item.serviceImg}}>
+      <Card featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: serviceImg}}>
           <ListItem
               title={host}
               titleStyle={adourStyle.listItemText}
@@ -297,7 +345,7 @@ class DashboardDetails extends Component {
             keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
         />
         {
-          item.status == 1 && !item.optedOutAsGuest &&
+          item.status == 1 && !item.optedOut &&
           <Button
           icon={{name: 'chat'}}
           onPress={() =>
@@ -334,7 +382,7 @@ class DashboardDetails extends Component {
           }
 
           {
-           item.status < 2 && !item.optedOutAsGuest &&
+           item.status < 2 && !item.optedOut &&
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}

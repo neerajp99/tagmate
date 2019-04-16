@@ -85,9 +85,6 @@ class GuestList extends Component {
       }
     }
 
-    goBack = () => {
-      this.props.navigation.navigate('Dashboard');
-    }
 
     /*
     * render an item of the list
@@ -151,7 +148,7 @@ class GuestList extends Component {
             />
 
             <Button
-                onPress={()=>this.goBack()}
+                onPress={()=>this.props.navigation.goBack()}
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
                 disabled={this.state.disabledDone}
