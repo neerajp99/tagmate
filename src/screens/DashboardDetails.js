@@ -37,8 +37,6 @@ class DashboardDetails extends Component {
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
 
-    this.getConfirmedGuests();
-
     //this.getServiceItem();
   }
 
@@ -54,6 +52,9 @@ class DashboardDetails extends Component {
       let data = snapshot.val();
       this.setState({ item: data});
       console.log('inside getTaskItem');
+
+      if(this.state.item.status != 0) this.getConfirmedGuests();
+      console.log('this.state.item.status', this.state.item.status);
       // Fetching service's title:
       this.state.services.map(service =>
       {

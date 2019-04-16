@@ -55,8 +55,8 @@ export const createCustomService = (customTitle) => new Promise((resolve, reject
             img: 'http://chillmateapp.com/assets/item_img/custom.jpg',
             icon: 'av-timer'
           })
+          resolve(newServiceId);
         });
-        resolve(newServiceId);
     } catch (e) {
         reject(e)
     }

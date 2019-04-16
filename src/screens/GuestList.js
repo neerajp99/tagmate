@@ -41,6 +41,11 @@ class GuestList extends Component {
           var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds`);
           console.log('inside getGuestList');
           ref.on('value', (snapshot) => {
+          if(snapshot.val() == null){
+            //no potential guests available
+            this.setState({fetching:false});
+            return;
+           }
           console.log('snapshot.val(): ', snapshot.val());
           let data = snapshot.val();
           let guestItems = Object.values(data);
@@ -125,12 +130,13 @@ class GuestList extends Component {
           <View style={{flex: 2, marginBottom: 8}}>
           <ScrollView>
             <View style={styles.mainContainer}>
-                <FlatList
+                {(guestList.length == 0) && <Text style={adourStyle.defaultText}>No potential guests. Please check back later.</Text>}
+                {(guestList.length != 0) && <FlatList
                     data={guestList}
                     extraData={guestList}
                     renderItem={this.renderItem}
                     keyExtractor={(guestList, index) => guestList.id}
-                />
+                />}
                 {
                     fetching && <View style={styles.progressContainer}>
                         <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>

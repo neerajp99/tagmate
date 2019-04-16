@@ -9,7 +9,7 @@ import {connect} from "react-redux";
 import {setDeviceToken} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
-import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
+import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 import CardStack, { Card as SwipableCard } from 'react-native-card-stack-swiper';
 
 
