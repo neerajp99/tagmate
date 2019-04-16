@@ -17,6 +17,7 @@ class GuestList extends Component {
       this.state = {
           myTasks: [],
           guestList: [],
+          disabledBtn: false,
           item:{id:this.props.navigation.state.params.taskId}, // Loading service request's ID which was passed on
           fetching: false,
       };
@@ -43,7 +44,7 @@ class GuestList extends Component {
           ref.on('value', (snapshot) => {
           if(snapshot.val() == null){
             //no potential guests available
-            this.setState({fetching:false});
+            this.setState({fetching:false, disabledBtn: true});
             return;
            }
           console.log('snapshot.val(): ', snapshot.val());
@@ -149,7 +150,7 @@ class GuestList extends Component {
                 onPress={()=>this.confirmGuestList()}
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
-                disabled={this.state.disabledDone}
+                disabled={this.state.disabledBtn}
                 title="Good to Go"
             />
 
@@ -157,7 +158,6 @@ class GuestList extends Component {
                 onPress={()=>this.props.navigation.goBack()}
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
-                disabled={this.state.disabledDone}
                 title="Not Yet"
             />
 

@@ -338,7 +338,7 @@ class DashboardDetails extends Component {
       </Card>
 
 
-      <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
+      {item.status == 1 && <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
         <FlatList
             data={confirmedGuestList}
             extraData={confirmedGuestList}
@@ -358,7 +358,7 @@ class DashboardDetails extends Component {
           textStyle={adourStyle.btnText}
           title="Chat" />
         }
-      </Card>
+      </Card>}
 
       <Card>
 
