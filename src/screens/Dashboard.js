@@ -29,7 +29,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});
@@ -196,7 +196,7 @@ class DashboardScreen extends Component {
                     subtitleStyle={adourStyle.listItemText}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
-                    badge={(notifications!=0)? { value: notifications, textStyle: { color: 'orange' }, containerStyle: { marginTop: -20 } } : null}
+                    badge={(notifications!=0)? { value: notifications, status: 'error', containerStyle: { marginTop: -20 } } : null}
                   />
             </View>
           </View>

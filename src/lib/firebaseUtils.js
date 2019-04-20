@@ -30,6 +30,7 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                   custom: customBool,
                   customTitle: customTitle,
                   status: 0,
+                  interestedCount: 0,
                   created_at:firebase.database.ServerValue.TIMESTAMP,
                   hostName: fullName,
                 }

@@ -178,6 +178,14 @@ export const adourStyle = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
+  btnGeneralBadge: {
+    borderRadius: 25,
+    height: 45,
+    width: WIDTH -120,
+    backgroundColor: BRAND_COLOR_TWO,
+    justifyContent: 'center',
+    marginTop: 20
+  },
   btnCancel: {
     borderRadius: 25,
     height: 45,

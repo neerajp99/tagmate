@@ -3,7 +3,7 @@ import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollVie
 import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Button, Card, ListItem, Text, Divider, Badge } from 'react-native-elements';
+import { Button, Card, ListItem, Text, Divider, Badge, withBadge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {getAllServices, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
@@ -287,7 +287,6 @@ class DashboardDetails extends Component {
     var statusStr = 'Not available';
     let host = 'Anonymous';
     if(!item.anonymous) host = item.hostName;
-
     if(typeof item.status != 'undefined')
     {
       switch(item.status)
@@ -387,7 +386,7 @@ class DashboardDetails extends Component {
                        title="Guest List"
                        rightIcon={{name: 'code'}}
                    />
-                   <Badge value={item.interestedCount} textStyle={{ color: 'orange' }} />
+                   {(item.interestedCount != 0) && <Badge value={item.interestedCount} status="error" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
                    </View>
 
            }
