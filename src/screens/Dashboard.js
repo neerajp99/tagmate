@@ -196,7 +196,9 @@ class DashboardScreen extends Component {
                     subtitleStyle={adourStyle.listItemText}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
-                    badge={(notifications!=0)? { value: notifications, status: 'error', containerStyle: { marginTop: -20 } } : null}
+                    chevron={true}
+                    bottomDivider={true}
+                    badge={(notifications!=0)? { value: notifications, status: 'error', containerStyle: { marginTop: -25 } } : null}
                   />
             </View>
           </View>
