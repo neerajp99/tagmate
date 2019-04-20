@@ -12,6 +12,7 @@ import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 import CardStack, { Card as SwipableCard } from 'react-native-card-stack-swiper';
 
+const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
 //Test commit
 
@@ -225,17 +226,24 @@ class TaskScreen extends Component {
     swipableRender(myTasks) {
 
       return myTasks.map((item) => {
-        const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
+        const {serviceId, id, when, details, anonymous, custom, customTitle, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
         const {allServices} = this.state
         var serviceTitle = '---';
-        allServices.map(service => {
+        if(!custom)
+        {
+          allServices.map(service => {
             if(service.id == serviceId)
             {
                 serviceTitle = service.title;
                 serviceImg = service.img;
             }
-        });
+          });
+        } else {
+          //this is a custom activity, get custom title from post instead of the global service object
+          serviceTitle = customTitle;
+          serviceImg = CUSTOM_IMG;
+        }
         if(details == "" || typeof details == "undefined") detailsAvailable = false
 
         let interestAvailable = false;

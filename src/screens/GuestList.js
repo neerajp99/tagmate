@@ -151,14 +151,14 @@ class GuestList extends Component {
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
                 disabled={this.state.disabledBtn}
-                title="Good to Go"
+                title="Finalize List"
             />
 
             <Button
                 onPress={()=>this.props.navigation.goBack()}
                 buttonStyle={adourStyle.btnGeneral}
                 textStyle={adourStyle.btnText}
-                title="Not Yet"
+                title="Wait for More People to Join"
             />
 
             </View>

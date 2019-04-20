@@ -5,15 +5,19 @@ import * as _ from 'lodash'
 /*
 * method to post the service request.
 * */
-export const postServiceRequest = ({serviceId: serviceId, when: when, details: details, anonymous: anonymous}) => new Promise((resolve, reject) => {
+export const postServiceRequest = ({serviceId: serviceId, when: when, details: details, anonymous: anonymous, customTitle: customTitle}) => new Promise((resolve, reject) => {
     try {
         console.log('inside posting Req')
         const {currentUser: {uid} = {}} = firebase.auth()
           getFullName(uid).then(fullName =>{
             firebaseReferences.SERVICES_REQUESTS.once('value', (snapshot) => {
                 let servicesRequests = snapshot.val()
+                let customBool = false;
                 if (_.isEmpty(servicesRequests)) {
                     servicesRequests = {}
+                }
+                if (serviceId === 'custom'){
+                  customBool = true;
                 }
                 const id = uuid.v4()
                 servicesRequests[id] = {
@@ -23,6 +27,8 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                   when: when,
                   details: details,
                   anonymous: anonymous,
+                  custom: customBool,
+                  customTitle: customTitle,
                   status: 0,
                   created_at:firebase.database.ServerValue.TIMESTAMP,
                   hostName: fullName,
@@ -521,6 +527,7 @@ export const countServicesRequests = () => {
   let countOpen = 0;
   let openPostUsers = [];
   let openPosts = [];
+  let debugPosts = [];
 
   //Count various statuses
   var srRef = firebase.database().ref("servicesRequests");
@@ -536,6 +543,9 @@ export const countServicesRequests = () => {
         countOpen++;
         openPostUsers.push(clientId);
         openPosts.push(id)
+        if(clientId == "aZ1rbtZgu1as9adqVwLEg5tJ6ss2"){
+          debugPosts.push(id);
+        }
       }
     });
     console.log('number of activities cancelled by acceptor: ', countAcc);
@@ -545,6 +555,7 @@ export const countServicesRequests = () => {
     console.log('number of open activities: ', countOpen);
     console.log('list of users who currently have open activities: ', openPostUsers);
     console.log('list of open activities: ', openPosts);
+    console.log('list of open activities created by Shivam: ', debugPosts);
   });
 
   //Count number of unique users created activities

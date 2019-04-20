@@ -83,10 +83,14 @@ class RequestDetails extends Component{
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
-            if(selectedServiceId === 'custom' && customTitle == ''){
-              this.erred('You must put a post title');
-              this.setState({disabledBtn:false});
-              return
+            if(customTitle.length > 15) return this.erred('Title should not exceed 15 characters. Use description to specify more details.');
+            if(selectedServiceId === 'custom'){
+              if(customTitle == '')
+                {
+                  this.erred('You must put a post title');
+                  this.setState({disabledBtn:false});
+                  return
+                }
             }
 
             /* PREVENTS USER FROM CREATING POSTS IF USER DOES NOT HAVE ENOUGH COINS - DISABLED TEMPORARILY
@@ -101,24 +105,22 @@ class RequestDetails extends Component{
                     // user has as many ongoing requests as their Adour coin balance.
                 }
             });
-          */
 
           //If you enable the currently disabled coin system again, delete below code
 
           if(selectedServiceId === 'custom'){
             createCustomService(customTitle).then(newServiceId => {
-              postServiceRequest({serviceId:newServiceId, when:when,details:details, anonymous: anonymous}).then(res => {
+              postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, custom: custom, customTitle: customTitle}).then(res => {
               this.setState({disabledBtn:false}); // Enable the button again
               this.props.navigation.navigate('Tasks');
               });
             })
-          } else {
-            postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous}).then(res => {
-            this.setState({disabledBtn:false}); // Enable the button again
-            this.props.navigation.navigate('Tasks'); 
-            });
           }
-
+          */
+            postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle}).then(res => {
+            this.setState({disabledBtn:false}); // Enable the button again
+            this.props.navigation.goBack();
+            });
         }
     }
 

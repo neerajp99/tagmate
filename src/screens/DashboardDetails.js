@@ -9,6 +9,8 @@ import {getAllServices, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
+const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
+
 class DashboardDetails extends Component {
   constructor(props) {
     super(props);
@@ -56,13 +58,20 @@ class DashboardDetails extends Component {
       if(this.state.item.status != 0) this.getConfirmedGuests();
       console.log('this.state.item.status', this.state.item.status);
       // Fetching service's title:
-      this.state.services.map(service =>
-      {
-        if(this.state.item.serviceId == service.id){
-          this.setState({serviceTitle: service.title});
-          this.setState({serviceImg: service.img});
-        }
-      })
+      if(!this.state.item.custom){
+        //this is not a custom activity, match the serviceId of the post with the service Id of the global list of services
+        //then fetch the image and title from the global service object
+        this.state.services.map(service =>
+          {
+          if(this.state.item.serviceId == service.id){
+            this.setState({serviceTitle: service.title});
+            this.setState({serviceImg: service.img});
+            }
+          })
+      } else {
+        //this is a custom activity, get the title from post object, get image from the hard coded constant
+        this.setState({serviceTitle: this.state.item.customTitle, serviceImg: CUSTOM_IMG});
+      }
     })
 
 
@@ -110,26 +119,30 @@ class DashboardDetails extends Component {
           return;
         }
         item.serviceTitle = '';
-        // Fetching service's title:
-        this.state.services.map(service =>
+
+        if(!item.custom)
         {
-          if(item.serviceId == service.id){
-            item.serviceTitle = service.title;
-            item.serviceImg = service.img;
-          }
-        })
+          //get services object
+          firebase.database().ref(`/services/${this.state.item.serviceId}`).on('value', (snapshot) => {
+            let serviceData = snapshot.val();
+            let serviceItem = Object.values(serviceData);
+            this.setState({ itemService: serviceItem});
+          })
+          // Fetching service's title:
+          this.state.services.map(service =>
+          {
+            if(item.serviceId == service.id){
+              item.serviceTitle = service.title;
+              item.serviceImg = service.img;
+            }
+          })
+        } else {
+          //this is a custom post, get title from the post object instead of fetching it from the global service object
+          item.serviceTitle = item.customTitle;
+          item.serviceImg = CUSTOM_IMG;
+        }
 
-        item.whatsapp = this.state.item.whatsapp;
         this.setState({item:item});
-
-        firebase.database().ref(`/services/${this.state.item.serviceId}`).on('value', (snapshot) => {
-          let serviceData = snapshot.val();
-          let serviceItem = Object.values(serviceData);
-          this.setState({ itemService: serviceItem});
-        })
-
-        console.log('itemService: ', this.state.itemService)
-        console.log('services: ', this.state.services)
 
         // Get name of the user involved in this service request:
         getName(uid).then(selfName=>
@@ -237,7 +250,9 @@ class DashboardDetails extends Component {
 
     markRequestCancelled(uid, item.id, item.isClient).then(resp =>
     {
-      this.props.navigation.navigate('DashboardScreen')
+      console.log('cancelled');
+      //Do nothing
+      //this.props.navigation.navigate('DashboardScreen')
     });
   }
 

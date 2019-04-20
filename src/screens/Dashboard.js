@@ -29,7 +29,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});
@@ -87,30 +87,29 @@ class DashboardScreen extends Component {
         //If the user is the confirmed accepter, add to accepted array:
         isConfirmedAcceptor(uid, request.id).then(result => {
           if( result && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+          // Do nothing if the service request was not related to the user:
+          //if(request.clientId != uid && request.serverId != uid) return;
+          // Else, find it in the arrays and replace it with the new information.
+          else if(this._isMounted)
+          {
+            let req = [];//this.state.requested;
+            let acc = [];//this.state.accepted;
+            this.state.requested.map(item =>
+            {
+              if(item.id == request.id) req.push(request);
+              else req.push(item);
+            });
+            this.state.accepted.map(item =>
+            {
+              if(item.id == request.id) acc.push(request);
+              else acc.push(item);
+            });
+            this.setState({requested:req});
+            this.setState({accepted:acc});
+          }
         })
 
-        // Do nothing if the service request was not related to the user:
-        //if(request.clientId != uid && request.serverId != uid) return;
-        // If it is a service request the user has recently accepted, add it to accepted array:
-        if(request.status == 1 && request.serverId == uid && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
-        // Else, find it in the arrays and replace it with the new information.
-        else if(this._isMounted)
-        {
-          let req = [];//this.state.requested;
-          let acc = [];//this.state.accepted;
-          this.state.requested.map(item =>
-          {
-            if(item.id == request.id) req.push(request);
-            else req.push(item);
-          });
-          this.state.accepted.map(item =>
-          {
-            if(item.id == request.id) acc.push(request);
-            else acc.push(item);
-          });
-          this.setState({requested:req});
-          this.setState({accepted:acc});
-        }
+
       });
     }
 
@@ -149,17 +148,23 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, created_at, details} = item;
+        const{serviceId, id, created_at, details, custom, customTitle} = item;
         const {services} = this.state
         var serviceTitle = '---';
         console.log(services);
-        // Find service title corresponding to the service ID of the service request:
-        services.map(service => {
-            if(service.id == serviceId)
-            {
-                serviceTitle = service.title;
-            }
-        });
+        if(!custom)
+        {
+          // Find service title corresponding to the service ID of the service request:
+          services.map(service => {
+              if(service.id == serviceId)
+              {
+                  serviceTitle = service.title;
+              }
+          });
+        } else {
+          //this is a custom post, get title from post instead of global service object
+          serviceTitle = customTitle;
+        }
         // Find appropriate status for current status code:
         var statusStr = 'Not available';
         switch(item.status)
