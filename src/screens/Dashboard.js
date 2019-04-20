@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
 import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
-import { Button, ButtonGroup, ListItem } from 'react-native-elements';
+import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
@@ -148,8 +148,13 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, created_at, details, custom, customTitle} = item;
+        const{serviceId, id, created_at, details, custom, customTitle, interestedCount} = item;
         const {services} = this.state
+        let notifications = 0;
+        if(interestedCount != null && interestedCount != undefined && item.status == 0){
+          notifications = interestedCount;
+          //TODO: add unread chat count
+        }
         var serviceTitle = '---';
         console.log(services);
         if(!custom)
@@ -175,6 +180,12 @@ class DashboardScreen extends Component {
           case 3:
           case 4: statusStr = 'Meetup cancelled.'; break;
         }
+
+        /* Update: removed the following code
+        rightTitle={<TimeAgo time={created_at} />}
+        rightTitleStyle={adourStyle.listItemText}
+        */
+
         return (
           <View key={id}>
             <View>
@@ -183,10 +194,9 @@ class DashboardScreen extends Component {
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
                     subtitle={statusStr}
                     subtitleStyle={adourStyle.listItemText}
-                    rightTitle={<TimeAgo time={created_at} />}
-                    rightTitleStyle={adourStyle.listItemText}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
+                    badge={(notifications!=0)? { value: notifications, textStyle: { color: 'orange' }, containerStyle: { marginTop: -20 } } : null}
                   />
             </View>
           </View>
@@ -219,7 +229,7 @@ class DashboardScreen extends Component {
                 />
               }
               <View style={{marginBottom:30}}>
-              <Button title="Create A Post" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
+              <Button title="Create A Post" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
               </View>
 
               {

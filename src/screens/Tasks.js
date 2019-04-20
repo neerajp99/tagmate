@@ -83,7 +83,7 @@ class TaskScreen extends Component {
                 <Text style={adourStyle.guideText}>
                 You will see other people's Chillmate meetup posts here. Your posts are on your Dashboard. {"\n"} {"\n"}
                 </Text>
-                <Button title="Create A Chillmate Meetup" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
+                <Button title="Create A Chillmate Meetup" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                 </View>
           }
     }
@@ -268,7 +268,7 @@ class TaskScreen extends Component {
               titleStyle={adourStyle.listItemText}
               subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
-              hideChevron={true}
+              chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
 
@@ -280,9 +280,9 @@ class TaskScreen extends Component {
                 detailsAvailable && <ListItem
                   subtitle={ details }
                   subtitleStyle={adourStyle.listItemText}
-                  hideChevron={true}
+                  chevron={false}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  subtitleNumberOfLines={2}
+                  subtitleProps={{ numberOfLines: 2 }}
                 />
             }
               <View>
@@ -341,12 +341,13 @@ class TaskScreen extends Component {
         return (
           <View key={id}>
           <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+          <View>
               <ListItem
               title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
               subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
-              hideChevron={true}
+              chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
 
@@ -358,12 +359,13 @@ class TaskScreen extends Component {
                 detailsAvailable && <ListItem
                   subtitle={ details }
                   subtitleStyle={adourStyle.listItemText}
-                  hideChevron={true}
+                  chevron={false}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  subtitleNumberOfLines={2}
+                  subtitleProps={{ numberOfLines: 2 }}
                 />
             }
 
+            </View>
               </Card>
             </View>
         )

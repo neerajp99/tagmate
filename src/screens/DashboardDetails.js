@@ -3,7 +3,7 @@ import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollVie
 import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
+import { Button, Card, ListItem, Text, Divider, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {getAllServices, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
@@ -265,14 +265,14 @@ class DashboardDetails extends Component {
         {guestStatus != 3 && <ListItem
           title={fullName}
           titleStyle={adourStyle.listItemText}
-          hideChevron={true}
+          chevron={false}
           containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
           leftIcon={{ name: 'person'}}
         />}
         {guestStatus == 3 && <ListItem
           title={fullName + " has left"}
           titleStyle={adourStyle.greyText}
-          hideChevron={true}
+          chevron={false}
           containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
           leftIcon={{ name: 'person'}}
         />}
@@ -310,7 +310,7 @@ class DashboardDetails extends Component {
               subtitleStyle={adourStyle.listItemText}
               rightTitle={statusStr}
               rightTitleStyle={adourStyle.listItemText}
-              hideChevron={true}
+              chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
                   {/* Task Timing and details */ }
@@ -320,7 +320,7 @@ class DashboardDetails extends Component {
                           title={"Scheduled for: "+(item.when) }
                           subtitleStyle={adourStyle.listItemText}
                           titleStyle={adourStyle.listItemText}
-                          hideChevron={true}
+                          chevron={false}
                           containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                           leftIcon={{ name: 'access-time'}}
                         />
@@ -331,7 +331,7 @@ class DashboardDetails extends Component {
                         <ListItem
                             title={item.details}
                             titleStyle={adourStyle.listItemText}
-                            hideChevron={true}
+                            chevron={false}
                             containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                             leftIcon={{ name: 'info-outline'}}
                           />
@@ -342,7 +342,7 @@ class DashboardDetails extends Component {
                   <ListItem
                       title={['Posted ', <TimeAgo key={item.id} time={item.created_at} />]}
                       titleStyle={adourStyle.listItemText}
-                      hideChevron={true}
+                      chevron={false}
                       containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                       leftIcon={{ name: 'access-time'}}
                     />
@@ -370,7 +370,7 @@ class DashboardDetails extends Component {
                       taskId: item.id
                     })}
           buttonStyle={adourStyle.btnGeneral}
-          textStyle={adourStyle.btnText}
+          titleStyle={adourStyle.btnText}
           title="Chat" />
         }
       </Card>}
@@ -379,19 +379,24 @@ class DashboardDetails extends Component {
 
            {
              item.isClient && item.status == 0 &&
+                  <View>
                    <Button onPress={()=>this.openGuestList(item.id)}
                        buttonStyle={adourStyle.btnGeneral}
-                       textStyle={adourStyle.btnText}
+                       titleStyle={adourStyle.btnText}
                        disabled={this.state.disabledDone}
                        title="Guest List"
+                       rightIcon={{name: 'code'}}
                    />
+                   <Badge value={item.interestedCount} textStyle={{ color: 'orange' }} />
+                   </View>
+
            }
 
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}
                       buttonStyle={adourStyle.btnGeneral}
-                      textStyle={adourStyle.btnText}
+                      titleStyle={adourStyle.btnText}
                       disabled={this.state.disabledDone}
                       title="Mark as Done"
                   />
@@ -402,7 +407,7 @@ class DashboardDetails extends Component {
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
-                    textStyle={adourStyle.btnText}
+                    titleStyle={adourStyle.btnText}
                     title={(item.isClient)?"Remove":"Opt Out"}
                 />
           }

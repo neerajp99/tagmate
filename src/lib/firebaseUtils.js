@@ -538,7 +538,12 @@ export const countServicesRequests = () => {
       if(status == 4) countAcc++;
       else if (status == 3) countReq++;
       else if (status == 2) countDone++;
-      else if (status == 1) countProg++;
+      else if (status == 1){
+        if(clientId == "aZ1rbtZgu1as9adqVwLEg5tJ6ss2"){
+          debugPosts.push(id);
+        }
+        countProg++;
+      }
       else if (status == 0) {
         countOpen++;
         openPostUsers.push(clientId);
@@ -555,7 +560,7 @@ export const countServicesRequests = () => {
     console.log('number of open activities: ', countOpen);
     console.log('list of users who currently have open activities: ', openPostUsers);
     console.log('list of open activities: ', openPosts);
-    console.log('list of open activities created by Shivam: ', debugPosts);
+    console.log('list of all activities created by Shivam: ', debugPosts);
   });
 
   //Count number of unique users created activities

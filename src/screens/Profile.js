@@ -79,7 +79,7 @@ class ProfileScreen extends Component{
             <Card containerStyle={{alignItems: 'center', justifyContent: 'center'}}>
             <View style={{alignItems: 'center', marginBottom: 8}} >
               <Avatar
-                large
+                size="large"
                 rounded
                 source={{uri: this.state.photoURL}}
                 activeOpacity={0.7}
@@ -96,7 +96,7 @@ class ProfileScreen extends Component{
             subtitle='Reputation'
             subtitleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'coins', type:'material-community' }}
-            hideChevron={true}
+            chevron={false}
             containerStyle={{borderBottomColor: '#e6e6e6'}}
           />
         </Card>

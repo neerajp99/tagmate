@@ -27,12 +27,12 @@ class SupportScreen extends Component{
         </View>
         <Button onPress={()=>this.launchPhone()}
             buttonStyle={adourStyle.btnGeneral}
-            textStyle={adourStyle.btnText}
+            titleStyle={adourStyle.btnText}
             title="Phone"
         />
         <Button onPress={()=>this.launchEmail()}
             buttonStyle={adourStyle.btnGeneral}
-            textStyle={adourStyle.btnText}
+            titleStyle={adourStyle.btnText}
             title="Email"
         />
       </Card>

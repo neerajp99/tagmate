@@ -149,7 +149,7 @@ class GuestList extends Component {
             <Button
                 onPress={()=>this.confirmGuestList()}
                 buttonStyle={adourStyle.btnGeneral}
-                textStyle={adourStyle.btnText}
+                titleStyle={adourStyle.btnText}
                 disabled={this.state.disabledBtn}
                 title="Finalize List"
             />
@@ -157,7 +157,7 @@ class GuestList extends Component {
             <Button
                 onPress={()=>this.props.navigation.goBack()}
                 buttonStyle={adourStyle.btnGeneral}
-                textStyle={adourStyle.btnText}
+                titleStyle={adourStyle.btnText}
                 title="Wait for More People to Join"
             />
 

@@ -160,7 +160,7 @@ class RequestDetails extends Component{
             titleStyle={adourStyle.listItemText}
             subtitle="Host"
             subtitleStyle={adourStyle.listItemText}
-            hideChevron={true}
+            chevron={false}
             containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
           />
 
@@ -202,7 +202,7 @@ class RequestDetails extends Component{
                 onChangeText={details => this.setState({ details: details })}
               />
 
-              <Button title={dtPlaceholder} buttonStyle={styles.dateTimeStyle} textStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
+              <Button title={dtPlaceholder} buttonStyle={styles.dateTimeStyle} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
               <DateTimePicker
                 isVisible={isDateTimePickerVisible}
                 mode='datetime'
@@ -218,7 +218,7 @@ class RequestDetails extends Component{
                 checked={this.state.anonymous}
                 onPress={() => this.postAsAnonymous()}
               />
-	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} textStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
+	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} titleStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
       </ScrollView>
@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
     },
     dateTimeStyle: {
       height: 45,
+      width: WIDTH - 120,
       backgroundColor: 'rgba(54, 105, 169, 0.2)',
       justifyContent: 'center',
       marginBottom: 20,
