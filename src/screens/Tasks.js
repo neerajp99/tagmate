@@ -213,7 +213,7 @@ class TaskScreen extends Component {
                 //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                    addAcceptor(uid, item.id).then(o =>
+                    addAcceptor(uid, item.id, item.clientId).then(o =>
                     {
                       console.log('added as acceptor')
                         //this.hideTask(item.id);

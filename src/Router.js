@@ -2,7 +2,9 @@ import React from 'react';
 import {Image, View} from 'react-native';
 import { Icon, Badge } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
+import IconWithBadge from "./screens/IconWithBadge";
 import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
@@ -159,7 +161,7 @@ export const MainTabNav = createBottomTabNavigator(
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
           <View>
           <Icon name='dashboard' size={horizontal ? 20 : 25} color={tintColor} />
-          <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />
+          <IconWithBadge />
           </View>
         ),
       },

@@ -228,9 +228,10 @@ class DashboardScreen extends Component {
         const {services} = this.state
         const {currentUser: {uid} = {}} = firebase.auth()
         let notifications = 0;
+        let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
         if(interestedCount != null && interestedCount != undefined && item.status == 0){
           notifications = interestedCount;
-          //TODO: add unread chat count
+          badgeColor = 'primary';
         } else if (item.status != 0 && item.unreadMsgs != undefined){
           notifications = item.unreadMsgs;
         }
@@ -252,11 +253,11 @@ class DashboardScreen extends Component {
         var statusStr = 'Not available';
         switch(item.status)
         {
-          case 0: statusStr = 'Looking for a match'; break;
-          case 1: statusStr = 'Matched'; break;
-          case 2: statusStr = 'Meetup completed.'; break;
+          case 0: statusStr = `Open: ${interestedCount}+ interested`; break;
+          case 1: statusStr = 'Guest List Finalized'; break;
+          case 2: statusStr = 'Completed'; break;
           case 3:
-          case 4: statusStr = 'Meetup cancelled.'; break;
+          case 4: statusStr = 'Cancelled'; break;
         }
 
         /* Update: removed the following code
@@ -276,7 +277,7 @@ class DashboardScreen extends Component {
                     onPress={() => this.openDetails(item)}
                     chevron={true}
                     bottomDivider={true}
-                    badge={(notifications!=0)? { value: notifications, status: 'success' } : null}
+                    badge={(notifications!=0)? { value: notifications, status: badgeColor } : null}
                   />
             </View>
           </View>
@@ -309,7 +310,7 @@ class DashboardScreen extends Component {
                     keyExtractor={(item, index) => item.id}
                 />
               }
-              <View style={{marginBottom:30}}>
+              <View style={{marginBottom:30, marginLeft: 20, marginRight: 20}}>
               <Button title="Create A Post" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
               </View>
 

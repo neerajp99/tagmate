@@ -97,6 +97,36 @@ export const getRejectedTasks = (uid) => new Promise((resolve, reject) => {
     }
 })
 
+// get the total number of unread chat msgs by this user
+export const getTotalUnread = (uid) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`users/${uid}/messages/`).once('value', (snapshot) => {
+          if(snapshot.val() == undefined){
+            resolve(0)
+          }
+          let totalUnread = 0;
+          snapshot.forEach(function(childSnapshot) {
+            const {unreadCount} = childSnapshot.val();
+            totalUnread = totalUnread + unreadCount;
+          })
+          resolve(totalUnread);
+        });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// get the total number of people interested in this user's all open activities
+export const getTotalInterested = (uid) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${uid}/totalInterested`).once('value', (snapshot) => {
+          resolve(snapshot.val() || 0);
+        });
+    } catch (e) {
+        reject(e)
+    }
+})
+
 /*
 * method toget all the task that user with userId can perform
 * */
@@ -320,7 +350,7 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     }
 })
 
-export const finalizeGuestList = (taskId) => new Promise((resolve, reject) => {
+export const finalizeGuestList = (taskId, clientId) => new Promise((resolve, reject) => {
   try {
     let ref = firebase.database().ref(`/servicesRequests/${taskId}/acceptorIds`);
     ref.once("value", function(snapshot){
@@ -331,6 +361,15 @@ export const finalizeGuestList = (taskId) => new Promise((resolve, reject) => {
       let confirmedRef = firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`);
       confirmedGuests.map(guest => confirmedRef.child(guest.id).set(guest) )
       firebase.database().ref(`/servicesRequests/${taskId}`).update({status: 1});
+
+      //Decrease (notification) interested count for this user
+      firebase.database().ref(`/servicesRequests/${taskId}/interestedCount`).once("value", function(snapshot){
+        let interestedCount = snapshot.val();
+        firebase.database().ref(`/users/${clientId}/totalInterested`).transaction(function(totalInterested){
+          return (totalInterested || 0) - interestedCount;
+        });
+      })
+
       resolve(confirmedGuests)
     } )
   } catch(e) {
@@ -339,7 +378,7 @@ export const finalizeGuestList = (taskId) => new Promise((resolve, reject) => {
 })
 
 // Push this user to the list of acceptors
-export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) => {
+export const addAcceptor = (userId, serviceId, clientId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
 
@@ -360,6 +399,11 @@ export const addAcceptor = (userId, serviceId) => new Promise((resolve, reject) 
         //Increment interested count for this task
         firebase.database().ref(`/servicesRequests/${serviceId}/interestedCount`).transaction(function(interestedCount){
           return (interestedCount || 0) + 1;
+        });
+
+        //Increment total interested count for the client. this is used for notifying the client as well as for showing badge in clients app
+        firebase.database().ref(`/users/${clientId}/totalInterested`).transaction(function(totalInterested){
+          return (totalInterested || 0) + 1;
         });
 
         console.log('pushed user to acceptor list')
@@ -399,6 +443,15 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
         if(isClient){
           ref.update({status:3});
           incUserDarkScore(uid, 2);
+
+          //Decrease (notification) interested count for this user
+          firebase.database().ref(`/servicesRequests/${id}/interestedCount`).once("value", function(snapshot){
+            let interestedCount = snapshot.val();
+            firebase.database().ref(`/users/${uid}/totalInterested`).transaction(function(totalInterested){
+              return (totalInterested || 0) - interestedCount;
+            });
+          })
+
         }else{
           //Guest is cancelling
           ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3})
