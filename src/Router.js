@@ -1,6 +1,6 @@
 import React from 'react';
-import {Image} from 'react-native';
-import { Icon } from 'react-native-elements';
+import {Image, View} from 'react-native';
+import { Icon, Badge } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
 import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
@@ -157,7 +157,10 @@ export const MainTabNav = createBottomTabNavigator(
       screen: DashboardStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <View>
           <Icon name='dashboard' size={horizontal ? 20 : 25} color={tintColor} />
+          <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />
+          </View>
         ),
       },
     },

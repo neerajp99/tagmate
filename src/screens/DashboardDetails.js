@@ -24,6 +24,7 @@ class DashboardDetails extends Component {
       itemService: [],
       optedOut: false,
       serviceTitle: '',
+      unreadChatCount: 0,
       serviceImg: 'http://chillmateapp.com/assets/item_img/custom.jpg',
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
@@ -55,7 +56,10 @@ class DashboardDetails extends Component {
       this.setState({ item: data});
       console.log('inside getTaskItem');
 
-      if(this.state.item.status != 0) this.getConfirmedGuests();
+      if(this.state.item.status != 0){
+        this.getConfirmedGuests();
+        this.getUnreadChatCount();
+      }
       console.log('this.state.item.status', this.state.item.status);
       // Fetching service's title:
       if(!this.state.item.custom){
@@ -84,6 +88,15 @@ class DashboardDetails extends Component {
       this.setState({ services: data});
       console.log('inside getServiceItem');
     })
+  }
+
+  getUnreadChatCount = () =>
+  {
+    const {currentUser: {uid} = {}} = firebase.auth()
+    firebase.database().ref(`/users/${uid}/messages/${this.state.item.id}/unreadCount`).on("value", function(snapshot)
+    {
+      if(this._isMounted) this.setState({unreadChatCount: snapshot.val() || "0"});
+    }.bind(this));
   }
 
 
@@ -151,6 +164,9 @@ class DashboardDetails extends Component {
           item.selfName = selfName;
           this.setState({item:item});
         });
+
+        //If guest list is finalized, check if there are unread chat msgs
+        if(item.status != 0) this.getUnreadChatCount();
 
         // If name is not available yet:
         if(!this.state.nameAvailable)
@@ -220,6 +236,24 @@ class DashboardDetails extends Component {
     this.props.navigation.navigate('GuestList',{taskId: itemId})
   }
 
+  openChat = (item) =>
+  {
+    //create an array of all users involved so that we can increment their unread message count later
+    let usersInvolved = [];
+    this.state.confirmedGuestList.map(guest =>
+      {
+        usersInvolved.push(guest.id);
+      })
+    usersInvolved.push(item.clientId);
+    console.log('usersInvolved', usersInvolved);
+
+    this.props.navigation.navigate("Chat", {
+      name: item.selfName,
+      taskId: item.id,
+      userList: usersInvolved,
+    })
+  }
+
   confirmCancel = (item) => {
     if(item.status ==1)
     {
@@ -282,7 +316,7 @@ class DashboardDetails extends Component {
 
   render()
   {
-    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg} = this.state;
+    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg, unreadChatCount} = this.state;
     console.log('state: ', this.state);
     var statusStr = 'Not available';
     let host = 'Anonymous';
@@ -361,16 +395,15 @@ class DashboardDetails extends Component {
         />
         {
           item.status == 1 && !item.optedOut &&
+          <View>
           <Button
           icon={{name: 'chat'}}
-          onPress={() =>
-                    this.props.navigation.navigate("Chat", {
-                      name: item.selfName,
-                      taskId: item.id
-                    })}
+          onPress={() => this.openChat(item)}
           buttonStyle={adourStyle.btnGeneral}
           titleStyle={adourStyle.btnText}
           title="Chat" />
+          {(unreadChatCount != 0) && <Badge value={unreadChatCount} status="success" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
+          </View>
         }
       </Card>}
 
