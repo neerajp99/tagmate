@@ -554,16 +554,25 @@ export const getCoins = (userId) => new Promise((resolve, reject) => {
 //checks if the uid was a confirmed acceptor that has now opted out
 export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject) => {
     try {
-      let result;
-      let ref = firebase.database().ref(`servicesRequests/${taskId}/confirmedGuests/${uid}/guestStatus`);
-      ref.once("value", function(snapshot){
-        if(snapshot.val() == 3){
-          result = true;
-        } else {
-          result = false;
-        }
-        resolve(result);
+      let clientId;
+      firebase.database().ref(`servicesRequests/${taskId}/clientId`).once("value", function(snapshot) {
+        clientId = snapshot.val();
       })
+      if(uid != clientId)
+      {
+        let result;
+        let ref = firebase.database().ref(`servicesRequests/${taskId}/confirmedGuests/${uid}/guestStatus`);
+        ref.once("value", function(snapshot){
+          if(snapshot.val() == 3){
+            result = true;
+          } else {
+            result = false;
+          }
+          resolve(result);
+        })
+      } else {
+        resolve(null);
+      }
     } catch (e) {
         reject(e)
     }

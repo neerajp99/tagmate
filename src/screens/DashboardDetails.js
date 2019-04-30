@@ -54,13 +54,11 @@ class DashboardDetails extends Component {
     ref.on('value', (snapshot) => {
       let data = snapshot.val();
       this.setState({ item: data});
-      console.log('inside getTaskItem');
 
       if(this.state.item.status != 0){
         this.getConfirmedGuests();
         this.getUnreadChatCount();
       }
-      console.log('this.state.item.status', this.state.item.status);
       // Fetching service's title:
       if(!this.state.item.custom){
         //this is not a custom activity, match the serviceId of the post with the service Id of the global list of services
@@ -75,6 +73,16 @@ class DashboardDetails extends Component {
       } else {
         //this is a custom activity, get the title from post object, get image from the hard coded constant
         this.setState({serviceTitle: this.state.item.customTitle, serviceImg: CUSTOM_IMG});
+      }
+    })
+
+    const {currentUser: {uid} = {}} = firebase.auth()
+
+    //Check if the current user is a guest and has recently opted out
+    hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
+    if(result != null){
+      console.log('hasOptedOutAsGuest result is ', result);
+      this.setState({optedOut: result})
       }
     })
 
@@ -180,6 +188,13 @@ class DashboardDetails extends Component {
           });
         }
 
+        //Check if the current user is a guest and has recently opted out
+        hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
+        if(result != null){
+          console.log('hasOptedOutAsGuest result is ', result);
+          this.setState({optedOut: result})
+          }
+        })
 
         // Get reputation coins of the other person involved in this service request:
         getCoins((item.isClient)?item.serverId:item.clientId).then(coins=>
@@ -188,16 +203,6 @@ class DashboardDetails extends Component {
           item.coins = coins;
           this.setState({item:item});
         });
-
-        //Check if the current user is a guest and has recently opted out
-        if(!item.isClient)
-        {
-          hasOptedOutAsGuest(uid, item.id).then(result =>{
-          if(result){
-            this.setState({optedOut: true})
-            }
-          })
-        }
 
         // If whatsapp number is not available yet:
         if(!this.state.whatsappAvailable)
@@ -285,13 +290,15 @@ class DashboardDetails extends Component {
     markRequestCancelled(uid, item.id, item.isClient).then(resp =>
     {
       console.log('cancelled');
+      if(!item.isClient){
+        this.setState({optedOut: true});
+      }
       //Do nothing
       //this.props.navigation.navigate('DashboardScreen')
     });
   }
 
   renderGuests = ({item}) => {
-    console.log('inside renderGuests');
       const {id, fullName, guestStatus} = item;
 
       return (
@@ -316,8 +323,7 @@ class DashboardDetails extends Component {
 
   render()
   {
-    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg, unreadChatCount} = this.state;
-    console.log('state: ', this.state);
+    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg, unreadChatCount, optedOut} = this.state;
     var statusStr = 'Not available';
     let host = 'Anonymous';
     if(!item.anonymous) host = item.hostName;
@@ -394,7 +400,7 @@ class DashboardDetails extends Component {
             keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
         />
         {
-          item.status == 1 && !item.optedOut &&
+          item.status == 1 && !optedOut &&
           <View>
           <Button
           icon={{name: 'chat'}}
@@ -435,7 +441,7 @@ class DashboardDetails extends Component {
           }
 
           {
-           item.status < 2 && !item.optedOut &&
+           item.status < 2 && !optedOut &&
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}

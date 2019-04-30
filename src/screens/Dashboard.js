@@ -30,7 +30,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});
@@ -121,7 +121,26 @@ class DashboardScreen extends Component {
 
         //If the user is the confirmed accepter, add to accepted array:
         isConfirmedAcceptor(uid, request.id).then(result => {
-          if( result && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+          if( result && (request.status < 3) && this._isMounted){
+            //Add a new property to see how many unread msgs this user has in this task
+            //unread msg check start
+            if(request.status != 0)
+            {
+              let unreadAv = false;
+              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
+              {
+
+                if(snapshot.val() != null && snapshot.val() != 0){
+                  request.unreadMsgs = snapshot.val();
+                  unreadAv = true;
+                }
+              }).then(result => {
+                if(unreadAv) this.setState({acceptedBadge: true})
+              })
+            }
+            //unread msg check end
+            this.setState({accepted:[request].concat(this.state.accepted)});
+          }
           // Do nothing if the service request was not related to the user:
           //if(request.clientId != uid && request.serverId != uid) return;
           // Else, find it in the arrays and replace it with the new information.
