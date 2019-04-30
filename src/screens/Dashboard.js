@@ -30,7 +30,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});

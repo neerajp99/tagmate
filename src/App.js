@@ -27,6 +27,7 @@ class App extends Component {
             // Get information about the notification that was opened
             this.handlePushNotification(notificationOpen.notification, true)
         }
+
 	}
 
 	handlePushNotification = (notification, wasAppClosed) => {

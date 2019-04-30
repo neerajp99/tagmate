@@ -1,11 +1,12 @@
 import React from 'react';
 import {View} from 'react-native';
 import { Badge } from 'react-native-elements';
+import {connect} from 'react-redux';
 import {getTotalUnread, getTotalInterested} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 
 
-export default class IconWithBadge extends React.Component {
+class IconWithBadge extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,9 +51,18 @@ export default class IconWithBadge extends React.Component {
 
     return (
       <View>
-        {(this.state.unreadNotifs > 0) && <Badge status="success" value={this.state.unreadNotifs} containerStyle={{ position: 'absolute', top: -34, right: -18 }} />}
-        {(this.state.totalInterestCount > 0) && <Badge status="primary" value={this.state.totalInterestCount} containerStyle={{ position: 'absolute', top: -34, right: -5 }} />}
+        {(this.state.unreadNotifs > 0 && !this.props.chatScreenActive) && <Badge status="success" value={this.state.unreadNotifs} containerStyle={{ position: 'absolute', top: -34, right: -18 }} />}
+        {(this.state.totalInterestCount > 0 && this.state.unreadNotifs == 0) && <Badge status="primary" containerStyle={{ position: 'absolute', top: -34, right: -5 }} />}
         </View>
     );
   }
 }
+
+const mapStateToProps = state => {
+  /* only return the property that we care about */
+  return{
+    chatScreenActive: state.general.chatScreenActive,
+  };
+};
+
+export default connect(mapStateToProps)(IconWithBadge);

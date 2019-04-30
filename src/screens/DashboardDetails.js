@@ -419,7 +419,7 @@ class DashboardDetails extends Component {
                        title="Guest List"
                        rightIcon={{name: 'code'}}
                    />
-                   {(item.interestedCount != 0) && <Badge value={item.interestedCount} status="error" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
+                   {(item.interestedCount != 0) && <Badge value={item.interestedCount} status="primary" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
                    </View>
 
            }
