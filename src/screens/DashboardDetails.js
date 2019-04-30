@@ -413,7 +413,7 @@ class DashboardDetails extends Component {
         }
       </Card>}
 
-      <Card>
+      {!optedOut && <Card>
 
            {
              item.isClient && item.status == 0 &&
@@ -441,7 +441,7 @@ class DashboardDetails extends Component {
           }
 
           {
-           item.status < 2 && !optedOut &&
+           item.status < 2 &&
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
@@ -449,7 +449,7 @@ class DashboardDetails extends Component {
                     title={(item.isClient)?"Remove":"Opt Out"}
                 />
           }
-        </Card>
+        </Card>}
       </View>
       </ScrollView>
     )
