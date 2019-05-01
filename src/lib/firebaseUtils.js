@@ -358,19 +358,15 @@ export const finalizeGuestList = (taskId, clientId) => new Promise((resolve, rej
       let allGuests = Object.values(data);
       let confirmedGuests = allGuests.filter(guest => guest.guestStatus == 1);
       console.log('confirmedGuests: ', confirmedGuests);
-      let confirmedRef = firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`);
-      confirmedGuests.map(guest => confirmedRef.child(guest.id).set(guest) )
-      firebase.database().ref(`/servicesRequests/${taskId}`).update({status: 1});
-
-      //Decrease (notification) interested count for this user
-      firebase.database().ref(`/servicesRequests/${taskId}/interestedCount`).once("value", function(snapshot){
-        let interestedCount = snapshot.val();
-        firebase.database().ref(`/users/${clientId}/totalInterested`).transaction(function(totalInterested){
-          return (totalInterested || 0) - interestedCount;
-        });
-      })
-
-      resolve(confirmedGuests)
+      if(confirmedGuests.length != 0)
+      {
+        let confirmedRef = firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`);
+        confirmedGuests.map(guest => confirmedRef.child(guest.id).set(guest) )
+        firebase.database().ref(`/servicesRequests/${taskId}`).update({status: 1});
+        resolve(true)
+      }else{
+        resolve(false);
+      }
     } )
   } catch(e) {
     reject(e)

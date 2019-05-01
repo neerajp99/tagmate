@@ -324,6 +324,7 @@ class DashboardDetails extends Component {
   render()
   {
     const {item, confirmedGuestList, itemService, serviceTitle, serviceImg, unreadChatCount, optedOut} = this.state;
+    console.log('DashboardScreen is displaying the item with ID: ', item.id);
     var statusStr = 'Not available';
     let host = 'Anonymous';
     if(!item.anonymous) host = item.hostName;
