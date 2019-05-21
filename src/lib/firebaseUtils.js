@@ -598,16 +598,18 @@ export const countServicesRequests = () => {
       else if (status == 3) countReq++;
       else if (status == 2) countDone++;
       else if (status == 1){
-        if(clientId == "aZ1rbtZgu1as9adqVwLEg5tJ6ss2"){
+        /*
+        if(clientId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
           debugPosts.push(id);
         }
+        */
         countProg++;
       }
       else if (status == 0) {
         countOpen++;
         openPostUsers.push(clientId);
         openPosts.push(id)
-        if(clientId == "aZ1rbtZgu1as9adqVwLEg5tJ6ss2"){
+        if(clientId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
           debugPosts.push(id);
         }
       }

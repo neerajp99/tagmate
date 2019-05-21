@@ -39,13 +39,42 @@ class DashboardDetails extends Component {
       this.getTaskItem();
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
-
+    this.getDeviceTokenList();
     //this.getServiceItem();
   }
 
   componentWillUnmount()
   {
     this._isMounted = false;
+  }
+
+  getDeviceTokenList = () => {
+
+    let ref = firebase.database().ref(`/servicesRequests/${this.state.item.id}/confirmedGuests`);
+    let guestIds = [];
+    let allDeviceTokens = [];
+
+    ref.once("value", (snapshot) => {
+      let confGuestsData = snapshot.val();
+      let confGuestItems = Object.keys(confGuestsData).map(function(key) {
+          return confGuestsData[key];
+      });
+      confGuestItems.map(guest => {
+        guestIds.push(guest.id)
+      })
+      console.log('getDeviceTokenList, guestIds: ', guestIds);
+      for(let i=0; i<guestIds.length; i++){
+        let userId = guestIds[i]
+        firebase.database().ref(`/users/${userId}/deviceTokens`).once('value', (tokenSnapshot) => {
+          let userData = tokenSnapshot.val();
+          let userItem = Object.keys(userData).map(function(key) {
+              return userData[key];
+          });
+          userItem.map(item => allDeviceTokens.push(item))
+        })
+      }
+      console.log('deviceToken list: ', allDeviceTokens);
+    })
   }
 
   //WIP

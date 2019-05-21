@@ -156,7 +156,7 @@ class DashboardScreen extends Component {
             });
             this.state.accepted.map(item =>
             {
-              if(item.id == request.id) acc.push(request);
+              if(item.id == request.id && item.clientId != uid) acc.push(request);
               else acc.push(item);
             });
 
