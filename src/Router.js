@@ -1,9 +1,11 @@
 import React from 'react';
-import {Image} from 'react-native';
-import { Icon } from 'react-native-elements';
+import {Image, View} from 'react-native';
+import { Icon, Badge } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
-import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import IconWithBadge from "./screens/IconWithBadge";
+import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import ActivityChat from './screens/ActivityChat';
@@ -73,15 +75,6 @@ export const RequestStack = createStackNavigator(
         }
       }
     },
-    RequestDetails: {
-      screen: RequestDetails,
-      navigationOptions: ({navigation}) => {
-        return{
-          headerTitle: 'Additional Info',
-          headerTitleStyle: routerStyle.headerText
-        }
-      }
-    }
   }
 )
 
@@ -92,7 +85,16 @@ export const TaskStack = createStackNavigator(
       screen: TaskScreen,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Current Requests',
+          headerTitle: (<Image source={require('./img/logo_black.png')}/>),
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    RequestDetails: {
+      screen: RequestDetails,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Create A Post',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -121,6 +123,15 @@ export const DashboardStack = createStackNavigator(
         }
       }
     },
+    GuestList: {
+      screen: GuestList,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Guest List',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
     Chat: {
       screen: ActivityChat,
       navigationOptions: ({navigation}) => {
@@ -137,18 +148,10 @@ export const DashboardStack = createStackNavigator(
 export const MainTabNav = createBottomTabNavigator(
   {
     Chillmate: {
-      screen: RequestStack,
-      navigationOptions: {
-        tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='call-to-action' size={horizontal ? 20 : 25} color={tintColor} />
-        ),
-      },
-    },
-    Requests: {
       screen: TaskStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
-          <Icon name='dehaze' size={horizontal ? 20 : 25} color={tintColor} />
+          <Icon name='call-to-action' size={horizontal ? 20 : 25} color={tintColor} />
         ),
       },
     },
@@ -156,7 +159,10 @@ export const MainTabNav = createBottomTabNavigator(
       screen: DashboardStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
+          <View>
           <Icon name='dashboard' size={horizontal ? 20 : 25} color={tintColor} />
+          <IconWithBadge />
+          </View>
         ),
       },
     },

@@ -3,11 +3,13 @@ import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollVie
 import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Button, Card, ListItem, Text, Divider } from 'react-native-elements';
+import { Button, Card, ListItem, Text, Divider, Badge, withBadge } from 'react-native-elements';
 import * as _ from 'lodash';
-import {getAllServices, getWhatsapp, getName, getCoins} from '../lib/firebaseUtils.js';
+import {getAllServices, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
+
+const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
 class DashboardDetails extends Component {
   constructor(props) {
@@ -18,6 +20,12 @@ class DashboardDetails extends Component {
       item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
       nameAvailable:false,
+      confirmedGuestList: [],
+      itemService: [],
+      optedOut: false,
+      serviceTitle: '',
+      unreadChatCount: 0,
+      serviceImg: 'http://chillmateapp.com/assets/item_img/custom.jpg',
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
@@ -28,8 +36,10 @@ class DashboardDetails extends Component {
     getAllServices().then(services => // Get list of all services, then:
     {
       this.setState({services}); // Make services list available to the screen
+      this.getTaskItem();
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     });
+    //this.getServiceItem();
   }
 
   componentWillUnmount()
@@ -37,13 +47,85 @@ class DashboardDetails extends Component {
     this._isMounted = false;
   }
 
-  liveUpdates = () => {
+  //WIP
+  getTaskItem = () => {
+    var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}`);
+    ref.on('value', (snapshot) => {
+      let data = snapshot.val();
+      this.setState({ item: data});
+
+      if(this.state.item.status != 0){
+        this.getConfirmedGuests();
+        this.getUnreadChatCount();
+      }
+      // Fetching service's title:
+      if(!this.state.item.custom){
+        //this is not a custom activity, match the serviceId of the post with the service Id of the global list of services
+        //then fetch the image and title from the global service object
+        this.state.services.map(service =>
+          {
+          if(this.state.item.serviceId == service.id){
+            this.setState({serviceTitle: service.title});
+            this.setState({serviceImg: service.img});
+            }
+          })
+      } else {
+        //this is a custom activity, get the title from post object, get image from the hard coded constant
+        this.setState({serviceTitle: this.state.item.customTitle, serviceImg: CUSTOM_IMG});
+      }
+    })
 
     const {currentUser: {uid} = {}} = firebase.auth()
 
+    //Check if the current user is a guest and has recently opted out
+    hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
+    if(result != null){
+      console.log('hasOptedOutAsGuest result is ', result);
+      this.setState({optedOut: result})
+      }
+    })
+
+
+  }
+
+  getServiceItem = () => {
+    var ref = firebase.database().ref(`services`);
+    ref.on('value', (snapshot) => {
+      let data = snapshot.val();
+      this.setState({ services: data});
+      console.log('inside getServiceItem');
+    })
+  }
+
+  getUnreadChatCount = () =>
+  {
+    const {currentUser: {uid} = {}} = firebase.auth()
+    firebase.database().ref(`/users/${uid}/messages/${this.state.item.id}/unreadCount`).on("value", function(snapshot)
+    {
+      if(this._isMounted) this.setState({unreadChatCount: snapshot.val() || "0"});
+    }.bind(this));
+  }
+
+
+  //Returns the react native component list with names of confirmed guests
+  getConfirmedGuests = () => {
+      var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/confirmedGuests`);
+      console.log('inside getConfirmedGuests');
+      ref.on('value', (snapshot) => {
+        let data = snapshot.val();
+        let guestItems = Object.values(data);
+        this.setState({ confirmedGuestList: guestItems});
+    })
+  }
+
+  liveUpdates = () => {
+
+    const {currentUser: {uid} = {}} = firebase.auth()
+    console.log('liveUpdates func')
     // Listen for changes in service request {this.state.item.id}
     firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
+      console.log('liveUpdates step 2')
       if(this._isMounted)
       {
         var item = snapshot.val();
@@ -57,15 +139,29 @@ class DashboardDetails extends Component {
           return;
         }
         item.serviceTitle = '';
-        // Fetching service's title:
-        this.state.services.map(service =>
+
+        if(!item.custom)
         {
-          if(item.serviceId == service.id){
-            item.serviceTitle = service.title;
-            item.serviceImg = service.img;
-          }
-        })
-        item.whatsapp = this.state.item.whatsapp;
+          //get services object
+          firebase.database().ref(`/services/${this.state.item.serviceId}`).on('value', (snapshot) => {
+            let serviceData = snapshot.val();
+            let serviceItem = Object.values(serviceData);
+            this.setState({ itemService: serviceItem});
+          })
+          // Fetching service's title:
+          this.state.services.map(service =>
+          {
+            if(item.serviceId == service.id){
+              item.serviceTitle = service.title;
+              item.serviceImg = service.img;
+            }
+          })
+        } else {
+          //this is a custom post, get title from the post object instead of fetching it from the global service object
+          item.serviceTitle = item.customTitle;
+          item.serviceImg = CUSTOM_IMG;
+        }
+
         this.setState({item:item});
 
         // Get name of the user involved in this service request:
@@ -75,6 +171,9 @@ class DashboardDetails extends Component {
           item.selfName = selfName;
           this.setState({item:item});
         });
+
+        //If guest list is finalized, check if there are unread chat msgs
+        if(item.status != 0) this.getUnreadChatCount();
 
         // If name is not available yet:
         if(!this.state.nameAvailable)
@@ -88,6 +187,13 @@ class DashboardDetails extends Component {
           });
         }
 
+        //Check if the current user is a guest and has recently opted out
+        hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
+        if(result != null){
+          console.log('hasOptedOutAsGuest result is ', result);
+          this.setState({optedOut: result})
+          }
+        })
 
         // Get reputation coins of the other person involved in this service request:
         getCoins((item.isClient)?item.serverId:item.clientId).then(coins=>
@@ -96,7 +202,6 @@ class DashboardDetails extends Component {
           item.coins = coins;
           this.setState({item:item});
         });
-
 
         // If whatsapp number is not available yet:
         if(!this.state.whatsappAvailable)
@@ -129,12 +234,36 @@ class DashboardDetails extends Component {
     }
   }
 
+  // Open Guest List Page: this page has the list of everyone who is interested in this activity
+  openGuestList = (itemId) =>
+  {
+    this.props.navigation.navigate('GuestList',{taskId: itemId})
+  }
+
+  openChat = (item) =>
+  {
+    //create an array of all users involved so that we can increment their unread message count later
+    let usersInvolved = [];
+    this.state.confirmedGuestList.map(guest =>
+      {
+        usersInvolved.push(guest.id);
+      })
+    usersInvolved.push(item.clientId);
+    console.log('usersInvolved', usersInvolved);
+
+    this.props.navigation.navigate("Chat", {
+      name: item.selfName,
+      taskId: item.id,
+      userList: usersInvolved,
+    })
+  }
+
   confirmCancel = (item) => {
     if(item.status ==1)
     {
       Alert.alert(
       'Confirmation',
-      'Are you sure you want to unmatch?',
+      'Are you sure you want to opt out of this activity?',
       [
         {text: 'No', onPress: () => console.log('Cancellation Revoked')},
         {text: 'Yes', onPress: () => this.markCancelled(item)}
@@ -159,121 +288,168 @@ class DashboardDetails extends Component {
 
     markRequestCancelled(uid, item.id, item.isClient).then(resp =>
     {
-      this.props.navigation.navigate('DashboardScreen')
+      console.log('cancelled');
+      if(!item.isClient){
+        this.setState({optedOut: true});
+      }
+      //Do nothing
+      //this.props.navigation.navigate('DashboardScreen')
     });
+  }
+
+  renderGuests = ({item}) => {
+      const {id, fullName, guestStatus} = item;
+
+      return (
+        <View>
+        {guestStatus != 3 && <ListItem
+          title={fullName}
+          titleStyle={adourStyle.listItemText}
+          chevron={false}
+          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
+          leftIcon={{ name: 'person'}}
+        />}
+        {guestStatus == 3 && <ListItem
+          title={fullName + " has left"}
+          titleStyle={adourStyle.greyText}
+          chevron={false}
+          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
+          leftIcon={{ name: 'person'}}
+        />}
+        </View>
+      )
   }
 
   render()
   {
-    const {item} = this.state;
-    console.log(item);
+    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg, unreadChatCount, optedOut} = this.state;
+    console.log('DashboardScreen is displaying the item with ID: ', item.id);
     var statusStr = 'Not available';
+    let host = 'Anonymous';
+    if(!item.anonymous) host = item.hostName;
     if(typeof item.status != 'undefined')
     {
       switch(item.status)
       {
-        case 0: statusStr = 'Looking for a Chillmate'; break;
+        case 0: statusStr = 'Looking for Chillmates'; break;
         case 1: statusStr = (item.isClient)?'Upcoming activity':'Upcoming activity'; break;
         case 2: statusStr = 'Completed'; break;
-        case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by requester'; break;
-        case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break;
+        case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by the host'; break;
+        case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break; //case 4 is useless now
       }
     }
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
-      <Card title={item.serviceTitle} titleStyle={adourStyle.cardTitle} image={{uri: item.serviceImg}}>
-          {/* Task Status */ }
-          <View style={styles.cardSubtitle}>
-          <Text style={adourStyle.cardSubtitle}>{statusStr}</Text>
-          </View>
-
-
-        <Divider />
-
-        {
-          item.status == 1 &&
-              <ListItem
-                  title={"Chillmate: "+ (item.name)}
-                  titleStyle={adourStyle.listItemText}
-                  subtitle={"Reputation: " + (item.coins)}
-                  subtitleStyle={adourStyle.listItemText}
-                  hideChevron={true}
-                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  leftIcon={{ name: 'info-outline'}}
-                />
-        }
-
-          {/* Task Timing and details */ }
-          {
-            item.when != "" &&
-                <ListItem
-                  title={"Scheduled for: "+(item.when) }
-                  subtitleStyle={adourStyle.listItemText}
-                  titleStyle={adourStyle.listItemText}
-                  hideChevron={true}
-                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  leftIcon={{ name: 'access-time'}}
-                />
-          }
-
-          {
-            item.details != "" &&
-                <ListItem
-                    title={item.details}
-                    titleStyle={adourStyle.listItemText}
-                    hideChevron={true}
-                    containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                    leftIcon={{ name: 'info-outline'}}
-                  />
-          }
-
-          {/* Timestamp DISABLED - throwing error
-          <View style={styles.subContent} key={item.id}>
+      <Card featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: serviceImg}}>
           <ListItem
-              title={['Posted ', <TimeAgo key={item.id} time={item.created_at} />]}
+              title={host}
               titleStyle={adourStyle.listItemText}
-              hideChevron={true}
+              subtitle="Host"
+              subtitleStyle={adourStyle.listItemText}
+              rightTitle={statusStr}
+              rightTitleStyle={adourStyle.listItemText}
+              chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              leftIcon={{ name: 'access-time'}}
             />
-          </View>
+                  {/* Task Timing and details */ }
+                  {
+                    item.when != "" &&
+                        <ListItem
+                          title={"Scheduled for: "+(item.when) }
+                          subtitleStyle={adourStyle.listItemText}
+                          titleStyle={adourStyle.listItemText}
+                          chevron={false}
+                          containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                          leftIcon={{ name: 'access-time'}}
+                        />
+                  }
 
-           */ }
+                  {
+                    item.details != "" &&
+                        <ListItem
+                            title={item.details}
+                            titleStyle={adourStyle.listItemText}
+                            chevron={false}
+                            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                            leftIcon={{ name: 'info-outline'}}
+                          />
+                  }
+
+                  {/* Timestamp DISABLED - throwing error
+                  <View style={styles.subContent} key={item.id}>
+                  <ListItem
+                      title={['Posted ', <TimeAgo key={item.id} time={item.created_at} />]}
+                      titleStyle={adourStyle.listItemText}
+                      chevron={false}
+                      containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                      leftIcon={{ name: 'access-time'}}
+                    />
+                  </View>
+
+                   */ }
+
+      </Card>
+
+
+      {item.status == 1 && <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
+        <FlatList
+            data={confirmedGuestList}
+            extraData={confirmedGuestList}
+            renderItem={this.renderGuests}
+            keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
+        />
+        {
+          item.status == 1 && !optedOut &&
+          <View>
+          <Button
+          icon={{name: 'chat'}}
+          onPress={() => this.openChat(item)}
+          buttonStyle={adourStyle.btnGeneral}
+          titleStyle={adourStyle.btnText}
+          title="Chat" />
+          {(unreadChatCount != 0) && <Badge value={unreadChatCount} status="success" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
+          </View>
+        }
+      </Card>}
+
+      {!optedOut && <Card>
 
            {
-             item.status == 1 &&
-             <Button
-             icon={{name: 'chat'}}
-             onPress={() =>
-                       this.props.navigation.navigate("Chat", {
-                         name: item.selfName,
-                         taskId: item.id
-                       })}
-             buttonStyle={adourStyle.btnGeneral}
-             textStyle={adourStyle.btnText}
-             title="Chat" />
+             item.isClient && item.status == 0 &&
+                  <View>
+                   <Button onPress={()=>this.openGuestList(item.id)}
+                       buttonStyle={adourStyle.btnGeneral}
+                       titleStyle={adourStyle.btnText}
+                       disabled={this.state.disabledDone}
+                       title="Guest List"
+                       rightIcon={{name: 'code'}}
+                   />
+                   {(item.interestedCount != 0) && <Badge value={item.interestedCount} status="primary" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
+                   </View>
+
            }
 
           {
             item.isClient && item.status == 1 &&
                   <Button onPress={()=>this.markDone(item.id)}
                       buttonStyle={adourStyle.btnGeneral}
-                      textStyle={adourStyle.btnText}
+                      titleStyle={adourStyle.btnText}
                       disabled={this.state.disabledDone}
                       title="Mark as Done"
                   />
           }
+
           {
            item.status < 2 &&
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
-                    textStyle={adourStyle.btnText}
-                    title={(item.status == 1)?"Unmatch":"Remove"}
+                    titleStyle={adourStyle.btnText}
+                    title={(item.isClient)?"Remove":"Opt Out"}
                 />
           }
-        </Card>
+        </Card>}
       </View>
       </ScrollView>
     )
@@ -299,7 +475,7 @@ const styles = StyleSheet.create({
       marginBottom: 10
     },
     cardSubtitle: {
-      marginBottom: 16,
+      marginBottom: 10,
       marginLeft: 18
     },
     cardSubtitleText: {

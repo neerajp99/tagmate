@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { Text, View, StyleSheet } from "react-native";
-
+import {connect} from 'react-redux';
+import {chatScreenMounted, chatScreenUnmounted} from '../actions';
 import ChatLib from "../lib/ChatLib";
 
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
@@ -10,17 +11,22 @@ class ActivityChat extends React.Component {
     super(props);
     this.state = {
       name: this.props.navigation.state.params.name,
-      taskId: this.props.navigation.state.params.taskId
+      taskId: this.props.navigation.state.params.taskId,
+      userList: this.props.navigation.state.params.userList,
     };
   }
   state = {
     messages: []
   };
 
-  componentWillMount() {}
+  componentWillMount() {
+    ChatLib.resetUnread(this.state.taskId);
+  }
 
   componentDidMount() {
     ChatLib.setTaskId(this.state.taskId);
+    ChatLib.resetUnread(this.state.taskId);
+    this.props.chatScreenMounted();
     ChatLib.loadMessages(message => {
       this.setState(previousState => {
         return {
@@ -50,7 +56,7 @@ class ActivityChat extends React.Component {
           messages={this.state.messages}
           renderBubble={this.renderBubble}
           onSend={message => {
-            ChatLib.sendMessage(message);
+            ChatLib.sendMessage(message, this.state.userList);
           }}
           user={{
             _id: ChatLib.getUid(),
@@ -61,6 +67,8 @@ class ActivityChat extends React.Component {
     );
   }
   componentWillUnmount() {
+    ChatLib.resetUnread(this.state.taskId);
+    this.props.chatScreenUnmounted();
     ChatLib.closeChat();
   }
 }
@@ -71,4 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#d6d6d6"
   }
 });
-export default ActivityChat;
+
+//mapStateToProps not needed yet
+
+export default connect(null, {chatScreenMounted, chatScreenUnmounted})(ActivityChat);

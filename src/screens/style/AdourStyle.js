@@ -6,16 +6,16 @@ import {StyleSheet, Dimensions} from 'react-native';
 //TODO: Separate Router related style to another file so that Hot Reloading starts working
 
 //Light Blue
-export const BRAND_COLOR_ONE = '#944bbb';
-export const BRAND_COLOR_TWO = '#aa7bc3';
+export const BRAND_COLOR_ONE = '#5C7AFF';
+export const BRAND_COLOR_TWO = '#4A8FE7';
 
 //Light Purple
-export const BRAND_COLOR_THREE = '#cc92c2';
+export const BRAND_COLOR_THREE = '#845BFF';
 //Dark Blue
-export const BRAND_COLOR_FOUR = '#531cb3';
+export const BRAND_COLOR_FOUR = '#215596';
 
 //Cyan
-export const BRAND_COLOR_FIVE = '#aa7bc3'
+export const BRAND_COLOR_FIVE = '#73FBD3'
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -23,6 +23,20 @@ export const adourStyle = StyleSheet.create({
   listItemText: {
     fontFamily:'OpenSans-Regular',
     fontWeight:'200'
+  },
+  cardOverText:{
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    alignSelf: 'center',
+    justifyContent: 'center'
+  },
+  timeAgoText: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    alignSelf:'flex-end',
+    marginBottom: 10,
+    marginRight: 12,
+    color: '#bfbfbf'
   },
   listItemTextBold: {
     fontFamily:'OpenSans-Semibold',
@@ -35,12 +49,25 @@ export const adourStyle = StyleSheet.create({
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid'
   },
+  greyText: {
+    fontFamily:'OpenSans-Regular',
+    fontWeight:'200',
+    color: '#bfbfbf'
+  },
   defaultText: {
     fontFamily:'OpenSans-Regular',
-    marginLeft: 12,
+    marginLeft: 14,
     marginBottom: 10,
     marginTop: 10,
     fontWeight:'200'
+  },
+  pickerStyle: {
+    marginLeft: 14,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    marginBottom: 10,
+    marginTop: 10,
+    height: 45,
+    width: WIDTH -108,
   },
   titleText: {
     fontFamily:'OpenSans-Regular',
@@ -82,7 +109,6 @@ export const adourStyle = StyleSheet.create({
   textInput: {
     height: 45,
     width: WIDTH -120,
-    borderRadius: 25,
     marginLeft: 15,
     marginBottom: 15,
     fontSize: 16,
@@ -94,7 +120,6 @@ export const adourStyle = StyleSheet.create({
   textInputCenter: {
     height: 45,
     width: WIDTH -108,
-    borderRadius: 25,
     marginLeft: 15,
     marginBottom: 15,
     fontSize: 16,
@@ -111,7 +136,6 @@ export const adourStyle = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)'
   },
   pickerContainer: {
-    borderRadius: 25,
     borderWidth: 1,
     borderColor: BRAND_COLOR_ONE,
     overflow: 'hidden'
@@ -150,6 +174,14 @@ export const adourStyle = StyleSheet.create({
   btnGeneral: {
     borderRadius: 25,
     height: 45,
+    backgroundColor: BRAND_COLOR_TWO,
+    justifyContent: 'center',
+    marginTop: 20
+  },
+  btnGeneralBadge: {
+    borderRadius: 25,
+    height: 45,
+    width: WIDTH -120,
     backgroundColor: BRAND_COLOR_TWO,
     justifyContent: 'center',
     marginTop: 20

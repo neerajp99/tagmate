@@ -1,16 +1,20 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, appendRejectedTask, getRelatedServices} from "../lib/firebaseUtils";
+import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {connect} from "react-redux";
 import {setDeviceToken} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
-import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
+import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
+import CardStack, { Card as SwipableCard } from 'react-native-card-stack-swiper';
 
+const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
+
+//Test commit
 
 const { width: WIDTH } = Dimensions.get('window')
 
@@ -30,13 +34,25 @@ class TaskScreen extends Component {
         this._isMounted = true;
         this.setState({fetching:true});
         const {currentUser: {uid} = {}} = firebase.auth()
-        // Keep updating tasks
+        // TEMPORARY
+        //getAcceptors("testServiceRequest").then(response => {
+        //  console.log("Returned from getAcceptors: ", response);
+        //})
+        //alreadyAccepted("ShivamGupta500", "testServiceRequest").then(accptBool => {
+        //  console.log('Returned from alreadyAccepted (expected true): ', accptBool)
+        //})
+        //addAcceptor("VineetNand999", "testServiceRequest"); //TEMPORARY
+
         getRelatedServices(uid).then(services =>
         {
             this.setState(services);
             console.log('relatedServices:',services);
             // Keep updating tasks
-            this.getMyTasks();
+            getRejectedTasks(uid).then(rejectedTaskList => {
+              this.setState({rejectedTasks: rejectedTaskList});
+              console.log('rejectedTasks state: ', this.state.rejectedTasks);
+              this.getMyTasks();
+            })
         });
         this.tokenFunc();
     }
@@ -65,9 +81,9 @@ class TaskScreen extends Component {
       if(this.state.myTasks.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                 <Text style={adourStyle.guideText}>
-                There are no live requests matching your interests. Check back later! Your posts are on your Dashboard. {"\n"} {"\n"}
+                You will see other people's Chillmate meetup posts here. Your posts are on your Dashboard. {"\n"} {"\n"}
                 </Text>
-                <Button title="Create A Post" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
+                <Button title="Create A Chillmate Meetup" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Create')}}/>
                 </View>
           }
     }
@@ -78,11 +94,25 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
 
         // Load the service request IDs for the ones the user has rejected and push them to the state.
+        /*
         firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
             var rejectId = snapshot.val();
             if(this._isMounted) this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
             console.log('triggered',this.state.rejectedTasks);
         });
+
+
+        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
+            var rejectId = snapshot.val();
+            if(this._isMounted){
+              this.setState({
+                myTasks: this.state.myTasks.filter(item => item.id !== rejectId),
+                rejectedTasks: this.state.rejectedTasks.concat([rejectId])
+              });
+            }
+            console.log('triggered',this.state.rejectedTasks);
+        });
+        */
 
         var ref = firebase.database().ref('servicesRequests')
 
@@ -90,24 +120,29 @@ class TaskScreen extends Component {
         ref.on('child_added', (snapshot) => {
             if(this._isMounted)
             {
-                // To hide activity indicator:
-                this.setState({fetching:false});
                 var request = snapshot.val();
-                if(
-                    request.clientId != uid // This request is not made by same user.
-                    && request.status == 0 // This request is still not taken by anyone
-                    && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                    && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )
-                    this.setState({myTasks:[request].concat(this.state.myTasks)});
+                alreadyAccepted(uid, request.id).then(alreadyAcc => {
+                  if(
+                      request.clientId != uid // This request is not made by same user.
+                      && request.status == 0 // This request is still not set as CONFIRMED by the host
+                      && !alreadyAcc // This user has not already accepted this request
+                      //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                      && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
+                      )
+                      this.setState({myTasks:[request].concat(this.state.myTasks)});
+                })
+                // To hide activity indicator:
+                if(this.state.fetching) this.setState({fetching:false});
             }
 
         });
 
         // If a service request object is removed from the realtime database:
+        /*
         ref.on('child_removed', (snapshot) => {
             if(this._isMounted)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
         });
+        */
 
         // If an existing service request object is changed in the realtime database:
         ref.on('child_changed', (snapshot) => {
@@ -116,19 +151,11 @@ class TaskScreen extends Component {
                 var request = snapshot.val();
                 if(
                     request.clientId == uid // This request is not made by same user.
-                    || request.status != 0 // This request is still not taken by anyone
-                    || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                    || request.status != 0 // This request is still not set as CONFIRMED by the host
+                    //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                     || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                     )
                 this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
-
-                if(
-                    request.clientId != uid // This request is not made by same user.
-                    && request.status == 0 // This request is still not taken by anyone
-                    && _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                    && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )
-                    this.setState({myTasks:[request].concat(this.state.myTasks)});
             }
         });
 
@@ -145,7 +172,7 @@ class TaskScreen extends Component {
                     if(
                         request.clientId == uid // This request is not made by same user.
                         || request.status != 0 // This request is still not taken by anyone
-                        || !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
+                        //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                         || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
                         )
                         toRemove.push(request.id);
@@ -153,7 +180,6 @@ class TaskScreen extends Component {
                 this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
             }
         })
-
     }
 
 
@@ -169,7 +195,7 @@ class TaskScreen extends Component {
     // It hides the service request corresponding to the ID and appends the ID to user's list of rejected tasks.
     rejectTask = (id) =>
     {
-        this.hideTask(id);
+        //this.hideTask(id);
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
     }
@@ -182,25 +208,110 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
-            serverExists(item.id).then(exists => // Check if someone has already accepted the task {id}.
+            alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
             {
-                this.hideTask(item.id);
-                if(!exists) // If the task is still not accepted by anyone, assign it to user {uid}.
+                //this.hideTask(item.id);
+                if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                    addServer(uid, item.id).then(whatsapp =>
+                    addAcceptor(uid, item.id, item.clientId).then(o =>
                     {
-                        this.props.navigation.navigate('DashboardDetails', {taskId: item.id});
+                      console.log('added as acceptor')
+                        //this.hideTask(item.id);
                     });
                 }
             });
         }
     }
 
+    swipableRender(myTasks) {
+
+      return myTasks.map((item) => {
+        const {serviceId, id, when, details, anonymous, custom, customTitle, created_at, hostName, interestedCount} = item;
+        var detailsAvailable = true;
+        const {allServices} = this.state
+        var serviceTitle = '---';
+        if(!custom)
+        {
+          allServices.map(service => {
+            if(service.id == serviceId)
+            {
+                serviceTitle = service.title;
+                serviceImg = service.img;
+            }
+          });
+        } else {
+          //this is a custom activity, get custom title from post instead of the global service object
+          serviceTitle = customTitle;
+          serviceImg = CUSTOM_IMG;
+        }
+        if(details == "" || typeof details == "undefined") detailsAvailable = false
+
+        let interestAvailable = false;
+        let interestNumText = '';
+
+        if(interestedCount > 0){
+          interestNumText = `${interestedCount}+ interested`;
+          interestAvailable = true;
+        }
+
+        let scheduledFor = "null"
+
+        if(when != ""){
+          scheduledFor = ("Scheduled for " + when);
+        }
+
+        return (
+          <SwipableCard key={id} onSwipedLeft={() => this.rejectTask(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+              <ListItem
+              title={anonymous? "Anonymous": hostName}
+              titleStyle={adourStyle.listItemText}
+              subtitle="Host"
+              subtitleStyle={adourStyle.listItemText}
+              chevron={false}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+            />
+
+            { (scheduledFor != "null") && <Text style={adourStyle.defaultText}>{scheduledFor}</Text> }
+            {interestAvailable && <Text style={adourStyle.defaultText}>{interestNumText}</Text>}
+            <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
+
+            {
+                detailsAvailable && <ListItem
+                  subtitle={ details }
+                  subtitleStyle={adourStyle.listItemText}
+                  chevron={false}
+                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                  subtitleProps={{ numberOfLines: 2 }}
+                />
+            }
+              <View>
+              </View>
+              <View style={styles.buttonsContainer}>
+              <View>
+                <TouchableOpacity style={styles.btnReject} onPress={() => { this.swiper.swipeLeft() }} >
+                  <Icon name={'thumbs-o-down'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                </TouchableOpacity>
+              </View>
+                <View>
+                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.swiper.swipeRight() }}>
+                    <Icon name={'thumbs-o-up'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              </Card>
+            </SwipableCard>
+        )
+      })
+
+  }
+
     /*
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {serviceId, id, when, details, created_at} = item;
+        const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
         const {allServices} = this.state
         var serviceTitle = '---';
@@ -212,44 +323,49 @@ class TaskScreen extends Component {
             }
         });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
+
+        let interestAvailable = false;
+        let interestNumText = '';
+
+        if(interestedCount > 0){
+          interestNumText = `${interestedCount}+ interested`;
+          interestAvailable = true;
+        }
+
+        let scheduledFor = "null"
+
+        if(when != ""){
+          scheduledFor = ("Scheduled for " + when);
+        }
+
         return (
           <View key={id}>
-          <Card image={{uri: serviceImg}}>
+          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+          <View>
               <ListItem
-              title={serviceTitle}
+              title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
-              hideChevron={true}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              subtitle={(when === '')? (""):("Scheduled for: "+(when)) }
+              subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
-              rightTitle={['Posted ', <TimeAgo key={id} time={created_at} />]}
-              subtitleNumberOfLines={2}
+              chevron={false}
+              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
+
+            { (scheduledFor != "null") && <Text style={adourStyle.defaultText}>{scheduledFor}</Text> }
+            {interestAvailable && <Text style={adourStyle.defaultText}>{interestNumText}</Text>}
+            <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
+
             {
                 detailsAvailable && <ListItem
                   subtitle={ details }
                   subtitleStyle={adourStyle.listItemText}
-                  hideChevron={true}
+                  chevron={false}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  subtitleNumberOfLines={2}
+                  subtitleProps={{ numberOfLines: 2 }}
                 />
             }
-              <View>
-              </View>
-              <View style={styles.buttonsContainer}>
-                <View>
-                  <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptTask(item) }}>
-                    <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectTask(id) }} >
-                    <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
-                  </TouchableOpacity>
-                </View>
 
-              </View>
-
+            </View>
               </Card>
             </View>
         )
@@ -259,18 +375,30 @@ class TaskScreen extends Component {
         const {fetching, myTasks} = this.state
         return (
             <View style={styles.mainContainer}>
-            {!fetching && this.userGuideContainer()}
-                <FlatList
-                    data={myTasks}
-                    extraData={myTasks}
-                    renderItem={this.renderItem}
-                    keyExtractor={(item, index) => item.id}
-                />
-                {
-                    fetching && <View style={styles.progressContainer}>
-                        <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>
-                    </View>
-                }
+            <Card>
+              <ListItem
+                title="Create A Post"
+                titleStyle={adourStyle.listItemText}
+                leftIcon={{ name: 'edit' }}
+                onPress={() => this.props.navigation.navigate('RequestDetails')}
+                containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              />
+            </Card>
+            <CardStack
+                renderNoMoreCards={() => <View style={{marginTop: 50}}>
+                                                  {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}
+                                                  {!fetching && <Text style={adourStyle.cardOverText}>Check back later</Text>}
+                                                  </View>}
+                disableBottomSwipe={true}
+                disableTopSwipe={true}
+                ref={swiper => {
+                  this.swiper = swiper
+                }}
+              >
+              {this.swipableRender(myTasks)}
+              </CardStack>
+
+
 
             </View>
         )
@@ -289,16 +417,12 @@ const styles = StyleSheet.create({
         flex: 1
     },
     progressContainer: {
-        width: 60,
-        height: 60,
-        backgroundColor: 'transparent',
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',
         left: '50%',
         top: '50%',
-        marginLeft: -30,
-        marginTop: -30
+        marginTop: 100
     },
     rowItem: {
         alignSelf: 'stretch',
@@ -318,6 +442,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: BRAND_COLOR_FOUR
+    },
+    footer:{
+    flex:1,
+    justifyContent:'center',
+    alignItems:'center'
     },
     buttonsContainer: {
     flexDirection: 'row',

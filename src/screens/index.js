@@ -4,8 +4,9 @@ export * from './Support';
 export * from './PrivacyPolicy'
 export * from './ToS'
 export RequestScreen from './Request';
-export * from './RequestDetails';
+export RequestDetails from './RequestDetails';
 export TaskScreen from './Tasks';
+export GuestList from './GuestList';
 export * from './Dashboard';
 export * from './DashboardDetails';
 export Loading from './Loading';

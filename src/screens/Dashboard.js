@@ -2,9 +2,9 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests} from "../lib/firebaseUtils";
+import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
-import { Button, ButtonGroup, ListItem } from 'react-native-elements';
+import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
@@ -15,6 +15,7 @@ class DashboardScreen extends Component {
       this.state = {
         active:0, // Determines active tab: Requested Tasks or Accepted Tasks. Default: Accepted.
         fetching:false,
+        acceptedBadge: false,
         requested:[], // Array of requested services
         accepted:[], // Array of accepted tasks
       }
@@ -51,10 +52,51 @@ class DashboardScreen extends Component {
       ref.on('child_added', (snapshot) => {
         if(this._isMounted) this.setState({fetching:false});
         var request = snapshot.val();
-        //If the user is the requester, and it is not a cancelled activity add to requested array:
-        if(request.clientId == uid && (request.status < 3) && this._isMounted) this.setState({requested:[request].concat(this.state.requested)});
-        //If the user is the accepter, add to accepted array:
-        else if(request.serverId == uid && (request.status < 3) && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
+        //Checking if this task object has the property anonymous. If the task object has the property anonymous that means it is a post from v2 of the app. Posts from old version do not have this property
+        // We do this to ensure we only show posts from the new version of the app
+        if(request.anonymous != undefined)
+        {
+
+
+            //If the user is the requester, and it is not a cancelled activity add to requested array:
+          if(request.clientId == uid && (request.status < 3) && this._isMounted){
+            //Add a new property to see how many unread msgs this user has in this task
+            if(request.status != 0)
+            {
+              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
+              {
+                if(snapshot.val() != null){
+                  request.unreadMsgs = snapshot.val();
+                }
+              });
+            }
+
+            this.setState({requested:[request].concat(this.state.requested)});
+          }
+          //If the user is the confirmed accepter, add to accepted array:
+          isConfirmedAcceptor(uid, request.id).then(result => {
+            if( result && (request.status < 3) && this._isMounted) {
+              //Add a new property to see how many unread msgs this user has in this task
+              if(request.status != 0)
+              {
+                let unreadAv = false;
+                firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
+                {
+
+                  if(snapshot.val() != null && snapshot.val() != 0){
+                    request.unreadMsgs = snapshot.val();
+                    unreadAv = true;
+                  }
+                }).then(result => {
+                  if(unreadAv) this.setState({acceptedBadge: true})
+                })
+              }
+              this.setState({accepted:[request].concat(this.state.accepted)});
+            }
+          })
+
+
+        }
       });
 
       // When an existing service request object is removed:
@@ -76,29 +118,95 @@ class DashboardScreen extends Component {
               return element.id !== request.id
           })});
         }
-        // Do nothing if the service request was not related to the user:
-        //if(request.clientId != uid && request.serverId != uid) return;
-        // If it is a service request the user has recently accepted, add it to accepted array:
-        if(request.status == 1 && request.serverId == uid && this._isMounted) this.setState({accepted:[request].concat(this.state.accepted)});
-        // Else, find it in the arrays and replace it with the new information.
-        else if(this._isMounted)
-        {
-          let req = [];//this.state.requested;
-          let acc = [];//this.state.accepted;
-          this.state.requested.map(item =>
+
+        //If the user is the confirmed accepter, add to accepted array:
+        isConfirmedAcceptor(uid, request.id).then(result => {
+          if( result && (request.status < 3) && this._isMounted){
+            //Add a new property to see how many unread msgs this user has in this task
+            //unread msg check start
+            if(request.status != 0)
+            {
+              let unreadAv = false;
+              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
+              {
+
+                if(snapshot.val() != null && snapshot.val() != 0){
+                  request.unreadMsgs = snapshot.val();
+                  unreadAv = true;
+                }
+              }).then(result => {
+                if(unreadAv) this.setState({acceptedBadge: true})
+              })
+            }
+            //unread msg check end
+            this.setState({accepted:[request].concat(this.state.accepted)});
+          }
+          // Do nothing if the service request was not related to the user:
+          //if(request.clientId != uid && request.serverId != uid) return;
+          // Else, find it in the arrays and replace it with the new information.
+          else if(this._isMounted)
           {
-            if(item.id == request.id) req.push(request);
+            let req = [];//this.state.requested;
+            let acc = [];//this.state.accepted;
+
+            this.state.requested.map(item =>
+            {
+              if(item.id == request.id) req.push(request);
+              else req.push(item);
+            });
+            this.state.accepted.map(item =>
+            {
+              if(item.id == request.id && item.clientId != uid) acc.push(request);
+              else acc.push(item);
+            });
+
+            this.setState({requested:req});
+            this.setState({accepted:acc});
+          }
+        })
+
+
+      });
+
+      //If the user object's message is updated, this means the unread count mustve changed
+      firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
+        var ob = snapshot.val();
+        //iterate through and look for a matching item Id with the changed object
+        let req = [];//this.state.requested;
+        let acc = [];//this.state.accepted;
+
+        if(this._isMounted)
+        {
+            this.state.requested.map(item =>
+          {
+            if(item.id == ob.taskId){
+              item.unreadMsgs = ob.unreadCount;
+              req.push(item);
+            }
             else req.push(item);
           });
           this.state.accepted.map(item =>
           {
-            if(item.id == request.id) acc.push(request);
+            if(item.id == ob.taskId){
+              item.unreadMsgs = ob.unreadCount;
+              acc.push(item);
+            }
             else acc.push(item);
           });
+
+          //If no unread msgs are left in accepted, disable the mini badge
+          let unreadMsgTasks = [];
+          unreadMsgTasks = this.state.accepted.filter(item => item.unreadMsgs != 0 && item.unreadMsgs != undefined)
+          console.log('unreadMsgTasks', unreadMsgTasks);
+          if(unreadMsgTasks.length == 0) this.setState({acceptedBadge: false})
+          if(unreadMsgTasks.length != 0) this.setState({acceptedBadge: true})
+
           this.setState({requested:req});
           this.setState({accepted:acc});
         }
-      });
+
+      })
+
     }
 
     // Open Dashboard Details screen for the task the user has tapped.
@@ -135,27 +243,47 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, created_at, details} = item;
+        const{serviceId, id, created_at, details, custom, customTitle, interestedCount} = item;
         const {services} = this.state
+        const {currentUser: {uid} = {}} = firebase.auth()
+        let notifications = 0;
+        let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
+        if(interestedCount != null && interestedCount != undefined && item.status == 0){
+          notifications = interestedCount;
+          badgeColor = 'primary';
+        } else if (item.status != 0 && item.unreadMsgs != undefined){
+          notifications = item.unreadMsgs;
+        }
         var serviceTitle = '---';
-        console.log(services);
-        // Find service title corresponding to the service ID of the service request:
-        services.map(service => {
-            if(service.id == serviceId)
-            {
-                serviceTitle = service.title;
-            }
-        });
+        if(!custom)
+        {
+          // Find service title corresponding to the service ID of the service request:
+          services.map(service => {
+              if(service.id == serviceId)
+              {
+                  serviceTitle = service.title;
+              }
+          });
+        } else {
+          //this is a custom post, get title from post instead of global service object
+          serviceTitle = customTitle;
+        }
         // Find appropriate status for current status code:
         var statusStr = 'Not available';
         switch(item.status)
         {
-          case 0: statusStr = 'Looking for a match'; break;
-          case 1: statusStr = 'Matched'; break;
-          case 2: statusStr = 'Meetup completed.'; break;
+          case 0: statusStr = `Open: ${interestedCount}+ interested`; break;
+          case 1: statusStr = 'Guest List Finalized'; break;
+          case 2: statusStr = 'Completed'; break;
           case 3:
-          case 4: statusStr = 'Meetup cancelled.'; break;
+          case 4: statusStr = 'Cancelled'; break;
         }
+
+        /* Update: removed the following code
+        rightTitle={<TimeAgo time={created_at} />}
+        rightTitleStyle={adourStyle.listItemText}
+        */
+
         return (
           <View key={id}>
             <View>
@@ -164,10 +292,11 @@ class DashboardScreen extends Component {
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
                     subtitle={statusStr}
                     subtitleStyle={adourStyle.listItemText}
-                    rightTitle={<TimeAgo time={created_at} />}
-                    rightTitleStyle={adourStyle.listItemText}
                     containerStyle={{backgroundColor: '#fff'}}
                     onPress={() => this.openDetails(item)}
+                    chevron={true}
+                    bottomDivider={true}
+                    badge={(notifications!=0)? { value: notifications, status: badgeColor } : null}
                   />
             </View>
           </View>
@@ -175,7 +304,7 @@ class DashboardScreen extends Component {
     }
 
     render() {
-        const {fetching, accepted, requested, active} = this.state
+        const {fetching, accepted, requested, active, acceptedBadge} = this.state
         const buttons = ['My Activities', 'Accepted Activities']
 
         return (
@@ -188,6 +317,7 @@ class DashboardScreen extends Component {
                   textStyle={adourStyle.buttonText}
                   containerStyle={{height: 45}}
                 />
+                {acceptedBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
             </View>
               {!fetching && this.userGuideContainer(active)}
 
@@ -199,8 +329,8 @@ class DashboardScreen extends Component {
                     keyExtractor={(item, index) => item.id}
                 />
               }
-              <View style={{marginBottom:30}}>
-              <Button title="Create A Post" textStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
+              <View style={{marginBottom:30, marginLeft: 20, marginRight: 20}}>
+              <Button title="Create A Post" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('Chillmate')}}/>
               </View>
 
               {

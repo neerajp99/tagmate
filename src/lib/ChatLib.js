@@ -45,7 +45,7 @@ class ChatLib {
     this.messagesRef.limitToLast(20).on("child_added", onReceive);
   }
   // send the message to the Backend
-  sendMessage(message) {
+  sendMessage(message, userList) {
     for (let i = 0; i < message.length; i++) {
       this.messagesRef.push({
         text: message[i].text,
@@ -53,7 +53,30 @@ class ChatLib {
         createdAt: firebase.database.ServerValue.TIMESTAMP
       });
     }
+    this.incrementUnread(userList);
   }
+
+  //Reset unread msg count for this user
+  resetUnread(taskId){
+    const {currentUser: {uid} = {}} = firebase.auth()
+    ref = firebase.database().ref(`/users/${uid}/messages/${taskId}`);
+    ref.set({taskId: taskId, unreadCount: 0});
+  }
+
+  //Increment unread msg count for all users
+  incrementUnread(userList){
+
+    for(let i = 0; i< userList.length; i++){
+      console.log('I have incremented unread counts for these users: ', userList[i]);
+
+      firebase.database().ref(`/users/${userList[i]}/messages/${this.taskId}/unreadCount`).transaction(function(unreadCount){
+        return (unreadCount || 0) + 1;
+      });
+    }
+
+  }
+
+
   // close the connection to the Backend
   closeChat() {
     if (this.messagesRef) {

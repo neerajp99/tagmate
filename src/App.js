@@ -7,6 +7,7 @@ import {RootNav, AppContainer} from './Router';
 import * as _ from 'lodash'
 import firebase from 'react-native-firebase';
 import { NavigationActions } from 'react-navigation';
+import {getTotalUnread} from "./lib/firebaseUtils";
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 class App extends Component {
@@ -26,6 +27,7 @@ class App extends Component {
             // Get information about the notification that was opened
             this.handlePushNotification(notificationOpen.notification, true)
         }
+
 	}
 
 	handlePushNotification = (notification, wasAppClosed) => {
