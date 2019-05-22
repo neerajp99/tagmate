@@ -35,8 +35,12 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                   hostName: fullName,
                 }
                 firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
-                    Alert.alert('Posted Successfully. You can find it on your Dashboard.')
-                    resolve(true)
+                    let userHostingRef = firebase.database().ref(`/users/${uid}/posts/host/${id}`);
+                    userHostingRef.update({id: id}).then(finalRes => {
+                      console.log('Posted with ID: ', id);
+                      Alert.alert('Posted Successfully. You can find it on your Dashboard.')
+                      resolve(true)
+                    })
                 })
             })
           })

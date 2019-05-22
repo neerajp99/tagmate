@@ -31,8 +31,20 @@ class ProfileScreen extends Component{
     //Fetching name and photo URL
     const {currentUser: {displayName, photoURL} = {}} = firebase.auth();
     this.setState({displayName, photoURL});
-    // Updating Adour coin balance
+    /* Cloud Function Test
+    const httpsCallable = firebase.functions().httpsCallable('cloudFuncTest');
+
+    httpsCallable({ some: 'args' })
+    .then(({ data }) => {
+        console.log(data.someResponse); // hello world
+    })
+    .catch(httpsError => {
+        console.log(httpsError.code); // invalid-argument
+    })
+    */
+
     this.updateCoins();
+
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
       /*

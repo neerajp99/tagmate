@@ -8,6 +8,24 @@ const _ = require('lodash');
 // initializes your application
 admin.initializeApp();
 
+  exports.helloWorld = functions.https.onRequest((req, res) => {
+  res.send("Hello from a Serverless Database!");
+  });
+
+  exports.cloudFuncTest = functions.https.onCall((data, context) => {
+
+      console.log(context.auth.uid);
+
+      if (!data.some) {
+          throw new functions.https.HttpsError(
+            'invalid-argument', // code
+            'Your error message goes here', // message
+          );
+      }
+
+      return { someResponse: 'hello' };
+  });
+
 // This function pushes notifications to a user (client) when their requested task is accepted by someone.
     exports.sendPushNotificationToRequester = functions.database
     .ref('/servicesRequests/{pushId}/serverId')
