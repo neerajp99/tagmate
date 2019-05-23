@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
+import {serverExists, addServer, rejectTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -95,7 +95,7 @@ class TaskScreen extends Component {
 
 
         var ref = firebase.database().ref('servicesRequests')
-        let livePostsRef = firebase.database().ref('livePosts')
+        let livePostsRef = firebase.database().ref(`/users/${uid}/livePosts`)
 
         livePostsRef.on('value', (snapshot) => {
           let livePosts = [];
@@ -109,19 +109,11 @@ class TaskScreen extends Component {
             console.log('map: ', livePostId);
             firebase.database().ref(`servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
               let request  = postSnapshot.val()
-              alreadyAccepted(uid, request.id).then(alreadyAcc => {
-                  if(
-                      request.clientId != uid // This request is not made by same user.
-                      && request.status == 0 // This request is still not set as CONFIRMED by the host
-                      && !alreadyAcc // This user has not already accepted this request
-                      //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                      && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    ){
+                  if(request.clientId != uid) // This request is not made by same user.
+                    {
                       livePosts.push(request)
                       this.setState({myTasks:livePosts, fetching: false});
                     }
-
-                })
                 if(this.state.fetching) this.setState({fetching:false});
               console.log('this.state.myTasks: ', this.state.myTasks);
             })
@@ -139,8 +131,8 @@ class TaskScreen extends Component {
         })
 
         livePostsRef.on('child_removed', (snapshot) => {
-          console.log('child_removed')
-          if(this._isMounted && this.state.myTasks > 0)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.id)});
+          console.log('child_removed, snapshot key is ', snapshot.key)
+          this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
 
         })
 
@@ -162,7 +154,7 @@ class TaskScreen extends Component {
     {
         //this.hideTask(id);
         const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid) rejectTask(uid, id); 
+        if(uid) rejectTask(uid, id);
     }
 
     // This function takes service request ID as parameter.

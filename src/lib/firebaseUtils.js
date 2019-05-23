@@ -538,7 +538,7 @@ export const rejectTask = (userId, serviceId) => new Promise((resolve, reject) =
   try {
     resolve(
       //Since the user has rejected this post, we won't be showing this on the user's live post screen anymore
-      firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
+      firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove()
     )
   } catch (e) {
     reject(e)
