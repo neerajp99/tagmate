@@ -84,6 +84,7 @@ class DashboardScreen extends Component {
         if(this._isMounted){
             this.setState({requested:userHostedPosts});
             console.log('this.state.requested: ', this.state.requested)
+            console.log('this.state.requested.length: ', this.state.requested.length)
         }
 
       })
@@ -312,6 +313,8 @@ class DashboardScreen extends Component {
                     </View>
           }
       } else {
+        /* disabling due to glitch, tempororily
+
         if(this.state.requested.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                     <Text style={adourStyle.guideText}>
@@ -319,6 +322,7 @@ class DashboardScreen extends Component {
                     </Text>
                   </View>
         }
+        */
       }
     }
 

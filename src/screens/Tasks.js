@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, rejectTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
+import {serverExists, addServer, rejectTask, getRelatedServices, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -103,31 +103,29 @@ class TaskScreen extends Component {
 
           snapshot.forEach(function(childSnapshot) {
             const {id} = childSnapshot.val();
-            livePostIds.push(id);
-          })
-          livePostIds.map(livePostId => {
-            console.log('map: ', livePostId);
-            firebase.database().ref(`servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
-              let request  = postSnapshot.val()
-                  if(request.clientId != uid) // This request is not made by same user.
-                    {
-                      livePosts.push(request)
-                      this.setState({myTasks:livePosts, fetching: false});
-                    }
-                if(this.state.fetching) this.setState({fetching:false});
-              console.log('this.state.myTasks: ', this.state.myTasks);
+
+            //do not show the post if it is created by the same user
+            removeSelfHostedPosts(uid, id).then(selfHosted => {
+              if(!selfHosted) livePostIds.push(id);
             })
           })
 
-          /*
-            promise.then(() => {
-              console.log('livePosts array stage 2: ', livePosts)
-              if(this._isMounted) this.setState({myTasks:livePosts});
-              console.log('this.state.myTasks: ', this.state.myTasks);
-              // To hide activity indicator:
-              if(this.state.fetching) this.setState({fetching:false});
+          if(livePostIds.length != 0){
+            livePostIds.map(livePostId => {
+
+              firebase.database().ref(`servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
+                let request  = postSnapshot.val()
+                livePosts.push(request)
+                this.setState({myTasks:livePosts, fetching: false});
+                if(this.state.fetching) this.setState({fetching:false});
+                console.log('this.state.myTasks: ', this.state.myTasks);
+              })
             })
-            */
+          } else {
+            if(this.state.fetching) this.setState({fetching:false});
+            console.log('livePostIds Array is Empty')
+          }
+
         })
 
         livePostsRef.on('child_removed', (snapshot) => {

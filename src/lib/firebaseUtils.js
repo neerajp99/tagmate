@@ -545,6 +545,24 @@ export const rejectTask = (userId, serviceId) => new Promise((resolve, reject) =
   }
 })
 
+//If this user is the host of this post, do not show it / remove it from livePosts
+export const removeSelfHostedPosts = (userId, serviceId) => new Promise((resolve, reject) => {
+  try{
+      firebase.database().ref(`users/${userId}/posts/host/${serviceId}`).once('value', (userIsTheHost) => {
+        console.log('userIsTheHost: ', userIsTheHost)
+        if(userIsTheHost.exists()){
+          firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove()
+          resolve(true)
+        }else{
+          resolve(false)
+        }
+      })
+
+  } catch(e){
+    reject(e)
+  }
+})
+
 // user has done some malicious behavior. Increase their Dark Score by score
 export const incUserDarkScore = (userId, score) => new Promise((resolve, reject) => {
     try {
