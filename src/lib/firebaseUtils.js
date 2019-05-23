@@ -396,6 +396,9 @@ export const addAcceptor = (userId, serviceId, clientId) => new Promise((resolve
           });
         });
 
+        //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
+        firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
+
         //Increment interested count for this task
         firebase.database().ref(`/servicesRequests/${serviceId}/interestedCount`).transaction(function(interestedCount){
           return (interestedCount || 0) + 1;
@@ -529,6 +532,17 @@ export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, r
     } catch (e) {
         reject(e)
     }
+})
+
+export const rejectTask = (userId, serviceId) => new Promise((resolve, reject) => {
+  try {
+    resolve(
+      //Since the user has rejected this post, we won't be showing this on the user's live post screen anymore
+      firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
+    )
+  } catch (e) {
+    reject(e)
+  }
 })
 
 // user has done some malicious behavior. Increase their Dark Score by score

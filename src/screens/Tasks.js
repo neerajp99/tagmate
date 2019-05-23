@@ -93,93 +93,58 @@ class TaskScreen extends Component {
     getMyTasks = () => {
         const {currentUser: {uid} = {}} = firebase.auth()
 
-        // Load the service request IDs for the ones the user has rejected and push them to the state.
-        /*
-        firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
-            var rejectId = snapshot.val();
-            if(this._isMounted) this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
-            console.log('triggered',this.state.rejectedTasks);
-        });
-
-
-        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
-            var rejectId = snapshot.val();
-            if(this._isMounted){
-              this.setState({
-                myTasks: this.state.myTasks.filter(item => item.id !== rejectId),
-                rejectedTasks: this.state.rejectedTasks.concat([rejectId])
-              });
-            }
-            console.log('triggered',this.state.rejectedTasks);
-        });
-        */
 
         var ref = firebase.database().ref('servicesRequests')
+        let livePostsRef = firebase.database().ref('livePosts')
 
-        // When a service request object is added to the realtime database:
-        ref.on('child_added', (snapshot) => {
-            if(this._isMounted)
-            {
-                var request = snapshot.val();
-                alreadyAccepted(uid, request.id).then(alreadyAcc => {
+        livePostsRef.on('value', (snapshot) => {
+          let livePosts = [];
+          let livePostIds = [];
+
+          snapshot.forEach(function(childSnapshot) {
+            const {id} = childSnapshot.val();
+            livePostIds.push(id);
+          })
+          livePostIds.map(livePostId => {
+            console.log('map: ', livePostId);
+            firebase.database().ref(`servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
+              let request  = postSnapshot.val()
+              alreadyAccepted(uid, request.id).then(alreadyAcc => {
                   if(
                       request.clientId != uid // This request is not made by same user.
                       && request.status == 0 // This request is still not set as CONFIRMED by the host
                       && !alreadyAcc // This user has not already accepted this request
                       //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
                       && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                      )
-                      this.setState({myTasks:[request].concat(this.state.myTasks)});
+                    ){
+                      livePosts.push(request)
+                      this.setState({myTasks:livePosts, fetching: false});
+                    }
+
                 })
-                // To hide activity indicator:
                 if(this.state.fetching) this.setState({fetching:false});
-            }
+              console.log('this.state.myTasks: ', this.state.myTasks);
+            })
+          })
 
-        });
-
-        // If a service request object is removed from the realtime database:
-        /*
-        ref.on('child_removed', (snapshot) => {
-            if(this._isMounted)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
-        });
-        */
-
-        // If an existing service request object is changed in the realtime database:
-        ref.on('child_changed', (snapshot) => {
-            if(this._isMounted)
-            {
-                var request = snapshot.val();
-                if(
-                    request.clientId == uid // This request is not made by same user.
-                    || request.status != 0 // This request is still not set as CONFIRMED by the host
-                    //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                    || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )
-                this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
-            }
-        });
-
-        // If there is a change noted in the services the user offers:
-        firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
-            if(this._isMounted)
-            {
-                this.setState({myServices: snapshot.val() || []});
-                let myTaskss = this.state.myTasks;
-                let toRemove = [];
-                // Filter the currently shown service requests to adjust to the user's new choices:
-                myTaskss.map(request =>
-                {
-                    if(
-                        request.clientId == uid // This request is not made by same user.
-                        || request.status != 0 // This request is still not taken by anyone
-                        //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                        || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                        )
-                        toRemove.push(request.id);
-                });
-                this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
-            }
+          /*
+            promise.then(() => {
+              console.log('livePosts array stage 2: ', livePosts)
+              if(this._isMounted) this.setState({myTasks:livePosts});
+              console.log('this.state.myTasks: ', this.state.myTasks);
+              // To hide activity indicator:
+              if(this.state.fetching) this.setState({fetching:false});
+            })
+            */
         })
+
+        livePostsRef.on('child_removed', (snapshot) => {
+          console.log('child_removed')
+          if(this._isMounted && this.state.myTasks > 0)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.id)});
+
+        })
+
+
     }
 
 
@@ -197,7 +162,7 @@ class TaskScreen extends Component {
     {
         //this.hideTask(id);
         const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
+        if(uid) rejectTask(uid, id); 
     }
 
     // This function takes service request ID as parameter.

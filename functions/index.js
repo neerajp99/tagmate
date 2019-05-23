@@ -145,6 +145,59 @@ admin.initializeApp();
           })
     });
 
+    exports.finalizeGuestListOps = functions.database
+    .ref('/servicesRequests/{pushId}/confirmedGuests')
+    .onCreate((snapshot, context) => {
+        const pushId = context.params.pushId;
+        if (!pushId) {
+            return console.log('missing mandatory params for sending push.')
+        }
+          let confGuestsData = snapshot.val();
+          let confGuestItems = Object.keys(confGuestsData).map(function(key) {
+              return confGuestsData[key];
+          });
+          confGuestItems.map(guest => {
+            admin.database().ref(`/users/${guest.id}/posts/guest/${pushId}`).update({id: pushId})
+          })
+    });
+
+    exports.addLivePosts = functions.database
+    .ref('/servicesRequests/{postId}/')
+    .onCreate((snapshot, context) => {
+        const postId = context.params.postId;
+        if (!postId) {
+            return console.log('missing mandatory params for sending push.')
+        }
+          let postData = snapshot.val();
+          if(postData.status == 0){
+            admin.database().ref('users').once('value', (snapshot) => {
+              snapshot.forEach(function(childSnapshot) {
+                childSnapshot.ref.child(`/livePosts/${postId}`).update({id: postId})
+              })
+            })
+            return admin.database().ref(`/livePosts/${postId}`).update({id: postId})
+          }
+    });
+
+    exports.manageLivePosts = functions.database
+    .ref('/servicesRequests/{postId}/status')
+    .onUpdate((change, context) => {
+        const postId = context.params.postId;
+        if (!postId) {
+            return console.log('missing mandatory params for sending push.')
+        }
+        console.log('change.before.val() :', change.before.val());
+        console.log('change.after.val() :', change.after.val());
+
+          //if the post is no longer live, remove it from the livePosts reference object
+          if(change.before.val() == 0 && change.after.val() != 0){
+            console.log('Post no longer live. Removing it from livePosts.')
+            if(admin.database().ref(`/livePosts/${postId}`).exists()){
+              return admin.database().ref(`/livePosts/${postId}`).remove();
+            }
+          }
+    });
+
 /*
 // Sends notification to all confirmed guests when the host finalizes the list
   exports.sendFinalizedListNotification = functions.database
