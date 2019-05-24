@@ -446,15 +446,33 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
         if(isClient){
           ref.update({status:3});
           //incUserDarkScore(uid, 2);
+          deletePostFromUser(uid, id, 'host');
 
         }else{
           //Guest is cancelling
           ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3})
+          deletePostFromUser(uid, id, 'guest');
           incUserDarkScore(uid, 1);
           //Also add it to the users rejected list
-          appendRejectedTask(uid, id);
+          //appendRejectedTask(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right
         }
         resolve(true);
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const deletePostFromUser = (uid, taskId, deletedBy) => new Promise((resolve, reject) => {
+    try {
+      if(deletedBy === 'host'){
+        //Its cancelled by the host
+        console.log(`Removing the task ${taskId} from the users host object`)
+        firebase.database().ref(`/users/${uid}/posts/host/${taskId}`).remove();
+      }else if(deletedBy === 'guest'){
+        //guest opted out
+        firebase.database().ref(`/users/${uid}/posts/guest/${taskId}`).remove();
+      }
+
     } catch (e) {
         reject(e)
     }

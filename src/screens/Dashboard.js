@@ -2,8 +2,9 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor} from "../lib/firebaseUtils";
+import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
@@ -106,12 +107,16 @@ class DashboardScreen extends Component {
             //Check for unread msg count START
             if(request.status != 0)
             {
+              let unreadAv = false;
               firebase.database().ref(`/users/${uid}/messages/${id}/unreadCount`).once("value", function(unreadSnapshot)
               {
-                if(unreadSnapshot.val() != null){
+                if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
                   request.unreadMsgs = unreadSnapshot.val();
+                  unreadAv = true;
                 }
-              });
+              }).then(result => {
+                  if(unreadAv) this.setState({acceptedBadge: true})
+                })
             }
             //Check for unread msg count END
 
@@ -385,6 +390,7 @@ class DashboardScreen extends Component {
                     bottomDivider={true}
                     badge={(notifications!=0)? { value: notifications, status: badgeColor } : null}
                   />
+
             </View>
           </View>
         )
@@ -392,7 +398,7 @@ class DashboardScreen extends Component {
 
     render() {
         const {fetching, accepted, requested, active, acceptedBadge} = this.state
-        const buttons = ['My Activities', 'Accepted Activities']
+        const buttons = ['Hosting', 'Attending']
 
         return (
           <View style={styles.mainContainer}>
