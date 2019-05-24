@@ -1,5 +1,6 @@
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 const functions = require('firebase-functions');
+const uuid = require('uuid');
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
@@ -24,6 +25,53 @@ admin.initializeApp();
       }
 
       return { someResponse: 'hello' };
+  });
+
+  exports.createNewPost = functions.https.onCall((data, context) => {
+      console.log(context.auth.uid);
+
+      if (!data.customTitle) {
+          throw new functions.https.HttpsError(
+            'invalid-argument', // code
+            'Please ensure you have filled all the fields' // message
+          );
+      }
+
+      console.log('inside posting Req')
+
+      const uid = context.auth.uid;
+
+      admin.database().ref('/servicesRequests').once('value', (snapshot) => {
+          let servicesRequests = snapshot.val()
+          let customBool = false;
+          if (_.isEmpty(servicesRequests)) {
+              servicesRequests = {}
+          }
+          if (data.serviceId === 'custom'){
+            customBool = true;
+          }
+          const id_gen = uuid.v4()
+          servicesRequests[id_gen] = {
+            id: id_gen,
+            serviceId: data.serviceId,
+            clientId: uid,
+            when: data.when,
+            details: data.details,
+            anonymous: data.anonymous,
+            custom: customBool,
+            customTitle: data.customTitle,
+            status: 0,
+            interestedCount: 0,
+            created_at:admin.database.ServerValue.TIMESTAMP,
+            hostName: data.fullName,
+          }
+          admin.database().ref('/servicesRequests').update(servicesRequests).then(res => {
+              let userHostingRef = admin.database().ref(`/users/${uid}/posts/host/${id_gen}`);
+              return userHostingRef.update({id: id_gen}).then(finalRes => {
+              console.log('Posted with ID: ', id_gen);
+              })
+          })
+      })
   });
 
 // This function pushes notifications to a user (client) when their requested task is accepted by someone.
@@ -192,9 +240,7 @@ admin.initializeApp();
           //if the post is no longer live, remove it from the livePosts reference object
           if(change.before.val() == 0 && change.after.val() != 0){
             console.log('Post no longer live. Removing it from livePosts.')
-            if(admin.database().ref(`/livePosts/${postId}`).exists()){
-              return admin.database().ref(`/livePosts/${postId}`).remove();
-            }
+            return admin.database().ref(`/livePosts/${postId}`).remove();
           }
     });
 

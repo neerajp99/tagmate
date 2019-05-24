@@ -54,7 +54,7 @@ class DashboardDetails extends Component {
       let data = snapshot.val();
       this.setState({ item: data});
 
-      if(this.state.item.status != 0){
+      if(this.state.item.status != 0 && this.state.item.status != 3){
         this.getConfirmedGuests();
         this.getUnreadChatCount();
       }
@@ -111,11 +111,14 @@ class DashboardDetails extends Component {
   getConfirmedGuests = () => {
       var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/confirmedGuests`);
       console.log('inside getConfirmedGuests');
-      ref.on('value', (snapshot) => {
-        let data = snapshot.val();
-        let guestItems = Object.values(data);
-        this.setState({ confirmedGuestList: guestItems});
-    })
+      if(this._isMounted){
+        ref.on('value', (snapshot) => {
+          let data = snapshot.val();
+          let guestItems = Object.values(data);
+          this.setState({ confirmedGuestList: guestItems});
+        })
+      }
+
   }
 
   liveUpdates = () => {
@@ -285,16 +288,19 @@ class DashboardDetails extends Component {
   // Changes service request's status to cancelled in Firebase realtime database
   markCancelled = (item) => {
     const {currentUser: {uid} = {}} = firebase.auth()
+      console.log('item.isClient: ', item.isClient);
 
-    markRequestCancelled(uid, item.id, item.isClient).then(resp =>
-    {
-      console.log('cancelled');
-      if(!item.isClient){
-        this.setState({optedOut: true});
-      }
-      //Do nothing
-      //this.props.navigation.navigate('DashboardScreen')
-    });
+      markRequestCancelled(uid, item.id, item.isClient).then(resp =>
+      {
+        console.log('cancelled');
+        if(!item.isClient){
+          this.setState({optedOut: true});
+        }
+        //Do nothing
+        //this.props.navigation.navigate('DashboardScreen')
+      });
+      
+
   }
 
   renderGuests = ({item}) => {

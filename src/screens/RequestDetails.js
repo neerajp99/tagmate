@@ -40,7 +40,9 @@ class RequestDetails extends Component{
       getFullName(uid).then(selfName=>
       {
         this.setState({selfName:selfName});
+        console.log('selfName ', this.state.selfName)
       });
+
     }
 
     _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
@@ -117,9 +119,29 @@ class RequestDetails extends Component{
             })
           }
           */
+
+          /* DISABLING LOCAL POST FUNCTION
             postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle}).then(res => {
             this.setState({disabledBtn:false}); // Enable the button again
             this.props.navigation.goBack();
+            });
+            */
+
+            //ENABLING CLOUD BASED POST FUNCTION
+            const createNewPost = firebase.functions().httpsCallable('createNewPost');
+
+            getFullName(uid).then(fullName=>
+            {
+              createNewPost({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName})
+              .then(({ data }) => {
+                console.log('[Client] Server successfully posted')
+                alert('Posted Successfully. You can find it on your Dashboard.')
+                this.setState({disabledBtn:false}); // Enable the button again
+                this.props.navigation.goBack();
+              })
+              .catch(HttpsError => {
+                  console.log(HttpsError.code); // invalid-argument
+              })
             });
         }
     }

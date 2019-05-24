@@ -445,15 +445,7 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
         var ref = firebase.database().ref(`/servicesRequests/${id}`);
         if(isClient){
           ref.update({status:3});
-          incUserDarkScore(uid, 2);
-
-          //Decrease (notification) interested count for this user
-          firebase.database().ref(`/servicesRequests/${id}/interestedCount`).once("value", function(snapshot){
-            let interestedCount = snapshot.val();
-            firebase.database().ref(`/users/${uid}/totalInterested`).transaction(function(totalInterested){
-              return (totalInterested || 0) - interestedCount;
-            });
-          })
+          //incUserDarkScore(uid, 2);
 
         }else{
           //Guest is cancelling
