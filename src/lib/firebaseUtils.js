@@ -396,8 +396,9 @@ export const addAcceptor = (userId, serviceId, clientId) => new Promise((resolve
           });
         });
 
+        appendRejectedTask(userId, serviceId);
         //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
-        firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
+        //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
 
         //Increment interested count for this task
         firebase.database().ref(`/servicesRequests/${serviceId}/interestedCount`).transaction(function(interestedCount){
@@ -535,7 +536,7 @@ export const getFullName = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-// To note in database that user {userId} has rejected task {serviceId}
+// To note in database that user {userId} has rejected task {serviceId} . The app wont show these tasks to this user again
 export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
         resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));

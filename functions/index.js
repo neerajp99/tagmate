@@ -218,11 +218,6 @@ admin.initializeApp();
         }
           let postData = snapshot.val();
           if(postData.status == 0){
-            admin.database().ref('users').once('value', (snapshot) => {
-              snapshot.forEach(function(childSnapshot) {
-                childSnapshot.ref.child(`/livePosts/${postId}`).update({id: postId})
-              })
-            })
             return admin.database().ref(`/livePosts/${postId}`).update({id: postId})
           }
     });
