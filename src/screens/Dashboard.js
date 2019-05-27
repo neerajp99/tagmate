@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllServices, countServicesRequests, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
+import {countServicesRequests, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
@@ -35,12 +35,9 @@ class DashboardScreen extends Component {
       this._isMounted = true;
       this.setState({fetching:true});
       //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
-      getAllServices().then(services => // Get all possible services, then:
-      {
-        this.setState({services});
-        this.runFirebaseListeners();
-      });
+      this.runFirebaseListeners();
 
+      //TEMPORARY
       this.addNetworkDetails();
     }
 
@@ -255,7 +252,6 @@ class DashboardScreen extends Component {
     * */
     renderItem = ({item}) => {
         const{serviceId, id, created_at, details, custom, customTitle, interestedCount} = item;
-        const {services} = this.state
         const {currentUser: {uid} = {}} = firebase.auth()
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
@@ -265,20 +261,9 @@ class DashboardScreen extends Component {
         } else if (item.status != 0 && item.unreadMsgs != undefined){
           notifications = item.unreadMsgs;
         }
-        var serviceTitle = '---';
-        if(!custom)
-        {
-          // Find service title corresponding to the service ID of the service request:
-          services.map(service => {
-              if(service.id == serviceId)
-              {
-                  serviceTitle = service.title;
-              }
-          });
-        } else {
-          //this is a custom post, get title from post instead of global service object
-          serviceTitle = customTitle;
-        }
+        //this is a custom post, get title from post instead of global service object
+        let serviceTitle = customTitle;
+
         // Find appropriate status for current status code:
         var statusStr = 'Not available';
         switch(item.status)
