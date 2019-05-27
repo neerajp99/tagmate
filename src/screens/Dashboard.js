@@ -40,10 +40,32 @@ class DashboardScreen extends Component {
         this.setState({services});
         this.runFirebaseListeners();
       });
+
+      this.addNetworkDetails();
     }
 
     componentWillUnmount(){
       this._isMounted = false;
+    }
+
+    //TEMPORARY FOR TESTING
+    addNetworkDetails = () => {
+      console.log('firebase auth: ', firebase.auth() )
+      const {currentUser} = firebase.auth();
+      let email = currentUser.email;
+      let domain = email.substring(email.lastIndexOf("@") +1);
+      let uniqueDomainCode = domain.replace(/\./g,'x')
+      let name = domain.slice(0, domain.indexOf(".") );
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+
+      let network = {
+        domain: domain,
+        name: name,
+        id: uniqueDomainCode
+      }
+      console.log('network: ', network);
+      console.log('checking if firebase user email stayed intact: ', currentUser.email)
+      firebase.database().ref(`/users/${currentUser.uid}/network`).update(network)
     }
 
     runFirebaseListeners = () => {

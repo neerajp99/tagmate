@@ -86,15 +86,25 @@ class Login extends Component {
       const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);
-      let allow = (currentUser.user.email.slice(-14) === '@ashoka.edu.in');
-      let allowYC = (currentUser.user.email.slice(-16) === '@ycombinator.com');
-      if(allow || allowYC)
+
+      //India
+      let eduIn = (currentUser.user.email.slice(-7) === '.edu.in');
+      let acIn = (currentUser.user.email.slice(-6) === '.ac.in');
+      //USA & others
+      let edu = (currentUser.user.email.slice(-4) === '.edu');
+      //UK
+      let acUk = (currentUser.user.email.slice(-6) === '.ac.uk');
+
+      //let allowYC = (currentUser.user.email.slice(-16) === '@ycombinator.com');
+
+      if(eduIn || acIn || edu || acUk)
       {
         await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
         if(this._isMounted)
         {
           this.setState({loading:false});
           this.populateUserServices();
+          this.addNetworkDetails();
           this.props.navigation.navigate('MainStack')
         }
       }
@@ -118,6 +128,24 @@ class Login extends Component {
     }
   }
 
+  addNetworkDetails = () => {
+    console.log('firebase auth: ', firebase.auth() )
+    const {currentUser} = firebase.auth();
+    let email = currentUser.email;
+    let domain = email.substring(email.lastIndexOf("@") +1);
+    let uniqueDomainCode = domain.replace(/\./g,'x')
+    let name = domain.slice(0, domain.indexOf(".") );
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+
+    let network = {
+      domain: domain,
+      name: name,
+      id: uniqueDomainCode
+    }
+    console.log('network: ', network);
+    console.log('checking if firebase user email stayed intact: ', currentUser.email)
+    firebase.database().ref(`/users/${currentUser.uid}/network`).update(network)
+  }
 
   populateUserServices = () => {
     let servicesCount = 0
@@ -178,7 +206,7 @@ class Login extends Component {
           {
             this.state.invalid_email &&
             <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
-              Please use your Ashoka email.
+              Please use your university email to login.
             </Text>
           }
           {/*
