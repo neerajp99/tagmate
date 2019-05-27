@@ -40,36 +40,29 @@ admin.initializeApp();
       console.log('inside posting Req')
 
       const uid = context.auth.uid;
-
-      admin.database().ref('/servicesRequests').once('value', (snapshot) => {
-          let servicesRequests = snapshot.val()
-          let customBool = false;
-          if (_.isEmpty(servicesRequests)) {
-              servicesRequests = {}
-          }
-          if (data.serviceId === 'custom'){
-            customBool = true;
-          }
-          const id_gen = uuid.v4()
-          servicesRequests[id_gen] = {
-            id: id_gen,
-            serviceId: data.serviceId,
-            clientId: uid,
-            when: data.when,
-            details: data.details,
-            anonymous: data.anonymous,
-            custom: customBool,
-            customTitle: data.customTitle,
-            status: 0,
-            interestedCount: 0,
-            created_at:admin.database.ServerValue.TIMESTAMP,
-            hostName: data.fullName,
-          }
-          admin.database().ref('/servicesRequests').update(servicesRequests).then(res => {
-              let userHostingRef = admin.database().ref(`/users/${uid}/posts/host/${id_gen}`);
-              return userHostingRef.update({id: id_gen}).then(finalRes => {
-              console.log('Posted with ID: ', id_gen);
-              })
+      let customBool = false;
+      if (data.serviceId === 'custom'){
+        customBool = true;
+      }
+      const id_gen = uuid.v4()
+      let post = {
+        id: id_gen,
+        serviceId: data.serviceId,
+        clientId: uid,
+        when: data.when,
+        details: data.details,
+        anonymous: data.anonymous,
+        custom: customBool,
+        customTitle: data.customTitle,
+        status: 0,
+        interestedCount: 0,
+        created_at:admin.database.ServerValue.TIMESTAMP,
+        hostName: data.fullName,
+      }
+      admin.database().ref(`servicesRequests/${id_gen}`).update(post).then(res => {
+          let userHostingRef = admin.database().ref(`/users/${uid}/posts/host/${id_gen}`);
+          return userHostingRef.update(post).then(finalRes => {
+          console.log('Posted with ID: ', id_gen);
           })
       })
   });
@@ -204,9 +197,17 @@ admin.initializeApp();
           let confGuestItems = Object.keys(confGuestsData).map(function(key) {
               return confGuestsData[key];
           });
-          confGuestItems.map(guest => {
-            admin.database().ref(`/users/${guest.id}/posts/guest/${pushId}`).update({id: pushId})
+
+          admin.database().ref(`/servicesRequests/${pushId}`).once('value', (postSnapshot) => {
+            let post = postSnapshot.val()
+
+            confGuestItems.map(guest => {
+              admin.database().ref(`/users/${guest.id}/posts/guest/${pushId}`).update(post)
+            })
+
           })
+
+
     });
 
     exports.addLivePosts = functions.database
@@ -218,12 +219,12 @@ admin.initializeApp();
         }
           let postData = snapshot.val();
           if(postData.status == 0){
-            return admin.database().ref(`/livePosts/${postId}`).update({id: postId})
+            return admin.database().ref(`/livePosts/${postId}`).update(postData)
           }
     });
 
     exports.manageLivePosts = functions.database
-    .ref('/servicesRequests/{postId}/status')
+    .ref('/servicesRequests/{postId}')
     .onUpdate((change, context) => {
         const postId = context.params.postId;
         if (!postId) {
@@ -232,11 +233,51 @@ admin.initializeApp();
         console.log('change.before.val() :', change.before.val());
         console.log('change.after.val() :', change.after.val());
 
-          //if the post is no longer live, remove it from the livePosts reference object
-          if(change.before.val() == 0 && change.after.val() != 0){
-            console.log('Post no longer live. Removing it from livePosts.')
-            return admin.database().ref(`/livePosts/${postId}`).remove();
-          }
+        //if the post is no longer live, remove it from the livePosts reference object
+        if(change.before.val().status == 0 && change.after.val().status != 0){
+          console.log('Post no longer live. Removing it from livePosts.')
+          return admin.database().ref(`/livePosts/${postId}`).remove();
+        }
+
+        let post = change.after.val();
+
+        if(post.status === 1){
+          //Since the post's guest list is finalized, it is no longer in livePosts, so we don't need to update livePosts
+          console.log('Post change detected.')
+          //Update the duplicate post for the host
+          return admin.database().ref(`/users/${post.clientId}/posts/host/${postId}`).update(post).then(res => {
+            console.log('Updated host post')
+
+            //Now update the duplicate post for all the confirmed guests
+            let guestIds = [];
+            let confGuestItems = Object.keys(post.confirmedGuests).map(function(key) {
+                return post.confirmedGuests[key];
+            });
+            confGuestItems.map(guest => {
+              guestIds.push(guest.id)
+            })
+            let promises = []
+            for(let i=0; i<guestIds.length; i++){
+              let guestId = guestIds[i];
+              promise = admin.database().ref(`/users/${guestId}/posts/guest/${post.id}`).update(post);
+              promises.push(promise);
+            }
+            return Promise.all(promises).then(() => {
+              console.log('final Promise returned')
+            })
+
+          })
+        }
+
+        //if the post is still live but something has changed, update it in livePosts and user's host object.
+        // There is no guest object yet since the guest list is not finalized yet
+
+        if(post.status === 0){
+          admin.database().ref(`/livePosts/${postId}`).update(post).then(res => {
+            return admin.database().ref(`/users/${post.clientId}/posts/host/${postId}`).update(post)
+          })
+        }
+
     });
 
 /*

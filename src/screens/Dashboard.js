@@ -2,13 +2,16 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
+import {getAllServices, countServicesRequests, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
+
+const {currentUser: {uid} = {}} = firebase.auth()
+let USER_POST_REF = firebase.database().ref(`/users/${uid}/posts`);
 
 class DashboardScreen extends Component {
     constructor(props) {
@@ -20,7 +23,7 @@ class DashboardScreen extends Component {
         requested:[], // Array of requested services
         accepted:[], // Array of accepted tasks
       }
-      this.getAllRelatedTasks = this.getAllRelatedTasks.bind(this);
+      this.runFirebaseListeners = this.runFirebaseListeners.bind(this);
       this.updateIndex = this.updateIndex.bind(this);
     }
 
@@ -35,7 +38,7 @@ class DashboardScreen extends Component {
       getAllServices().then(services => // Get all possible services, then:
       {
         this.setState({services});
-        this.getAllRelatedTasks();
+        this.runFirebaseListeners();
       });
     }
 
@@ -43,219 +46,114 @@ class DashboardScreen extends Component {
       this._isMounted = false;
     }
 
-    // Home to all the listeners for the service request objects:
-    getAllRelatedTasks = () => {
-      const {currentUser: {uid} = {}} = firebase.auth()
-      var ref = firebase.database().ref('servicesRequests');
+    runFirebaseListeners = () => {
+      this.hostedPostsListeners();
+      this.guestPostsListeners();
+      this.unreadMsgListeners();
+    }
 
-      var userPostRef = firebase.database().ref(`/users/${uid}/posts`)
+    // Home to all the listeners for fetching the user's hosted posts
+    hostedPostsListeners = () => {
 
       //Get all the posts that this user is a host of
-      userPostRef.child('host').on('value', (snapshot) => {
-        let userHostedPosts = [];
-
-        if(this._isMounted) this.setState({fetching:false});
-        snapshot.forEach(function(childSnapshot) {
-
-          const {id} = childSnapshot.val();
-          console.log('id: ', id);
-
-          firebase.database().ref(`servicesRequests/${id}`).once('value', (postSnapshot) => {
-            let request = postSnapshot.val();
-            console.log('postSnapshot.val(): ', request);
-            console.log('isMounted ', this._isMounted);
-
-            //Check for unread msg count START
-            if(request.status != 0)
-            {
-              firebase.database().ref(`/users/${uid}/messages/${id}/unreadCount`).once("value", function(unreadSnapshot)
-              {
-                if(unreadSnapshot.val() != null){
-                  request.unreadMsgs = unreadSnapshot.val();
-                }
-              });
-            }
-            //Check for unread msg count END
-
-            //Finally add this post object to the array that is going to be rendered
-            userHostedPosts.push(request);
-          })
-        });
-
-        if(this._isMounted){
-            this.setState({requested:userHostedPosts});
-            console.log('this.state.requested: ', this.state.requested)
-            console.log('this.state.requested.length: ', this.state.requested.length)
-        }
-
-      })
-
-      //Get all posts that this user is a guest of / accepted posts
-      userPostRef.child('guest').on('value', (snapshot) => {
-        let userAcceptedPosts = [];
-
-        if(this._isMounted) this.setState({fetching:false});
-        snapshot.forEach(function(childSnapshot) {
-
-          const {id} = childSnapshot.val();
-          console.log('guest: id: ', id);
-
-          firebase.database().ref(`servicesRequests/${id}`).once('value', (postSnapshot) => {
-            let request = postSnapshot.val();
-            console.log('guest: postSnapshot.val(): ', request);
-
-            //Check for unread msg count START
-            if(request.status != 0)
-            {
-              let unreadAv = false;
-              firebase.database().ref(`/users/${uid}/messages/${id}/unreadCount`).once("value", function(unreadSnapshot)
-              {
-                if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
-                  request.unreadMsgs = unreadSnapshot.val();
-                  unreadAv = true;
-                }
-              }).then(result => {
-                  if(unreadAv) this.setState({acceptedBadge: true})
-                })
-            }
-            //Check for unread msg count END
-
-            //Finally add this post object to the array that is going to be rendered
-            userAcceptedPosts.push(request);
-          })
-        });
-
-        if(this._isMounted){
-            this.setState({accepted:userAcceptedPosts});
-            console.log('this.state.accepted: ', this.state.accepted)
-        }
-
-      })
-
-      /* START
-
-      // When a new service request object is added:
-      ref.on('child_added', (snapshot) => {
-        if(this._isMounted) this.setState({fetching:false});
-        var request = snapshot.val();
-        //Checking if this task object has the property anonymous. If the task object has the property anonymous that means it is a post from v2 of the app. Posts from old version do not have this property
-        // We do this to ensure we only show posts from the new version of the app
-        if(request.anonymous != undefined)
+      USER_POST_REF.child('host').on('child_added', (snapshot) => {
+        let request  = snapshot.val()
+        //Check for unread msg count START
+        if(request.status != 0)
         {
-
-
-            //If the user is the requester, and it is not a cancelled activity add to requested array:
-          if(request.clientId == uid && (request.status < 3) && this._isMounted){
-            //Add a new property to see how many unread msgs this user has in this task
-            if(request.status != 0)
-            {
-              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
-              {
-                if(snapshot.val() != null){
-                  request.unreadMsgs = snapshot.val();
-                }
-              });
+          firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(unreadSnapshot)
+          {
+            if(unreadSnapshot.val() != null){
+              request.unreadMsgs = unreadSnapshot.val();
             }
-
-            this.setState({requested:[request].concat(this.state.requested)});
-            console.log('this.state.requested: ', this.state.requested)
-
-          }
-          //If the user is the confirmed accepter, add to accepted array:
-          isConfirmedAcceptor(uid, request.id).then(result => {
-            if( result && (request.status < 3) && this._isMounted) {
-              //Add a new property to see how many unread msgs this user has in this task
-              if(request.status != 0)
-              {
-                let unreadAv = false;
-                firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
-                {
-
-                  if(snapshot.val() != null && snapshot.val() != 0){
-                    request.unreadMsgs = snapshot.val();
-                    unreadAv = true;
-                  }
-                }).then(result => {
-                  if(unreadAv) this.setState({acceptedBadge: true})
-                })
-              }
-              this.setState({accepted:[request].concat(this.state.accepted)});
-            }
-          })
-
-
+          });
         }
+        //Check for unread msg count END
+        this.setState({requested:[request].concat(this.state.requested)});
+        if(this._isMounted) this.setState({fetching:false});
       });
 
-      // When an existing service request object is removed:
-      ref.on('child_removed', (snapshot) => {
+
+
+      USER_POST_REF.child('host').on('child_removed', (snapshot) => {
           // Remove it from both arrays:
           if(this._isMounted)
-          this.setState({
-            requested: this.state.requested.filter(item => item.id !== snapshot.key),
-            accepted: this.state.accepted.filter(item => item.id !== snapshot.key),
-          });
+          this.setState({requested: this.state.requested.filter(item => item.id !== snapshot.key)});
       });
 
-      // When contents of an existing service request object are changed:
-      ref.on('child_changed', (snapshot) => {
-        var request = snapshot.val();
-        // If it is a service request the user has recently unmatched, it means the user is neither the server or the client anymore. Remove it from the accepted array:
-        if(request.serverId != uid && request.clientId != uid && this._isMounted){
-          this.setState({accepted: this.state.accepted.filter(function(element) {
-              return element.id !== request.id
-          })});
-        }
-
-        //If the user is the confirmed accepter, add to accepted array:
-        isConfirmedAcceptor(uid, request.id).then(result => {
-          if( result && (request.status < 3) && this._isMounted){
-            //Add a new property to see how many unread msgs this user has in this task
-            //unread msg check start
-            if(request.status != 0)
-            {
-              let unreadAv = false;
-              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
-              {
-
-                if(snapshot.val() != null && snapshot.val() != 0){
-                  request.unreadMsgs = snapshot.val();
-                  unreadAv = true;
-                }
-              }).then(result => {
-                if(unreadAv) this.setState({acceptedBadge: true})
-              })
-            }
-            //unread msg check end
-            this.setState({accepted:[request].concat(this.state.accepted)});
-          }
-          // Do nothing if the service request was not related to the user:
-          //if(request.clientId != uid && request.serverId != uid) return;
-          // Else, find it in the arrays and replace it with the new information.
-          else if(this._isMounted)
+      // When a post object that the user is hosting changes on the realtime database, update its local state
+      USER_POST_REF.child('host').on('child_changed', (snapshot) => {
+        var request = snapshot.val(); //this is the post object that changed
+        let req = []; // creating a new array for this.state.requested;
+        console.log('host changed. mounted? ', this._isMounted)
+        if(this._isMounted)
+        {
+          //Look for the post locally that changed in the realtime database
+          this.state.requested.map(item =>
           {
-            let req = [];//this.state.requested;
-            let acc = [];//this.state.accepted;
-
-            this.state.requested.map(item =>
-            {
-              if(item.id == request.id) req.push(request);
-              else req.push(item);
-            });
-            this.state.accepted.map(item =>
-            {
-              if(item.id == request.id && item.clientId != uid) acc.push(request);
-              else acc.push(item);
-            });
-
-            this.setState({requested:req});
-            this.setState({accepted:acc});
-          }
-        })
-
-
+            if(item.id == request.id) req.push(request); //if we find it, add the updated post to the array
+            else req.push(item); // add all other posts as they were into the array
+          });
+          this.setState({requested:req});
+        }
       });
-      END */
+
+    }
+
+    // Home to all the listeners for fetching the user's hosted posts
+    guestPostsListeners = () => {
+
+      //Get all the posts that this user is a guest of
+      USER_POST_REF.child('guest').on('child_added', (snapshot) => {
+        let request  = snapshot.val()
+
+        //Check for unread msg count for guest START
+        if(request.status != 0)
+        {
+          let unreadAv = false;
+          firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(unreadSnapshot)
+          {
+            if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
+              request.unreadMsgs = unreadSnapshot.val();
+              unreadAv = true;
+            }
+          }).then(result => {
+              if(unreadAv) this.setState({acceptedBadge: true})
+            })
+        }
+        //Check for unread msg count END
+
+        this.setState({accepted:[request].concat(this.state.accepted)});
+      });
+
+      USER_POST_REF.child('guest').on('child_removed', (snapshot) => {
+          // Remove it from both arrays:
+          if(this._isMounted)
+          this.setState({accepted: this.state.accepted.filter(item => item.id !== snapshot.key)});
+      });
+
+
+      // When a post object that the user is hosting changes on the realtime database, update its local state
+      USER_POST_REF.child('guest').on('child_changed', (snapshot) => {
+        var request = snapshot.val(); //this is the post object that changed
+        let acc = []; // creating a new array for this.state.requested;
+
+        if(this._isMounted)
+        {
+          //Look for the post locally that changed in the realtime database
+          this.state.accepted.map(item =>
+          {
+            if(item.id == request.id) acc.push(request); //if we find it, add the updated post to the array
+            else acc.push(item); // add all other posts as they were into the array
+          });
+          this.setState({accepted:acc});
+        }
+      });
+
+}
+
+    // Listener to check for changes in any of the post's unread msg count
+    unreadMsgListeners = () => {
 
       //If the user object's message is updated, this means the unread count mustve changed
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
@@ -295,7 +193,6 @@ class DashboardScreen extends Component {
         }
 
       })
-
     }
 
     // Open Dashboard Details screen for the task the user has tapped.

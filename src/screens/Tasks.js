@@ -111,14 +111,14 @@ class TaskScreen extends Component {
             firebase.database().ref(`servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
               let request  = postSnapshot.val()
               // Check if this request is not made by same user and it is not already decided upon by this user
-              if(request.clientId != uid && !_.includes(this.state.rejectedTasks, request.id)
+              if(request.clientId != uid && !_.includes(this.state.rejectedTasks, request.id))
               {
                 livePosts.push(request)
                 this.setState({myTasks:livePosts, fetching: false});
               }
-              console.log('postSnapshot.val(): ', postSnapshot.val());
+              //console.log('postSnapshot.val(): ', postSnapshot.val());
               if(this.state.fetching) this.setState({fetching:false});
-              console.log('this.state.myTasks: ', this.state.myTasks);
+              //console.log('this.state.myTasks: ', this.state.myTasks);
             })
           })
 
