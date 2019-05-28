@@ -85,14 +85,14 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-// get the list of all the task IDs that this user has rejected
-export const getRejectedTasks = (uid) => new Promise((resolve, reject) => {
+// get the list of all the task IDs that this user has rejected or accepted
+export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
+        firebase.database().ref(`users/${uid}/hiddenPosts`).once('value', (snapshot) => {
           if(snapshot.val() != undefined){
             let data = snapshot.val();
-            let rejectedTasks = Object.values(data);
-            resolve(rejectedTasks)
+            let hiddenPosts = Object.values(data);
+            resolve(hiddenPosts)
           } else {
             resolve([])
           }
@@ -146,16 +146,16 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
             }
             // Fetching all tasks
             firebase.database().ref(`networks/${networkId}/allPosts`).once('value', (snapshot) => {
-                // Fetching all tasks rejected by user {userId}
-                firebase.database().ref(`/users/${userId}/rejectedTasks`).once('value', (snapshotb) => {
+                // Fetching all tasks decided upon by user {userId}
+                firebase.database().ref(`/users/${userId}/hiddenPosts`).once('value', (snapshotb) => {
                     let myTasks = []
                     const allRequests = snapshot.val() || {}
                     console.log('allRequests: ', allRequests)
                     const keys = Object.keys(allRequests)
-                    const rejectedTasks = snapshotb.val() || {}
+                    const hiddenPosts = snapshotb.val() || {}
                     for (let key of keys) {
-                    // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
-                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].hostId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
+                    // Generating a list of only those tasks which user {userId} can perform, has not decided upon, did not create himself and still are available to be accepted.
+                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(hiddenPosts, allRequests[key].id) && allRequests[key].hostId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
 
                                 myTasks.push(allRequests[key])
                             }
@@ -424,7 +424,7 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
             });
           });
 
-          appendRejectedTask(userId, serviceId);
+          appendHiddenPosts(userId, serviceId);
           //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
           //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
 
@@ -488,8 +488,8 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
             ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3})
             deletePostFromUser(uid, id, 'guest');
             incUserDarkScore(uid, 1);
-            //Also add it to the users rejected list
-            //appendRejectedTask(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right
+            //Also add it to the users decided upon list
+            //appendHiddenPosts(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right
           }
           resolve(true);
         })
@@ -571,10 +571,10 @@ export const getFullName = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-// To note in database that user {userId} has rejected task {serviceId} . The app wont show these tasks to this user again
-export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
+// To note in database that user {userId} has rejected or accepted a post{serviceId} . The app wont show these tasks to this user again
+export const appendHiddenPosts = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
-        resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));
+        resolve(firebase.database().ref(`/users/${userId}/hiddenPosts`).push(serviceId));
     } catch (e) {
         reject(e)
     }

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, getNetworkId, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, addServer, appendHiddenPosts, getRelatedServices, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -23,7 +23,7 @@ class TaskScreen extends Component {
         super(props);
         this.state = {
             myTasks: [],
-            rejectedTasks: [],
+            hiddenPosts: [],
             myServices: [],
             fetching: false,
         };
@@ -47,8 +47,8 @@ class TaskScreen extends Component {
         {
             this.setState(services);
             // Keep updating tasks
-            getRejectedTasks(uid).then(rejectedTaskList => {
-              this.setState({rejectedTasks: rejectedTaskList});
+            getHiddenPosts(uid).then(hiddenPostList => {
+              this.setState({hiddenPosts: hiddenPostList});
 
               getNetworkId(uid).then(networkId => {
                 this.setState({networkId: networkId});
@@ -100,7 +100,7 @@ class TaskScreen extends Component {
 
           let request  = snapshot.val()
           // Check if this request is not made by same user and it is not already decided upon by this user
-          if(request.hostId != uid && !_.includes(this.state.rejectedTasks, request.id))
+          if(request.hostId != uid && !_.includes(this.state.hiddenPosts, request.id))
           {
             this.setState({myTasks:[request].concat(this.state.myTasks) , fetching: false});
           }
@@ -126,13 +126,12 @@ class TaskScreen extends Component {
         this.setState({myTasks:filteredTasks})
     }
 
-    // Filter the currently shown service requests to adjust to the user's new choices:
-    // It hides the service request corresponding to the ID and appends the ID to user's list of rejected tasks.
-    rejectTask = (id) =>
+    // The user has decided on this card and hence add this card to the user's hidden tasks list so that the app won't show it again
+    decideOnPost = (id) =>
     {
         //this.hideTask(id);
         const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid) appendRejectedTask(uid, id);
+        if(uid) appendHiddenPosts(uid, id);
     }
 
     // This function takes service request ID as parameter.
@@ -196,7 +195,7 @@ class TaskScreen extends Component {
         }
 
         return (
-          <SwipableCard key={id} onSwipedLeft={() => this.rejectTask(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTask(item)}>
           <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
               <ListItem
               title={anonymous? "Anonymous": hostName}
