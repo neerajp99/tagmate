@@ -105,6 +105,7 @@ class TaskScreen extends Component {
             livePostIds.push(id);
 
           })
+          console.log('livePostIds.length: ', livePostIds.length);
 
           livePostIds.map(livePostId => {
             firebase.database().ref(`networks/${networkId}/servicesRequests/${livePostId}`).once('value', (postSnapshot) => {

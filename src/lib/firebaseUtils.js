@@ -365,7 +365,6 @@ export const isConfirmedAcceptor = (uid, taskId) => new Promise((resolve, reject
 // Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester. No one being used
 export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
-        const {currentUser} = firebase.auth();
         getNetworkId(userId).then(networkId => {
           let ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${serviceId}`);
           ref.update({serverId:userId,status:1});
@@ -621,7 +620,7 @@ export const incUserDarkScore = (userId, score) => new Promise((resolve, reject)
 
 export const getNetworkId = (uid) => new Promise((resolve, reject) => {
   try{
-    firebase.database().ref(`/users/${currentUser.uid}/network/id`).once('value', (snapshot) => {
+    firebase.database().ref(`/users/${uid}/network/id`).once('value', (snapshot) => {
       resolve(snapshot.val());
     })
   } catch(e) {

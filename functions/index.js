@@ -291,7 +291,7 @@ admin.initializeApp();
         // There is no guest object yet since the guest list is not finalized yet
 
         if(post.status === 0){
-          admin.database().ref(`/networks/${networkId}/livePosts/${postId}`).update(post).then(res => {
+          return admin.database().ref(`/networks/${networkId}/livePosts/${postId}`).update(post).then(res => {
             return admin.database().ref(`/users/${post.clientId}/posts/host/${postId}`).update(post)
           })
         }

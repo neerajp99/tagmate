@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider, Badge, withBadge } from 'react-native-elements';
 import * as _ from 'lodash';
-import {getAllServices, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
+import {getAllServices, getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
