@@ -251,7 +251,7 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, created_at, details, custom, customTitle, interestedCount} = item;
+        const{serviceId, id, created_at, details, customTitle, interestedCount} = item;
         const {currentUser: {uid} = {}} = firebase.auth()
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
