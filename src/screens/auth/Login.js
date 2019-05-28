@@ -4,6 +4,7 @@ import firebase, { config } from 'react-native-firebase';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {connect} from 'react-redux';
 import {loginUser, loginGoogleUser,addNewGoogleUser} from '../../actions';
+import {populateUserServices, addNetworkDetails} from '../../lib/firebaseUtils';
 import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -102,10 +103,12 @@ class Login extends Component {
         await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
         if(this._isMounted)
         {
-          this.setState({loading:false});
-          this.populateUserServices();
-          this.addNetworkDetails();
-          this.props.navigation.navigate('MainStack')
+          populateUserServices(currentUser).then(res => {
+            addNetworkDetails(currentUser).then(lastRes => {
+              this.setState({loading:false});
+              this.props.navigation.navigate('MainStack');
+            })
+          })
         }
       }
       else if(this._isMounted)
@@ -128,10 +131,8 @@ class Login extends Component {
     }
   }
 
-  addNetworkDetails = () => {
-    console.log('firebase auth: ', firebase.auth() )
-    const {currentUser} = firebase.auth();
-    let email = currentUser.email;
+  addNetworkDetails = (currentUser) => {
+    let email = currentUser.user.email;
     let domain = email.substring(email.lastIndexOf("@") +1);
     let uniqueDomainCode = domain.replace(/\./g,'x')
     let name = domain.slice(0, domain.indexOf(".") );
@@ -143,19 +144,18 @@ class Login extends Component {
       id: uniqueDomainCode
     }
     console.log('network: ', network);
-    console.log('checking if firebase user email stayed intact: ', currentUser.email)
-    firebase.database().ref(`/users/${currentUser.uid}/network`).update(network).then(res => {
-      firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.uid}`).set(true)
+    console.log('checking if firebase user email stayed intact: ', currentUser.user.email)
+    firebase.database().ref(`/users/${currentUser.user.uid}/network`).update(network).then(res => {
+      firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.user.uid}`).set(true)
     });
   }
 
-  populateUserServices = () => {
+  populateUserServices = (currentUser) => {
     let servicesCount = 0
     let services = []
-    const {currentUser} = firebase.auth();
     console.log('Inside populate user services in Login js')
     //userRef.child(`services`).set(myServices);
-    firebase.database().ref(`/users/${currentUser.uid}/services`).once('value').then(snapshot => {
+    firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
     if (snapshot.val() === null ) {
       //Get the count of all available services
       firebase.database().ref('/services').once('value', function(snapshot) {
@@ -164,7 +164,7 @@ class Login extends Component {
            services.push('service' + i)
          }
          console.log('Populating new user object with all services by default')
-         var ref = firebase.database().ref(`/users/${currentUser.uid}`);
+         var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
          ref.child(`services`).set(services);
 
 

@@ -33,10 +33,15 @@ class DashboardDetails extends Component {
 
   componentDidMount(){
     this._isMounted = true;
+    const {currentUser: {uid} = {}} = firebase.auth()
+    console.log('this.state.item 1 : ', this.state.item);
+
     getAllServices().then(services => // Get list of all services, then:
     {
+      console.log('this.state.item 2 :  ', this.state.item);
       this.setState({services}); // Make services list available to the screen
       getNetworkId(uid).then(networkId => {
+        console.log('this.state.item 3 : ', this.state.item);
         this.setState({networkId});
         this.getTaskItem();
         this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
@@ -232,11 +237,12 @@ class DashboardDetails extends Component {
   // Expects {id} parameter to be a valid service request ID
   // Changes service request's status to 2 (Complete) in Firebase realtime database
   markDone = (id) => {
+    const {currentUser: {uid} = {}} = firebase.auth()
     if(this.state.disabledDone == true) return;
     else // Only if the button is not disabled:
     {
       this.setState({disabledDone:true});
-      markRequestDone(id).then(resp=>{
+      markRequestDone(id, uid).then(resp=>{
         alert('Your reputation points increased!')
         this.props.navigation.navigate('DashboardScreen')
       })

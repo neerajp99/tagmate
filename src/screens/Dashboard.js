@@ -10,9 +10,6 @@ import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
 
-const {currentUser: {uid} = {}} = firebase.auth()
-let USER_POST_REF = firebase.database().ref(`/users/${uid}/posts`);
-
 class DashboardScreen extends Component {
     constructor(props) {
       super(props);
@@ -22,6 +19,7 @@ class DashboardScreen extends Component {
         acceptedBadge: false,
         requested:[], // Array of requested services
         accepted:[], // Array of accepted tasks
+        uid:'',
       }
       this.runFirebaseListeners = this.runFirebaseListeners.bind(this);
       this.updateIndex = this.updateIndex.bind(this);
@@ -34,37 +32,14 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      //countallPosts(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      const {currentUser: {uid} = {}} = firebase.auth()
+      this.setState({uid: uid});
+      //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       this.runFirebaseListeners();
-
-      //TEMPORARY
-      this.addNetworkDetails();
     }
 
     componentWillUnmount(){
       this._isMounted = false;
-    }
-
-    //TEMPORARY FOR TESTING
-    addNetworkDetails = () => {
-      console.log('firebase auth: ', firebase.auth() )
-      const {currentUser} = firebase.auth();
-      let email = currentUser.email;
-      let domain = email.substring(email.lastIndexOf("@") +1);
-      let uniqueDomainCode = domain.replace(/\./g,'x')
-      let name = domain.slice(0, domain.indexOf(".") );
-      name = name.charAt(0).toUpperCase() + name.slice(1);
-
-      let network = {
-        domain: domain,
-        name: name,
-        id: uniqueDomainCode
-      }
-      console.log('network: ', network);
-      console.log('checking if firebase user email stayed intact: ', currentUser.email)
-      firebase.database().ref(`/users/${currentUser.uid}/network`).update(network).then(res => {
-        firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.uid}`).set(true)
-      });
     }
 
     runFirebaseListeners = () => {
@@ -75,9 +50,10 @@ class DashboardScreen extends Component {
 
     // Home to all the listeners for fetching the user's hosted posts
     hostedPostsListeners = () => {
-
+      const uid = this.state.uid;
+      let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
       //Get all the posts that this user is a host of
-      USER_POST_REF.child('host').on('child_added', (snapshot) => {
+      userPostRef.child('host').on('child_added', (snapshot) => {
         let request  = snapshot.val()
         //Check for unread msg count START
         if(request.status != 0)
@@ -94,16 +70,16 @@ class DashboardScreen extends Component {
         if(this._isMounted) this.setState({fetching:false});
       });
 
+      if(this._isMounted) this.setState({fetching:false});
 
-
-      USER_POST_REF.child('host').on('child_removed', (snapshot) => {
+      userPostRef.child('host').on('child_removed', (snapshot) => {
           // Remove it from both arrays:
           if(this._isMounted)
           this.setState({requested: this.state.requested.filter(item => item.id !== snapshot.key)});
       });
 
       // When a post object that the user is hosting changes on the realtime database, update its local state
-      USER_POST_REF.child('host').on('child_changed', (snapshot) => {
+      userPostRef.child('host').on('child_changed', (snapshot) => {
         var request = snapshot.val(); //this is the post object that changed
         let req = []; // creating a new array for this.state.requested;
         console.log('host changed. mounted? ', this._isMounted)
@@ -124,8 +100,11 @@ class DashboardScreen extends Component {
     // Home to all the listeners for fetching the user's hosted posts
     guestPostsListeners = () => {
 
+      const uid = this.state.uid;
+      let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
+
       //Get all the posts that this user is a guest of
-      USER_POST_REF.child('guest').on('child_added', (snapshot) => {
+      userPostRef.child('guest').on('child_added', (snapshot) => {
         let request  = snapshot.val()
 
         //Check for unread msg count for guest START
@@ -147,7 +126,7 @@ class DashboardScreen extends Component {
         this.setState({accepted:[request].concat(this.state.accepted)});
       });
 
-      USER_POST_REF.child('guest').on('child_removed', (snapshot) => {
+      userPostRef.child('guest').on('child_removed', (snapshot) => {
           // Remove it from both arrays:
           if(this._isMounted)
           this.setState({accepted: this.state.accepted.filter(item => item.id !== snapshot.key)});
@@ -155,7 +134,7 @@ class DashboardScreen extends Component {
 
 
       // When a post object that the user is hosting changes on the realtime database, update its local state
-      USER_POST_REF.child('guest').on('child_changed', (snapshot) => {
+      userPostRef.child('guest').on('child_changed', (snapshot) => {
         var request = snapshot.val(); //this is the post object that changed
         let acc = []; // creating a new array for this.state.requested;
 
@@ -175,6 +154,8 @@ class DashboardScreen extends Component {
 
     // Listener to check for changes in any of the post's unread msg count
     unreadMsgListeners = () => {
+
+      const uid = this.state.uid;
 
       //If the user object's message is updated, this means the unread count mustve changed
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
@@ -236,7 +217,6 @@ class DashboardScreen extends Component {
                     </View>
           }
       } else {
-        /* disabling due to glitch, tempororily
 
         if(this.state.requested.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
@@ -245,7 +225,6 @@ class DashboardScreen extends Component {
                     </Text>
                   </View>
         }
-        */
       }
     }
 
@@ -254,7 +233,7 @@ class DashboardScreen extends Component {
     * */
     renderItem = ({item}) => {
         const{serviceId, id, created_at, details, customTitle, interestedCount} = item;
-        const {currentUser: {uid} = {}} = firebase.auth()
+        const uid = this.state.uid;
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
         if(interestedCount != null && interestedCount != undefined && item.status == 0){

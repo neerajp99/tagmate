@@ -85,6 +85,62 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+export const populateUserServices = (currentUser) => new Promise((resolve, reject) => {
+    try {
+        let servicesCount = 0
+        let services = []
+        console.log('Inside populate user services in Login js')
+        //userRef.child(`services`).set(myServices);
+        firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
+        if (snapshot.val() === null ) {
+          //Get the count of all available services
+          firebase.database().ref('/services').once('value', function(snapshot) {
+             servicesCount = snapshot.numChildren();
+             for(i = 1; i<servicesCount+1; i++){
+               services.push('service' + i)
+             }
+             console.log('Populating new user object with all services by default')
+             var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
+             ref.child(`services`).set(services).then(res => {
+               resolve(true)
+             })
+           },
+           function(error) {
+            // The callback failed.
+            console.error(error);
+          });
+        }
+      });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const addNetworkDetails = (currentUser) => new Promise((resolve, reject) => {
+    try {
+      let email = currentUser.user.email;
+      let domain = email.substring(email.lastIndexOf("@") +1);
+      let uniqueDomainCode = domain.replace(/\./g,'x')
+      let name = domain.slice(0, domain.indexOf(".") );
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+
+      let network = {
+        domain: domain,
+        name: name,
+        id: uniqueDomainCode
+      }
+      console.log('network: ', network);
+      console.log('checking if firebase user email stayed intact: ', currentUser.user.email)
+      firebase.database().ref(`/users/${currentUser.user.uid}/network`).update(network).then(res => {
+        firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.user.uid}`).set(true).then(lres => {
+          resolve(true)
+        })
+      });
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // get the list of all the task IDs that this user has rejected or accepted
 export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
     try {

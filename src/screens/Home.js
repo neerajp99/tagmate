@@ -106,6 +106,7 @@ class HomeScreen extends Component {
           }
           if(this.state.fetching) this.setState({fetching:false});
         })
+        if(this._isMounted) this.setState({fetching:false});
 
         livePostsRef.on('child_removed', (snapshot) => {
           console.log('child_removed, snapshot key is ', snapshot.key)

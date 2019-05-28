@@ -75,11 +75,14 @@ class ProfileScreen extends Component{
   // It, in real-time, updates the Adour coin balance of the user.
   updateCoins = () =>
   {
-    const {currentUser: {uid} = {}} = firebase.auth()
-    firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
+    if(this._isMounted)
     {
-      if(this._isMounted) this.setState({coins: snapshot.val() || "0"});
-    }.bind(this));
+      const {currentUser: {uid} = {}} = firebase.auth()
+      firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
+      {
+        if(this._isMounted) this.setState({coins: snapshot.val() || "0"});
+      }.bind(this));
+    }
   }
 
   render(){
