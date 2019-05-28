@@ -43,7 +43,7 @@ class GuestList extends Component {
       if(this._isMounted)
       {
           let networkId = this.state.networkId;
-          var ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/acceptorIds`);
+          var ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds`);
           console.log('inside getGuestList');
           ref.on('value', (snapshot) => {
           if(snapshot.val() == null){
@@ -70,13 +70,13 @@ class GuestList extends Component {
 
     acceptGuest = (id) => {
       let networkId = this.state.networkId;
-      ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
+      ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 1})
     }
 
     rejectGuest = (id) => {
       let networkId = this.state.networkId;
-      ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
+      ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 2})
     }
 

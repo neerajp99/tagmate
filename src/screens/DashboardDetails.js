@@ -53,7 +53,7 @@ class DashboardDetails extends Component {
   //WIP
   getTaskItem = () => {
     let networkId = this.state.networkId;
-    var ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}`);
+    var ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}`);
     ref.on('value', (snapshot) => {
       let data = snapshot.val();
       this.setState({ item: data});
@@ -114,7 +114,7 @@ class DashboardDetails extends Component {
   //Returns the react native component list with names of confirmed guests
   getConfirmedGuests = () => {
       let networkId = this.state.networkId;
-      let ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/confirmedGuests`);
+      let ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/confirmedGuests`);
       console.log('inside getConfirmedGuests');
       if(this._isMounted){
         ref.on('value', (snapshot) => {
@@ -132,7 +132,7 @@ class DashboardDetails extends Component {
     console.log('liveUpdates func')
     // Listen for changes in service request {this.state.item.id}
     let networkId = this.state.networkId;
-    firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
+    firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}`).on("value", function(snapshot)
     {
       console.log('liveUpdates step 2')
       if(this._isMounted)

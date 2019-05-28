@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {countServicesRequests, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
+import {countallPosts, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
@@ -34,7 +34,7 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      //countallPosts(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       this.runFirebaseListeners();
 
       //TEMPORARY

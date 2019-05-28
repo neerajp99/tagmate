@@ -74,7 +74,7 @@ admin.initializeApp();
         created_at:admin.database.ServerValue.TIMESTAMP,
         hostName: data.fullName,
       }
-      admin.database().ref(`networks/${data.networkId}/servicesRequests/${id_gen}`).update(post).then(res => {
+      admin.database().ref(`networks/${data.networkId}/allPosts/${id_gen}`).update(post).then(res => {
           let userHostingRef = admin.database().ref(`/users/${uid}/posts/host/${id_gen}`);
           return userHostingRef.update(post).then(finalRes => {
           console.log('Posted with ID: ', id_gen);
@@ -84,7 +84,7 @@ admin.initializeApp();
 
 // This function pushes notifications to a user (client) when their requested task is accepted by someone.
     exports.sendPushNotificationToRequester = functions.database
-    .ref('/networks/{networkId}/servicesRequests/{pushId}/serverId')
+    .ref('/networks/{networkId}/allPosts/{pushId}/serverId')
     .onCreate((snapshot, context) => {
         const {pushId, networkId} = context.params;
         if (!pushId || !networkId) {
@@ -157,7 +157,7 @@ admin.initializeApp();
 
   // WIP This function sends push notifications when there are new unread chat messages for this user. This function is not working as of now
     exports.sendFinalizedListNotification = functions.database
-    .ref('/networks/{networkId}/servicesRequests/{pushId}/confirmedGuests')
+    .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests')
     .onCreate((snapshot, context) => {
         const {pushId, networkId} = context.params;
         if (!pushId || !networkId) {
@@ -202,7 +202,7 @@ admin.initializeApp();
     });
 
     exports.finalizeGuestListOps = functions.database
-    .ref('/networks/{networkId}/servicesRequests/{pushId}/confirmedGuests')
+    .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests')
     .onCreate((snapshot, context) => {
         const pushId = context.params.pushId;
         const networkId = context.params.networkId;
@@ -216,7 +216,7 @@ admin.initializeApp();
               return confGuestsData[key];
           });
 
-          admin.database().ref(`networks/${networkId}/servicesRequests/${pushId}`).once('value', (postSnapshot) => {
+          admin.database().ref(`networks/${networkId}/allPosts/${pushId}`).once('value', (postSnapshot) => {
             let post = postSnapshot.val()
 
             confGuestItems.map(guest => {
@@ -229,7 +229,7 @@ admin.initializeApp();
     });
 
     exports.addLivePosts = functions.database
-    .ref('/networks/{networkId}/servicesRequests/{postId}/')
+    .ref('/networks/{networkId}/allPosts/{postId}/')
     .onCreate((snapshot, context) => {
         const {postId, networkId} = context.params;
         if (!postId || !networkId) {
@@ -242,7 +242,7 @@ admin.initializeApp();
     });
 
     exports.manageLivePosts = functions.database
-    .ref('networks/{networkId}/servicesRequests/{postId}')
+    .ref('networks/{networkId}/allPosts/{postId}')
     .onUpdate((change, context) => {
         const {postId, networkId} = context.params;
         if (!postId || !networkId) {
@@ -301,7 +301,7 @@ admin.initializeApp();
 /*
 // Sends notification to all confirmed guests when the host finalizes the list
   exports.sendFinalizedListNotification = functions.database
-  .ref('/servicesRequests/{pushId}/confirmedGuests')
+  .ref('/allPosts/{pushId}/confirmedGuests')
   .onCreate((snapshot, context) => {
       const pushId = context.params.pushId;
       if (!pushId) {
@@ -319,7 +319,7 @@ admin.initializeApp();
           }
       };
 
-      let ref = admin.database().ref(`/servicesRequests/${pushId}/confirmedGuests`);
+      let ref = admin.database().ref(`/allPosts/${pushId}/confirmedGuests`);
       ref.once('value', (snapshot) => {
         if(snapshot.val() == undefined) return console.log('confirmedGuests undefined')
         // For each confirmed guest
