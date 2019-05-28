@@ -96,40 +96,23 @@ class TaskScreen extends Component {
         const {currentUser: {uid} = {}} = firebase.auth()
         let networkId = this.state.networkId;
         let livePostsRef = firebase.database().ref(`networks/${networkId}/livePosts`)
-        livePostsRef.on('value', (snapshot) => {
-          let livePosts = [];
-          let livePostIds = [];
-
-          snapshot.forEach(function(childSnapshot) {
-            const {id} = childSnapshot.val();
-            livePostIds.push(id);
-
-          })
-          console.log('livePostIds.length: ', livePostIds.length);
-
-          livePostIds.map(livePostId => {
-            firebase.database().ref(`networks/${networkId}/servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
-              let request  = postSnapshot.val()
-              // Check if this request is not made by same user and it is not already decided upon by this user
-              if(request.clientId != uid && !_.includes(this.state.rejectedTasks, request.id))
-              {
-                livePosts.push(request)
-                this.setState({myTasks:livePosts, fetching: false});
-              }
-              //console.log('postSnapshot.val(): ', postSnapshot.val());
-              if(this.state.fetching) this.setState({fetching:false});
-              //console.log('this.state.myTasks: ', this.state.myTasks);
-            })
-          })
-
-
+        livePostsRef.on('child_added', (snapshot) => {
+          
+          let request  = snapshot.val()
+          // Check if this request is not made by same user and it is not already decided upon by this user
+          if(request.clientId != uid && !_.includes(this.state.rejectedTasks, request.id))
+          {
+            this.setState({myTasks:[request].concat(this.state.myTasks) , fetching: false});
+          }
+          if(this.state.fetching) this.setState({fetching:false});
         })
 
         livePostsRef.on('child_removed', (snapshot) => {
           console.log('child_removed, snapshot key is ', snapshot.key)
           this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
-
         })
+
+        //TODO: child_changed - interested Count may change
 
 
     }
