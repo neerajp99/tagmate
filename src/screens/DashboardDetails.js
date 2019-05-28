@@ -139,7 +139,7 @@ class DashboardDetails extends Component {
       {
         var item = snapshot.val();
         this.setState({fetching:false});
-        if(item.clientId == uid) item.isClient = true; // The user is requester
+        if(item.hostId == uid) item.isClient = true; // The user is requester
         else if(item.serverId == uid) item.isClient = false; // The user is acceptor
         else
         {
@@ -188,7 +188,7 @@ class DashboardDetails extends Component {
         if(!this.state.nameAvailable)
         {
           // Get name of the other person involved in this service request:
-          getName((item.isClient)?item.serverId:item.clientId).then(name=>
+          getName((item.isClient)?item.serverId:item.hostId).then(name=>
           {
             // Then, update the name:
             item.name = name;
@@ -205,7 +205,7 @@ class DashboardDetails extends Component {
         })
 
         // Get reputation coins of the other person involved in this service request:
-        getCoins((item.isClient)?item.serverId:item.clientId).then(coins=>
+        getCoins((item.isClient)?item.serverId:item.hostId).then(coins=>
         {
           // Then, update the coins:
           item.coins = coins;
@@ -216,7 +216,7 @@ class DashboardDetails extends Component {
         if(!this.state.whatsappAvailable)
         {
           // Get whatsapp number of the other person involved in this service request:
-          getWhatsapp((item.isClient)?item.serverId:item.clientId).then(whatsapp=>
+          getWhatsapp((item.isClient)?item.serverId:item.hostId).then(whatsapp=>
           {
             // Then, update the whatsapp number:
             item.whatsapp = whatsapp;
@@ -257,7 +257,7 @@ class DashboardDetails extends Component {
       {
         usersInvolved.push(guest.id);
       })
-    usersInvolved.push(item.clientId);
+    usersInvolved.push(item.hostId);
     console.log('usersInvolved', usersInvolved);
 
     this.props.navigation.navigate("Chat", {

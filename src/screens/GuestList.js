@@ -91,7 +91,7 @@ class GuestList extends Component {
         return;
       }
       if(!incomplete){
-        finalizeGuestList(this.state.item.id, this.state.item.clientId).then(result => {
+        finalizeGuestList(this.state.item.id, this.state.item.hostId).then(result => {
           if(result){
             alert('Guest List Finalised');
             this.props.navigation.navigate('DashboardDetails',{taskId: this.state.item.id});

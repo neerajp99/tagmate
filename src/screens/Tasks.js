@@ -97,10 +97,10 @@ class TaskScreen extends Component {
         let networkId = this.state.networkId;
         let livePostsRef = firebase.database().ref(`networks/${networkId}/livePosts`)
         livePostsRef.on('child_added', (snapshot) => {
-          
+
           let request  = snapshot.val()
           // Check if this request is not made by same user and it is not already decided upon by this user
-          if(request.clientId != uid && !_.includes(this.state.rejectedTasks, request.id))
+          if(request.hostId != uid && !_.includes(this.state.rejectedTasks, request.id))
           {
             this.setState({myTasks:[request].concat(this.state.myTasks) , fetching: false});
           }
@@ -148,7 +148,7 @@ class TaskScreen extends Component {
                 //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                    addAcceptor(uid, item.id, item.clientId).then(o =>
+                    addAcceptor(uid, item.id, item.hostId).then(o =>
                     {
                       console.log('added as acceptor')
                         //this.hideTask(item.id);

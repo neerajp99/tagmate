@@ -24,7 +24,7 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                 allPosts[id] = {
                   id,
                   serviceId,
-                  clientId: uid,
+                  hostId: uid,
                   when: when,
                   details: details,
                   anonymous: anonymous,
@@ -155,7 +155,7 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                     const rejectedTasks = snapshotb.val() || {}
                     for (let key of keys) {
                     // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
-                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
+                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].hostId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
 
                                 myTasks.push(allRequests[key])
                             }
@@ -186,10 +186,10 @@ export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
                   for (let key of keys)
                   {
                       console.log("USERID: ",userId);
-                      console.log(allRequests[key].clientId,allRequests[key].serverId);
+                      console.log(allRequests[key].hostId,allRequests[key].serverId);
 
                       if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key])
-                      else if(allRequests[key].clientId == userId) requestedTasks.push(allRequests[key])
+                      else if(allRequests[key].hostId == userId) requestedTasks.push(allRequests[key])
                   }
                   let allRelatedTasks = {requestedTasks, acceptedTasks}
                   resolve(allRelatedTasks)
@@ -214,7 +214,7 @@ export const canRequestMore = (userId) => new Promise((resolve, reject) => {
                   var count = 0;
                   for (let key of keys)
                   {
-                      if(allRequests[key].clientId == userId && (allRequests[key].status == 0 || allRequests[key].status == 1)) count++;
+                      if(allRequests[key].hostId == userId && (allRequests[key].status == 0 || allRequests[key].status == 1)) count++;
                   }
                   getCoins(userId).then(coins => {
                       console.log('coins',coins,'reqs',count);
@@ -369,7 +369,7 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
           let ref = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}`);
           ref.update({serverId:userId,status:1});
           // Now returning the Whatsapp number of requester (client)
-          ref.child(`clientId`).once("value", function(snapshot) {
+          ref.child(`hostId`).once("value", function(snapshot) {
               resolve(getWhatsapp(snapshot.val()));
           });
         })
@@ -379,9 +379,9 @@ export const addServer = (userId, serviceId) => new Promise((resolve, reject) =>
     }
 })
 
-export const finalizeGuestList = (taskId, clientId) => new Promise((resolve, reject) => {
+export const finalizeGuestList = (taskId, hostId) => new Promise((resolve, reject) => {
   try {
-    getNetworkId(clientId).then(networkId => {
+    getNetworkId(hostId).then(networkId => {
       let ref = firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/acceptorIds`);
       ref.once("value", function(snapshot){
         let data = snapshot.val();
@@ -406,7 +406,7 @@ export const finalizeGuestList = (taskId, clientId) => new Promise((resolve, rej
 })
 
 // Push this user to the list of acceptors
-export const addAcceptor = (userId, serviceId, clientId) => new Promise((resolve, reject) => {
+export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
         getNetworkId(userId).then(networkId => {
@@ -434,7 +434,7 @@ export const addAcceptor = (userId, serviceId, clientId) => new Promise((resolve
           });
 
           //Increment total interested count for the client. this is used for notifying the client as well as for showing badge in clients app
-          firebase.database().ref(`/users/${clientId}/totalInterested`).transaction(function(totalInterested){
+          firebase.database().ref(`/users/${hostId}/totalInterested`).transaction(function(totalInterested){
             return (totalInterested || 0) + 1;
           });
 
@@ -456,8 +456,8 @@ export const markRequestDone = (id, uid) => new Promise((resolve, reject) => {
           let ref = firebase.database().ref(`networks/${networkId}/allPosts/${id}`);
           ref.update({status:2});
           ref.once("value", function(snapshot) {
-              const {clientId, serverId} = snapshot.val();
-              firebase.database().ref(`/users/${clientId}/coins`).transaction(function(coins){
+              const {hostId, serverId} = snapshot.val();
+              firebase.database().ref(`/users/${hostId}/coins`).transaction(function(coins){
                 return (coins || 0) + 1;
                 //previously was return (coins || 0) - 1;
               });
@@ -643,11 +643,11 @@ export const getCoins = (userId) => new Promise((resolve, reject) => {
 export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject) => {
     try {
       getNetworkId(uid).then(networkId => {
-        let clientId;
-        firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/clientId`).once("value", function(snapshot) {
-          clientId = snapshot.val();
+        let hostId;
+        firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/hostId`).once("value", function(snapshot) {
+          hostId = snapshot.val();
         })
-        if(uid != clientId)
+        if(uid != hostId)
         {
           let result;
           let ref = firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/confirmedGuests/${uid}/guestStatus`);
@@ -688,13 +688,13 @@ export const countallPosts = (networkId) => {
   srRef.once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
-      const {status, clientId, id} = childSnapshot.val();
+      const {status, hostId, id} = childSnapshot.val();
       if(status == 4) countAcc++;
       else if (status == 3) countReq++;
       else if (status == 2) countDone++;
       else if (status == 1){
         /*
-        if(clientId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
+        if(hostId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
           debugPosts.push(id);
         }
         */
@@ -702,9 +702,9 @@ export const countallPosts = (networkId) => {
       }
       else if (status == 0) {
         countOpen++;
-        openPostUsers.push(clientId);
+        openPostUsers.push(hostId);
         openPosts.push(id)
-        if(clientId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
+        if(hostId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
           debugPosts.push(id);
         }
       }
@@ -725,9 +725,9 @@ export const countallPosts = (networkId) => {
   srRef.once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
-      const {clientId} = childSnapshot.val();
-      if (!userPostCounted.includes(clientId)){
-        userPostCounted.push(clientId);
+      const {hostId} = childSnapshot.val();
+      if (!userPostCounted.includes(hostId)){
+        userPostCounted.push(hostId);
       }
     });
     console.log('number of activity posts created by unique users: ', userPostCounted.length);

@@ -63,7 +63,7 @@ admin.initializeApp();
       let post = {
         id: id_gen,
         serviceId: data.serviceId,
-        clientId: uid,
+        hostId: uid,
         when: data.when,
         details: data.details,
         anonymous: data.anonymous,
@@ -92,12 +92,12 @@ admin.initializeApp();
         }
         let deviceTokens = []
         const requestPromise = snapshot.ref.parent.once('value')
-        // Once we have clientId and serverId:
+        // Once we have hostId and serverId:
         return Promise.all([requestPromise])
             .then(results => {
                 var item = results[0].val()
-                const {serverId, clientId} = item
-                const clientDevicesPromise = admin.database().ref(`/users/${clientId}`).once('value')
+                const {serverId, hostId} = item
+                const clientDevicesPromise = admin.database().ref(`/users/${hostId}`).once('value')
                 const serverWhatsappPromise = admin.database().ref(`/users/${serverId}`).once('value')
                 // Once we have device IDs of client (requester) and Whatsapp number of server (acceptor)
                 return Promise.all([clientDevicesPromise, serverWhatsappPromise])
@@ -263,7 +263,7 @@ admin.initializeApp();
           //Since the post's guest list is finalized, it is no longer in livePosts, so we don't need to update livePosts
           console.log('Post change detected.')
           //Update the duplicate post for the host
-          return admin.database().ref(`/users/${post.clientId}/posts/host/${postId}`).update(post).then(res => {
+          return admin.database().ref(`/users/${post.hostId}/posts/host/${postId}`).update(post).then(res => {
             console.log('Updated host post')
 
             //Now update the duplicate post for all the confirmed guests
@@ -292,7 +292,7 @@ admin.initializeApp();
 
         if(post.status === 0){
           return admin.database().ref(`/networks/${networkId}/livePosts/${postId}`).update(post).then(res => {
-            return admin.database().ref(`/users/${post.clientId}/posts/host/${postId}`).update(post)
+            return admin.database().ref(`/users/${post.hostId}/posts/host/${postId}`).update(post)
           })
         }
 
