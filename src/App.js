@@ -41,7 +41,7 @@ class App extends Component {
                 if(notifType == 'SERVICE_REQUEST')
                 {
                 	this.navigator.dispatch(
-        				NavigationActions.navigate({ routeName: 'Tasks' })
+        				NavigationActions.navigate({ routeName: 'Home' })
       					);
                 }
                 // If the notification asked to open Dashboard Details screen:

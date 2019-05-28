@@ -18,7 +18,7 @@ const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
 const { width: WIDTH } = Dimensions.get('window')
 
-class TaskScreen extends Component {
+class HomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -314,7 +314,7 @@ class TaskScreen extends Component {
                 title="Create A Post"
                 titleStyle={adourStyle.listItemText}
                 leftIcon={{ name: 'edit' }}
-                onPress={() => this.props.navigation.navigate('RequestDetails')}
+                onPress={() => this.props.navigation.navigate('CreatePost')}
                 containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               />
             </Card>
@@ -341,7 +341,7 @@ class TaskScreen extends Component {
 
 }
 
-export default connect(null, {setDeviceToken}) (TaskScreen);
+export default connect(null, {setDeviceToken}) (HomeScreen);
 
 /*
 * Styles used in this screen

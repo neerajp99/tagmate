@@ -4,8 +4,8 @@ export * from './Support';
 export * from './PrivacyPolicy'
 export * from './ToS'
 export RequestScreen from './Request';
-export RequestDetails from './RequestDetails';
-export TaskScreen from './Tasks';
+export CreatePost from './CreatePost';
+export HomeScreen from './Home';
 export GuestList from './GuestList';
 export * from './Dashboard';
 export * from './DashboardDetails';

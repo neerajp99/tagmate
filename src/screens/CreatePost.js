@@ -12,7 +12,7 @@ const { width: WIDTH } = Dimensions.get('window');
 
 const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
-class RequestDetails extends Component{
+class CreatePost extends Component{
   	constructor(props) {
         super(props);
         this.state = {
@@ -114,7 +114,7 @@ class RequestDetails extends Component{
             createCustomService(customTitle).then(newServiceId => {
               postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, custom: custom, customTitle: customTitle}).then(res => {
               this.setState({disabledBtn:false}); // Enable the button again
-              this.props.navigation.navigate('Tasks');
+              this.props.navigation.navigate('Home');
               });
             })
           }
@@ -260,7 +260,7 @@ const mapStateToProps = ({profile: {fetching, services = []} = {}}, props) => {
     }
 }
 
-export default connect(mapStateToProps, {fetchAllServices})(RequestDetails);
+export default connect(mapStateToProps, {fetchAllServices})(CreatePost);
 
 const styles = StyleSheet.create({
 		backgroundContainer: {
