@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking, FlatList, ScrollView, Dimensions, TouchableOpacity} from 'react-native'
-import {getName, getLastName, finalizeGuestList} from "../lib/firebaseUtils";
+import {getName, getLastName, finalizeGuestList, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
@@ -26,8 +26,11 @@ class GuestList extends Component {
   componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      this.getGuestList();
-
+      const {currentUser: {uid} = {}} = firebase.auth()
+      getNetworkId(uid).then(networkId => {
+        this.setState({networkId});
+        this.getGuestList();
+      })
   }
 
   componentWillUnmount()
@@ -39,7 +42,8 @@ class GuestList extends Component {
     getGuestList = () => {
       if(this._isMounted)
       {
-          var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds`);
+          let networkId = this.state.networkId;
+          var ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/acceptorIds`);
           console.log('inside getGuestList');
           ref.on('value', (snapshot) => {
           if(snapshot.val() == null){
@@ -65,12 +69,14 @@ class GuestList extends Component {
     }
 
     acceptGuest = (id) => {
-      ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
+      let networkId = this.state.networkId;
+      ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 1})
     }
 
     rejectGuest = (id) => {
-      ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
+      let networkId = this.state.networkId;
+      ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 2})
     }
 

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -46,12 +46,14 @@ class TaskScreen extends Component {
         getRelatedServices(uid).then(services =>
         {
             this.setState(services);
-            console.log('relatedServices:',services);
             // Keep updating tasks
             getRejectedTasks(uid).then(rejectedTaskList => {
               this.setState({rejectedTasks: rejectedTaskList});
-              console.log('rejectedTasks state: ', this.state.rejectedTasks);
-              this.getMyTasks();
+
+              getNetworkId(uid).then(networkId => {
+                this.setState({networkId: networkId});
+                this.getMyTasks();
+              })
             })
         });
         this.tokenFunc();
@@ -92,11 +94,8 @@ class TaskScreen extends Component {
     * */
     getMyTasks = () => {
         const {currentUser: {uid} = {}} = firebase.auth()
-
-
-        var ref = firebase.database().ref('servicesRequests')
-        let livePostsRef = firebase.database().ref('livePosts')
-
+        let networkId = this.state.networkId;
+        let livePostsRef = firebase.database().ref(`networks/${networkId}/livePosts`)
         livePostsRef.on('value', (snapshot) => {
           let livePosts = [];
           let livePostIds = [];
@@ -108,7 +107,7 @@ class TaskScreen extends Component {
           })
 
           livePostIds.map(livePostId => {
-            firebase.database().ref(`servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
+            firebase.database().ref(`networks/${networkId}/servicesRequests/${livePostId}`).once('value', (postSnapshot) => {
               let request  = postSnapshot.val()
               // Check if this request is not made by same user and it is not already decided upon by this user
               if(request.clientId != uid && !_.includes(this.state.rejectedTasks, request.id))

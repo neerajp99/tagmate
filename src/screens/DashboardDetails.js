@@ -36,8 +36,11 @@ class DashboardDetails extends Component {
     getAllServices().then(services => // Get list of all services, then:
     {
       this.setState({services}); // Make services list available to the screen
-      this.getTaskItem();
-      this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
+      getNetworkId(uid).then(networkId => {
+        this.setState({networkId});
+        this.getTaskItem();
+        this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
+      })
     });
     //this.getServiceItem();
   }
@@ -49,7 +52,8 @@ class DashboardDetails extends Component {
 
   //WIP
   getTaskItem = () => {
-    var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}`);
+    let networkId = this.state.networkId;
+    var ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}`);
     ref.on('value', (snapshot) => {
       let data = snapshot.val();
       this.setState({ item: data});
@@ -109,7 +113,8 @@ class DashboardDetails extends Component {
 
   //Returns the react native component list with names of confirmed guests
   getConfirmedGuests = () => {
-      var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/confirmedGuests`);
+      let networkId = this.state.networkId;
+      let ref = firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}/confirmedGuests`);
       console.log('inside getConfirmedGuests');
       if(this._isMounted){
         ref.on('value', (snapshot) => {
@@ -126,7 +131,8 @@ class DashboardDetails extends Component {
     const {currentUser: {uid} = {}} = firebase.auth()
     console.log('liveUpdates func')
     // Listen for changes in service request {this.state.item.id}
-    firebase.database().ref(`/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
+    let networkId = this.state.networkId;
+    firebase.database().ref(`networks/${networkId}/servicesRequests/${this.state.item.id}`).on("value", function(snapshot)
     {
       console.log('liveUpdates step 2')
       if(this._isMounted)
@@ -299,7 +305,7 @@ class DashboardDetails extends Component {
         //Do nothing
         //this.props.navigation.navigate('DashboardScreen')
       });
-      
+
 
   }
 

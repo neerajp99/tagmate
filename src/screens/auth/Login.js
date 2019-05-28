@@ -144,7 +144,9 @@ class Login extends Component {
     }
     console.log('network: ', network);
     console.log('checking if firebase user email stayed intact: ', currentUser.email)
-    firebase.database().ref(`/users/${currentUser.uid}/network`).update(network)
+    firebase.database().ref(`/users/${currentUser.uid}/network`).update(network).then(res => {
+      firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.uid}`).set(true)
+    });
   }
 
   populateUserServices = () => {
