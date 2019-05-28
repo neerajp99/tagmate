@@ -132,15 +132,17 @@ class RequestDetails extends Component{
 
             getFullName(uid).then(fullName=>
             {
-              createNewPost({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName})
-              .then(({ data }) => {
-                console.log('[Client] Server successfully posted')
-                alert('Posted Successfully. You can find it on your Dashboard.')
-                this.setState({disabledBtn:false}); // Enable the button again
-                this.props.navigation.goBack();
-              })
-              .catch(HttpsError => {
-                  console.log(HttpsError.code); // invalid-argument
+              getNetworkId(uid).then(networkId => {
+                createNewPost({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName, networkId: networkId})
+                .then(({ data }) => {
+                  console.log('[Client] Server successfully posted')
+                  alert('Posted Successfully. You can find it on your Dashboard.')
+                  this.setState({disabledBtn:false}); // Enable the button again
+                  this.props.navigation.goBack();
+                })
+                .catch(HttpsError => {
+                    console.log(HttpsError.code); // invalid-argument
+                })
               })
             });
         }

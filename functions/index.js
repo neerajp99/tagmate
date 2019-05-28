@@ -27,6 +27,20 @@ admin.initializeApp();
       return { someResponse: 'hello' };
   });
 
+  exports.getNetworkId = functions.https.onCall((data, context) => {
+    if (!data.uid) {
+        throw new functions.https.HttpsError(
+          'invalid-argument', // code
+          'Please ensure you have filled all the fields' // message
+        );
+    }
+
+    return admin.database().ref(`/users/${data.uid}/network/id`).once('value', (snapshot) => {
+      return snapshot.val();
+    })
+
+  })
+
   exports.createNewPost = functions.https.onCall((data, context) => {
       console.log(context.auth.uid);
 
@@ -40,6 +54,7 @@ admin.initializeApp();
       console.log('inside posting Req')
 
       const uid = context.auth.uid;
+
       let customBool = false;
       if (data.serviceId === 'custom'){
         customBool = true;
@@ -59,7 +74,7 @@ admin.initializeApp();
         created_at:admin.database.ServerValue.TIMESTAMP,
         hostName: data.fullName,
       }
-      admin.database().ref(`servicesRequests/${id_gen}`).update(post).then(res => {
+      admin.database().ref(`networks/${data.networkId}/servicesRequests/${id_gen}`).update(post).then(res => {
           let userHostingRef = admin.database().ref(`/users/${uid}/posts/host/${id_gen}`);
           return userHostingRef.update(post).then(finalRes => {
           console.log('Posted with ID: ', id_gen);
@@ -69,10 +84,10 @@ admin.initializeApp();
 
 // This function pushes notifications to a user (client) when their requested task is accepted by someone.
     exports.sendPushNotificationToRequester = functions.database
-    .ref('/servicesRequests/{pushId}/serverId')
+    .ref('/networks/{networkId}/servicesRequests/{pushId}/serverId')
     .onCreate((snapshot, context) => {
-        const pushId = context.params.pushId;
-        if (!pushId) {
+        const {pushId, networkId} = context.params;
+        if (!pushId || !networkId) {
             return console.log('missing mandatory params for sending push.')
         }
         let deviceTokens = []
@@ -142,10 +157,10 @@ admin.initializeApp();
 
   // WIP This function sends push notifications when there are new unread chat messages for this user. This function is not working as of now
     exports.sendFinalizedListNotification = functions.database
-    .ref('/servicesRequests/{pushId}/confirmedGuests')
+    .ref('/networks/{networkId}/servicesRequests/{pushId}/confirmedGuests')
     .onCreate((snapshot, context) => {
-        const pushId = context.params.pushId;
-        if (!pushId) {
+        const {pushId, networkId} = context.params;
+        if (!pushId || !networkId) {
             return console.log('missing mandatory params for sending push.')
         }
         let allDeviceTokens = []
@@ -187,18 +202,21 @@ admin.initializeApp();
     });
 
     exports.finalizeGuestListOps = functions.database
-    .ref('/servicesRequests/{pushId}/confirmedGuests')
+    .ref('/networks/{networkId}/servicesRequests/{pushId}/confirmedGuests')
     .onCreate((snapshot, context) => {
         const pushId = context.params.pushId;
+        const networkId = context.params.networkId;
         if (!pushId) {
-            return console.log('missing mandatory params for sending push.')
+            return console.log('missing mandatory param pushId for sending push.')
+        }else if(!networkId){
+          return console.log('missing mandatory param networkId for sending push.')
         }
           let confGuestsData = snapshot.val();
           let confGuestItems = Object.keys(confGuestsData).map(function(key) {
               return confGuestsData[key];
           });
 
-          admin.database().ref(`/servicesRequests/${pushId}`).once('value', (postSnapshot) => {
+          admin.database().ref(`networks/${networkId}/servicesRequests/${pushId}`).once('value', (postSnapshot) => {
             let post = postSnapshot.val()
 
             confGuestItems.map(guest => {
@@ -211,23 +229,23 @@ admin.initializeApp();
     });
 
     exports.addLivePosts = functions.database
-    .ref('/servicesRequests/{postId}/')
+    .ref('/networks/{networkId}/servicesRequests/{postId}/')
     .onCreate((snapshot, context) => {
-        const postId = context.params.postId;
-        if (!postId) {
+        const {postId, networkId} = context.params;
+        if (!postId || !networkId) {
             return console.log('missing mandatory params for sending push.')
         }
           let postData = snapshot.val();
           if(postData.status == 0){
-            return admin.database().ref(`/livePosts/${postId}`).update(postData)
+            return admin.database().ref(`networks/${networkId}/livePosts/${postId}`).update(postData)
           }
     });
 
     exports.manageLivePosts = functions.database
-    .ref('/servicesRequests/{postId}')
+    .ref('networks/{networkId}/servicesRequests/{postId}')
     .onUpdate((change, context) => {
-        const postId = context.params.postId;
-        if (!postId) {
+        const {postId, networkId} = context.params;
+        if (!postId || !networkId) {
             return console.log('missing mandatory params for sending push.')
         }
         console.log('change.before.val() :', change.before.val());
@@ -236,7 +254,7 @@ admin.initializeApp();
         //if the post is no longer live, remove it from the livePosts reference object
         if(change.before.val().status == 0 && change.after.val().status != 0){
           console.log('Post no longer live. Removing it from livePosts.')
-          return admin.database().ref(`/livePosts/${postId}`).remove();
+          return admin.database().ref(`networks/${networkId}/livePosts/${postId}`).remove();
         }
 
         let post = change.after.val();
@@ -273,7 +291,7 @@ admin.initializeApp();
         // There is no guest object yet since the guest list is not finalized yet
 
         if(post.status === 0){
-          admin.database().ref(`/livePosts/${postId}`).update(post).then(res => {
+          admin.database().ref(`/networks/${networkId}/livePosts/${postId}`).update(post).then(res => {
             return admin.database().ref(`/users/${post.clientId}/posts/host/${postId}`).update(post)
           })
         }
