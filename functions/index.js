@@ -99,8 +99,6 @@ admin.initializeApp();
         return (totalInterested || 0) + 1;
       });
     })
-
-
   })
 
 // This function pushes notifications to a user (client) when their requested task is accepted by someone.
