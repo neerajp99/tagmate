@@ -82,6 +82,27 @@ admin.initializeApp();
       })
   });
 
+  //This function takes care of adding the notification badge on the host app when a new guest accepts the host's post
+  exports.notifyHostOnNewGuest = functions.database
+  .ref('/networks/{networkId}/allPosts/{pushId}/acceptorIds/{acceptorId}')
+  .onCreate((snapshot, context) => {
+    const {pushId, networkId, acceptorId} = context.params;
+    if (!pushId || !networkId || !acceptorId) {
+        return console.log('missing mandatory params')
+    }
+
+    //Get the host ID from the post object
+    return admin.database().ref(`networks/${networkId}/allPosts/${pushId}`).once('value', (postSnapshot) => {
+      let post = postSnapshot.val()
+      //Increment total interested count for the client. this is used for notifying the client as well as for showing badge in clients app
+      return admin.database().ref(`/users/${post.hostId}/totalInterested`).transaction(function(totalInterested){
+        return (totalInterested || 0) + 1;
+      });
+    })
+
+
+  })
+
 // This function pushes notifications to a user (client) when their requested task is accepted by someone.
     exports.sendPushNotificationToRequester = functions.database
     .ref('/networks/{networkId}/allPosts/{pushId}/serverId')

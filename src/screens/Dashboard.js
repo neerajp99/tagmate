@@ -19,7 +19,6 @@ class DashboardScreen extends Component {
         acceptedBadge: false,
         requested:[], // Array of requested services
         accepted:[], // Array of accepted tasks
-        uid:'',
       }
       this.runFirebaseListeners = this.runFirebaseListeners.bind(this);
       this.updateIndex = this.updateIndex.bind(this);
@@ -32,8 +31,6 @@ class DashboardScreen extends Component {
     componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      const {currentUser: {uid} = {}} = firebase.auth()
-      this.setState({uid: uid});
       //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       this.runFirebaseListeners();
     }
@@ -50,7 +47,7 @@ class DashboardScreen extends Component {
 
     // Home to all the listeners for fetching the user's hosted posts
     hostedPostsListeners = () => {
-      const uid = this.state.uid;
+      const {currentUser: {uid} = {}} = firebase.auth()
       let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
       //Get all the posts that this user is a host of
       userPostRef.child('host').on('child_added', (snapshot) => {
@@ -100,7 +97,7 @@ class DashboardScreen extends Component {
     // Home to all the listeners for fetching the user's hosted posts
     guestPostsListeners = () => {
 
-      const uid = this.state.uid;
+      const {currentUser: {uid} = {}} = firebase.auth()
       let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
 
       //Get all the posts that this user is a guest of
@@ -122,7 +119,6 @@ class DashboardScreen extends Component {
             })
         }
         //Check for unread msg count END
-
         this.setState({accepted:[request].concat(this.state.accepted)});
       });
 
@@ -155,7 +151,7 @@ class DashboardScreen extends Component {
     // Listener to check for changes in any of the post's unread msg count
     unreadMsgListeners = () => {
 
-      const uid = this.state.uid;
+      const {currentUser: {uid} = {}} = firebase.auth()
 
       //If the user object's message is updated, this means the unread count mustve changed
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {

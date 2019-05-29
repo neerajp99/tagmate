@@ -34,6 +34,7 @@ class Login extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    firebase.database().goOnline()
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
       /*
@@ -153,12 +154,16 @@ class Login extends Component {
   populateUserServices = (currentUser) => {
     let servicesCount = 0
     let services = []
+    console.log('currentUser: ', currentUser)
     console.log('Inside populate user services in Login js')
     //userRef.child(`services`).set(myServices);
     firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
+      console.log('inside firebase snapshot 1')
     if (snapshot.val() === null ) {
+      console.log('inside firebase snapshot 2')
       //Get the count of all available services
       firebase.database().ref('/services').once('value', function(snapshot) {
+        console.log('inside firebase snapshot 3')
          servicesCount = snapshot.numChildren();
          for(i = 1; i<servicesCount+1; i++){
            services.push('service' + i)
@@ -166,11 +171,13 @@ class Login extends Component {
          console.log('Populating new user object with all services by default')
          var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
          ref.child(`services`).set(services);
+         console.log('inside firebase snapshot 4')
 
 
        },
        function(error) {
         // The callback failed.
+        console.log('inside firebase snapshot ERROR')
         console.error(error);
       });
     }

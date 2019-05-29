@@ -87,30 +87,39 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
 
 export const populateUserServices = (currentUser) => new Promise((resolve, reject) => {
     try {
-        let servicesCount = 0
-        let services = []
-        console.log('Inside populate user services in Login js')
-        //userRef.child(`services`).set(myServices);
-        firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
-        if (snapshot.val() === null ) {
-          //Get the count of all available services
-          firebase.database().ref('/services').once('value', function(snapshot) {
-             servicesCount = snapshot.numChildren();
-             for(i = 1; i<servicesCount+1; i++){
-               services.push('service' + i)
-             }
-             console.log('Populating new user object with all services by default')
-             var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
-             ref.child(`services`).set(services).then(res => {
-               resolve(true)
-             })
-           },
-           function(error) {
-            // The callback failed.
-            console.error(error);
-          });
-        }
-      });
+      let servicesCount = 0
+      let services = []
+      console.log('currentUser: ', currentUser)
+      console.log('Inside populate user services in firebaseUtils')
+      //userRef.child(`services`).set(myServices);
+      firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
+        console.log('inside firebase snapshot 1')
+      if (snapshot.val() === null ) {
+        console.log('inside firebase snapshot 2')
+        //Get the count of all available services
+        firebase.database().ref('/services').once('value', function(snapshot) {
+          console.log('inside firebase snapshot 3')
+           servicesCount = snapshot.numChildren();
+           for(i = 1; i<servicesCount+1; i++){
+             services.push('service' + i)
+           }
+           console.log('Populating new user object with all services by default')
+           var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
+           ref.child(`services`).set(services).then(res => {
+             resolve(true)
+           })
+           console.log('inside firebase snapshot 4')
+
+
+         },
+         function(error) {
+          // The callback failed.
+          console.log('inside firebase snapshot ERROR')
+          console.error(error);
+        });
+      }
+      resolve(true)
+    });
     } catch (e) {
         reject(e)
     }
@@ -488,12 +497,6 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
           firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/interestedCount`).transaction(function(interestedCount){
             return (interestedCount || 0) + 1;
           });
-
-          //Increment total interested count for the client. this is used for notifying the client as well as for showing badge in clients app
-          firebase.database().ref(`/users/${hostId}/totalInterested`).transaction(function(totalInterested){
-            return (totalInterested || 0) + 1;
-          });
-
           console.log('pushed user to acceptor list')
 
         })
