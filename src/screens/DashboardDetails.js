@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollView} from 'react-native';
-import {markRequestDone, markRequestCancelled} from "../lib/firebaseUtils";
+import {markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider, Badge, withBadge } from 'react-native-elements';
@@ -241,9 +241,17 @@ class DashboardDetails extends Component {
     else // Only if the button is not disabled:
     {
       this.setState({disabledDone:true});
-      markRequestDone(id, uid).then(resp=>{
+      let networkId = this.state.networkId;
+      const markRequestDone = firebase.functions().httpsCallable('markRequestDone');
+
+      markRequestDone({uid: uid, postId: id, networkId: networkId})
+      .then(({ data }) => {
+        console.log('[Client] Server successfully posted')
         alert('Your reputation points increased!')
         this.props.navigation.navigate('DashboardScreen')
+      })
+      .catch(HttpsError => {
+          console.log(HttpsError.code); // invalid-argument
       })
     }
   }

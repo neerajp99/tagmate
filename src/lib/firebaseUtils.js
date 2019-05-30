@@ -506,9 +506,7 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
     }
 })
 
-// Expects service request ID in parameter
-// Marks request as done and CREDITS coins to requester
-// as well as to the acceptor
+// No longer being used. Cloud function is being used instead.
 export const markRequestDone = (id, uid) => new Promise((resolve, reject) => {
     try {
         getNetworkId(uid).then(networkId => {

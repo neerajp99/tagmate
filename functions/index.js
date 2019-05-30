@@ -27,6 +27,25 @@ admin.initializeApp();
       return { someResponse: 'hello' };
   });
 
+  //Takes care of what happens when a user presses Mark As Done button on DashboardScreen
+  exports.markRequestDone = functions.https.onCall((data, context) => {
+    if (!data.uid || !data.postId || !data.networkId) {
+        throw new functions.https.HttpsError(
+          'invalid-argument', // code
+          'Please ensure you have filled all the fields' // message
+        );
+    }
+    let ref = admin.database().ref(`networks/${data.networkId}/allPosts/${data.postId}`);
+    ref.update({status:2});
+    ref.once("value", function(snapshot) {
+        const {hostId} = snapshot.val();
+        return admin.database().ref(`/users/${hostId}/coins`).transaction(function(coins){
+          (coins || 0) + 1;
+          //previously was return (coins || 0) - 1;
+        })
+    });
+  })
+
   exports.getNetworkId = functions.https.onCall((data, context) => {
     if (!data.uid) {
         throw new functions.https.HttpsError(
@@ -267,8 +286,8 @@ admin.initializeApp();
         if (!postId || !networkId) {
             return console.log('missing mandatory params for sending push.')
         }
-        console.log('change.before.val() :', change.before.val());
-        console.log('change.after.val() :', change.after.val());
+        console.log('change.before.val().status :', change.before.val().status);
+        console.log('change.after.val().status :', change.after.val().status);
 
         //if the post is no longer live, remove it from the livePosts reference object
         if(change.before.val().status == 0 && change.after.val().status != 0){
@@ -278,7 +297,7 @@ admin.initializeApp();
 
         let post = change.after.val();
 
-        if(post.status === 1){
+        if(post.status > 0){
           //Since the post's guest list is finalized, it is no longer in livePosts, so we don't need to update livePosts
           console.log('Post change detected.')
           //Update the duplicate post for the host
