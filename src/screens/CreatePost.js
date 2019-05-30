@@ -12,6 +12,8 @@ const { width: WIDTH } = Dimensions.get('window');
 
 const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
+let uid;
+
 class CreatePost extends Component{
   	constructor(props) {
         super(props);
@@ -35,7 +37,12 @@ class CreatePost extends Component{
     }
 
     componentDidMount() {
-      const {currentUser: {uid} = {}} = firebase.auth();
+
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
+
       // Get name of the user
       getFullName(uid).then(selfName=>
       {
@@ -80,7 +87,6 @@ class CreatePost extends Component{
         else
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
-            const {currentUser: {uid} = {}} = firebase.auth();
             const {when, details, anonymous, selectedServiceId, selectedServiceItem, customTitle} = this.state;
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');

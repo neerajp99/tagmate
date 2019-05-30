@@ -10,6 +10,7 @@ import {canRequestMore} from '../lib/firebaseUtils.js';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
+let uid;
 
 class GuestList extends Component {
   constructor(props) {
@@ -26,7 +27,10 @@ class GuestList extends Component {
   componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      const {currentUser: {uid} = {}} = firebase.auth()
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
       getNetworkId(uid).then(networkId => {
         this.setState({networkId});
         this.getGuestList();

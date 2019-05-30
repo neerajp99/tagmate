@@ -29,8 +29,13 @@ class ProfileScreen extends Component{
   componentDidMount(){
     this._isMounted = true;
     //Fetching name and photo URL
-    const {currentUser: {displayName, photoURL} = {}} = firebase.auth();
-    this.setState({displayName, photoURL});
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      displayName = user.displayName;
+      photoURL = user.photoURL;
+      this.setState({displayName, photoURL});
+    }
+
     /* Cloud Function Test
     const httpsCallable = firebase.functions().httpsCallable('cloudFuncTest');
 
@@ -77,7 +82,10 @@ class ProfileScreen extends Component{
   {
     if(this._isMounted)
     {
-      const {currentUser: {uid} = {}} = firebase.auth()
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
       firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
       {
         if(this._isMounted) this.setState({coins: snapshot.val() || "0"});

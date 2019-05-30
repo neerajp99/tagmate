@@ -17,6 +17,7 @@ const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 //Test commit
 
 const { width: WIDTH } = Dimensions.get('window')
+let uid;
 
 class HomeScreen extends Component {
     constructor(props) {
@@ -33,7 +34,10 @@ class HomeScreen extends Component {
     componentDidMount(){
         this._isMounted = true;
         this.setState({fetching:true});
-        const {currentUser: {uid} = {}} = firebase.auth()
+        let user = firebase.auth().currentUser;
+        if (user != null) {
+          uid = user.uid;
+        }
         // TEMPORARY
         //getAcceptors("testServiceRequest").then(response => {
         //  console.log("Returned from getAcceptors: ", response);
@@ -93,7 +97,6 @@ class HomeScreen extends Component {
     * get all the task requests that this user can perform
     * */
     getMyTasks = () => {
-        const {currentUser: {uid} = {}} = firebase.auth()
         let networkId = this.state.networkId;
         let livePostsRef = firebase.database().ref(`networks/${networkId}/livePosts`)
         livePostsRef.on('child_added', (snapshot) => {
@@ -131,7 +134,6 @@ class HomeScreen extends Component {
     decideOnPost = (id) =>
     {
         //this.hideTask(id);
-        const {currentUser: {uid} = {}} = firebase.auth()
         if(uid) appendHiddenPosts(uid, id);
     }
 
@@ -140,7 +142,6 @@ class HomeScreen extends Component {
     // If yes, it assigns it to the user and navigates him/her to the DashboardDetails screen.
     acceptTask = (item) =>
     {
-        const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
             alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.

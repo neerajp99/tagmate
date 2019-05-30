@@ -10,6 +10,8 @@ import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
 
+let uid;
+
 class DashboardScreen extends Component {
     constructor(props) {
       super(props);
@@ -30,6 +32,10 @@ class DashboardScreen extends Component {
 
     componentDidMount(){
       this._isMounted = true;
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
       this.setState({fetching:true});
       //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       this.runFirebaseListeners();
@@ -47,7 +53,6 @@ class DashboardScreen extends Component {
 
     // Home to all the listeners for fetching the user's hosted posts
     hostedPostsListeners = () => {
-      const {currentUser: {uid} = {}} = firebase.auth()
       let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
       //Get all the posts that this user is a host of
       userPostRef.child('host').on('child_added', (snapshot) => {
@@ -96,8 +101,6 @@ class DashboardScreen extends Component {
 
     // Home to all the listeners for fetching the user's hosted posts
     guestPostsListeners = () => {
-
-      const {currentUser: {uid} = {}} = firebase.auth()
       let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
 
       //Get all the posts that this user is a guest of
@@ -150,9 +153,6 @@ class DashboardScreen extends Component {
 
     // Listener to check for changes in any of the post's unread msg count
     unreadMsgListeners = () => {
-
-      const {currentUser: {uid} = {}} = firebase.auth()
-
       //If the user object's message is updated, this means the unread count mustve changed
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
         var ob = snapshot.val();
@@ -204,7 +204,11 @@ class DashboardScreen extends Component {
       if(active){
           if(this.state.accepted.length == 0) {
             //Get Display Name
-            const {currentUser: {displayName} = {}} = firebase.auth();
+            let user = firebase.auth().currentUser;
+            let displayName;
+            if (user != null) {
+              displayName = user.displayName;
+            }
             return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                       <Text style={adourStyle.guideText}>
                       Hello {displayName} {"\n"} {"\n"}You haven't accepted any conversation requests yet. {"\n"} {"\n"}

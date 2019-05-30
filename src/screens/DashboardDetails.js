@@ -10,6 +10,7 @@ import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
 const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
+let uid;
 
 class DashboardDetails extends Component {
   constructor(props) {
@@ -33,7 +34,10 @@ class DashboardDetails extends Component {
 
   componentDidMount(){
     this._isMounted = true;
-    const {currentUser: {uid} = {}} = firebase.auth()
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      uid = user.uid;
+    }
     console.log('this.state.item 1 : ', this.state.item);
 
     getAllServices().then(services => // Get list of all services, then:
@@ -84,8 +88,6 @@ class DashboardDetails extends Component {
       }
     })
 
-    const {currentUser: {uid} = {}} = firebase.auth()
-
     //Check if the current user is a guest and has recently opted out
     hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
     if(result != null){
@@ -108,7 +110,6 @@ class DashboardDetails extends Component {
 
   getUnreadChatCount = () =>
   {
-    const {currentUser: {uid} = {}} = firebase.auth()
     firebase.database().ref(`/users/${uid}/messages/${this.state.item.id}/unreadCount`).on("value", function(snapshot)
     {
       if(this._isMounted) this.setState({unreadChatCount: snapshot.val() || "0"});
@@ -133,7 +134,6 @@ class DashboardDetails extends Component {
 
   liveUpdates = () => {
 
-    const {currentUser: {uid} = {}} = firebase.auth()
     console.log('liveUpdates func')
     // Listen for changes in service request {this.state.item.id}
     let networkId = this.state.networkId;
@@ -237,7 +237,6 @@ class DashboardDetails extends Component {
   // Expects {id} parameter to be a valid service request ID
   // Changes service request's status to 2 (Complete) in Firebase realtime database
   markDone = (id) => {
-    const {currentUser: {uid} = {}} = firebase.auth()
     if(this.state.disabledDone == true) return;
     else // Only if the button is not disabled:
     {
@@ -299,7 +298,6 @@ class DashboardDetails extends Component {
   // Expects {item} parameter to be an object with two valid properties: id (of service request) and isClient
   // Changes service request's status to cancelled in Firebase realtime database
   markCancelled = (item) => {
-    const {currentUser: {uid} = {}} = firebase.auth()
       console.log('item.isClient: ', item.isClient);
 
       markRequestCancelled(uid, item.id, item.isClient).then(resp =>
