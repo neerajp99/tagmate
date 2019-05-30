@@ -18,7 +18,7 @@ class GuestList extends Component {
           myTasks: [],
           guestList: [],
           disabledBtn: false,
-          item:{id:this.props.navigation.state.params.taskId}, // Loading service request's ID which was passed on
+          item:{id:this.props.navigation.state.params.taskId, hostId:this.props.navigation.state.params.hostId}, // Loading service request's ID which was passed on
           fetching: false,
       };
   }

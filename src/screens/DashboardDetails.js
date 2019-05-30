@@ -250,9 +250,9 @@ class DashboardDetails extends Component {
   }
 
   // Open Guest List Page: this page has the list of everyone who is interested in this activity
-  openGuestList = (itemId) =>
+  openGuestList = (itemId, hostId) =>
   {
-    this.props.navigation.navigate('GuestList',{taskId: itemId})
+    this.props.navigation.navigate('GuestList',{taskId: itemId, hostId: hostId})
   }
 
   openChat = (item) =>
@@ -436,7 +436,7 @@ class DashboardDetails extends Component {
            {
              item.isClient && item.status == 0 &&
                   <View>
-                   <Button onPress={()=>this.openGuestList(item.id)}
+                   <Button onPress={()=>this.openGuestList(item.id, item.hostId)}
                        buttonStyle={adourStyle.btnGeneral}
                        titleStyle={adourStyle.btnText}
                        disabled={this.state.disabledDone}
