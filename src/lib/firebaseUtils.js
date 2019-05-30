@@ -536,19 +536,26 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
         getNetworkId(uid).then(networkId => {
           var ref = firebase.database().ref(`networks/${networkId}/allPosts/${id}`);
           if(isClient){
-            ref.update({status:3});
-            //incUserDarkScore(uid, 2);
-            deletePostFromUser(uid, id, 'host');
+            ref.update({status:3}).then(res => {
+              //incUserDarkScore(uid, 2);
+              deletePostFromUser(uid, id, 'host').then(lastRes => {
+                resolve(true)
+              })
+            })
 
           }else{
             //Guest is cancelling
-            ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3})
-            deletePostFromUser(uid, id, 'guest');
-            incUserDarkScore(uid, 1);
-            //Also add it to the users decided upon list
-            //appendHiddenPosts(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right
+            ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3}).then(res => {
+              deletePostFromUser(uid, id, 'guest').then(secRes => {
+                incUserDarkScore(uid, 1).then(lastRes => {
+                  resolve(true)
+                })
+                //Also add it to the users decided upon list
+                //appendHiddenPosts(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right
+              })
+            })
+
           }
-          resolve(true);
         })
     } catch (e) {
         reject(e)
@@ -557,13 +564,14 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
 
 export const deletePostFromUser = (uid, taskId, deletedBy) => new Promise((resolve, reject) => {
     try {
+      console.log('Inside deletePostFromUser')
       if(deletedBy === 'host'){
         //Its cancelled by the host
         console.log(`Removing the task ${taskId} from the users host object`)
-        firebase.database().ref(`/users/${uid}/posts/host/${taskId}`).remove();
+        firebase.database().ref(`/users/${uid}/posts/host/${taskId}`).remove().then( res => {resolve(true)})
       }else if(deletedBy === 'guest'){
         //guest opted out
-        firebase.database().ref(`/users/${uid}/posts/guest/${taskId}`).remove();
+        firebase.database().ref(`/users/${uid}/posts/guest/${taskId}`).remove().then( res => {resolve(true)})
       }
 
     } catch (e) {
