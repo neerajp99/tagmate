@@ -1,4 +1,4 @@
-attending_arr // This screen shows tasks hosting and attending by the user.
+// This screen shows tasks hosting and attending by the user.
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
@@ -151,7 +151,7 @@ class DashboardScreen extends Component {
       // When a post object that the user is hosting changes on the realtime database, update its local state
       userPostRef.child('guest').on('child_changed', (snapshot) => {
         var post = snapshot.val(); //this is the post object that changed
-        let attending_arr = []; // creating a new array for this.state.hosting;
+        let attending_arr = []; // creating a new array for this.state.attending;
 
         if(this._isMounted)
         {
