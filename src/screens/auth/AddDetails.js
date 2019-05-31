@@ -4,13 +4,13 @@ import firebase from 'react-native-firebase';
 import {StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView} from 'react-native';
 import {CheckBox, Card, Divider, ButtonGroup} from 'react-native-elements';
 import {connect} from 'react-redux';
-import {submitUserUpdates, submitUserGender} from '../../actions';
-import {getMyServices, getWhatsapp} from '../../lib/firebaseUtils';
+import {submitUserUpdates} from '../../actions';
+import {getMyServices} from '../../lib/firebaseUtils';
 import * as _ from 'lodash'
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from '../style/AdourStyle'
 
 class AddDetails extends Component {
-    state = {myServices: [], genderActive: 0};
+    state = {myServices: []};
 
     async componentDidMount()
     {
@@ -20,22 +20,15 @@ class AddDetails extends Component {
     }
 
     onButtonPress() {
-        const {myServices, genderActive} = this.state;
+        const {myServices} = this.state;
 
         // Validating user inputs:
         if(_.isEmpty(myServices))
         {
             alert('You must select atleast one activity you are interested in');
             return;
-        } else if (genderActive == 0)
-        {
-          alert('Please select your gender');
-          return;
-        }
-        else
-        {
+        } else {
             this.props.submitUserUpdates(myServices); // Finalling updating profile.
-            this.props.submitUserGender(genderActive);
             if(typeof this.props.onboarding != "undefined") this.props.onboarding.navigate('MainStack');
             if(typeof this.props.onboarding == "undefined") alert('Changes Saved');
         }
@@ -74,28 +67,11 @@ class AddDetails extends Component {
         this.setState({myServices: newServices})
     }
 
-    updateIndex = (genderActive) => {
-      console.log(genderActive)
-      this.setState({genderActive: genderActive})
-    }
-
     render() {
-        const {services, genderActive} = this.props
-        const genderToggle = ['Not Specified', 'Male', 'Female']
+        const {services} = this.props
 
         return (
             <ScrollView>
-            <Card>
-                {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
-                <Text style={adourStyle.defaultText}>My Gender</Text>
-                <ButtonGroup
-                  onPress={this.updateIndex}
-                  selectedIndex={genderActive}
-                  buttons={genderToggle}
-                  textStyle={adourStyle.buttonText}
-                  containerStyle={{height: 45}}
-                />
-            </Card>
             <Card>
                 {/* TODO: Turn CheckBox into a resusable component. Use a loop to iterate and render. */}
                 <Text style={adourStyle.defaultText}>What are you interested in?</Text>
@@ -140,4 +116,4 @@ const mapStateToProps = ({auth: {loading, error} = {}, profile: {fetching, servi
     };
 };
 
-export default connect(mapStateToProps, {submitUserUpdates, submitUserGender})(AddDetails);
+export default connect(mapStateToProps, {submitUserUpdates})(AddDetails);
