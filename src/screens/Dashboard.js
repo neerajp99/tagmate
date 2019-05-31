@@ -2,7 +2,7 @@
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {countallPosts, isConfirmedAcceptor, deleteForever} from "../lib/firebaseUtils";
+import {countallPosts, isConfirmedAcceptor, deleteForever, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
@@ -37,7 +37,10 @@ class DashboardScreen extends Component {
         uid = user.uid;
       }
       this.setState({fetching:true});
+
       //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      //this.sendPushNotificationToHosts(hard code network Id here); //THIS IS A MANUAL CLOUD FUNCTION FOR ADMINS ONLY
+
       this.runFirebaseListeners();
     }
 
@@ -98,6 +101,19 @@ class DashboardScreen extends Component {
       });
 
     }
+
+    sendPushNotificationToHosts = (networkId) => {
+      const pushNotifyHostOnManual = firebase.functions().httpsCallable('pushNotifyHostOnManual');
+      pushNotifyHostOnManual({networkId: networkId})
+      .then(({ data }) => {
+        console.log('[Client] Server successfully posted')
+        alert('Push notification sent!')
+      })
+      .catch(HttpsError => {
+          console.log(HttpsError.code); // invalid-argument
+      })
+    }
+
 
     // Home to all the listeners for fetching the user's hosted posts
     guestPostsListeners = () => {

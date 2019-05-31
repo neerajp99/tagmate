@@ -473,6 +473,15 @@ class DashboardDetails extends Component {
                     title={(item.isClient)?"Remove":"Opt Out"}
                 />
           }
+          {
+           item.status == 3 &&
+                <Button
+                    onPress={()=>this.confirmCancel(item)}
+                    buttonStyle={adourStyle.btnCancel}
+                    titleStyle={adourStyle.btnText}
+                    title={"Remove"}
+                />
+          }
         </Card>}
       </View>
       </ScrollView>
