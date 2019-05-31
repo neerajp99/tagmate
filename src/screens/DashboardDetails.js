@@ -289,7 +289,7 @@ class DashboardDetails extends Component {
 
   render()
   {
-    const {item, confirmedGuestList, customTitle, bgImage, unreadChatCount, optedOut} = this.state;
+    const {item, confirmedGuestList, unreadChatCount, optedOut} = this.state;
     console.log('DashboardScreen is displaying the item with ID: ', item.id);
     var statusStr = 'Not available';
     let host = 'Anonymous';
@@ -308,7 +308,7 @@ class DashboardDetails extends Component {
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
-      <Card featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: bgImage}}>
+      <Card featuredTitle={item.customTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: item.bgImage}}>
           <ListItem
               title={host}
               titleStyle={adourStyle.listItemText}

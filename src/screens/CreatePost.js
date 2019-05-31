@@ -38,7 +38,7 @@ class CreatePost extends Component{
     }
 
     componentDidMount() {
-
+      this._isMounted = true;
       let user = firebase.auth().currentUser;
       if (user != null) {
         uid = user.uid;
@@ -47,10 +47,15 @@ class CreatePost extends Component{
       // Get name of the user
       getFullName(uid).then(selfName=>
       {
-        this.setState({selfName:selfName});
+        if(this._isMounted) this.setState({selfName:selfName});
         console.log('selfName ', this.state.selfName)
       });
 
+    }
+
+    componentWillUnmount()
+    {
+        this._isMounted = false;
     }
 
     _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
@@ -134,15 +139,17 @@ class CreatePost extends Component{
             });
             */
 
+            /* TESTER
+
             getFullName(uid).then(fullName=>
             {
               getNetworkId(uid).then(networkId => {
                 console.log(`when: ${when}, details: ${details}, anonymous: ${anonymous}, customTitle: ${customTitle}, fullName: ${fullName}, networkId: ${networkId}, bgImage: ${bgImage}`);
               })
             })
+            */
 
             //ENABLING CLOUD BASED POST FUNCTION
-            /*
             const createNewPost = firebase.functions().httpsCallable('createNewPost');
 
             getFullName(uid).then(fullName=>
@@ -160,7 +167,6 @@ class CreatePost extends Component{
                 })
               })
             });
-            */
         }
     }
 
@@ -179,7 +185,7 @@ class CreatePost extends Component{
     if(selectedServiceId != "custom")
     {
       getServiceItem(selectedServiceId).then(serviceItem => {
-      this.setState({selectedServiceItem: serviceItem, bgImage: serviceItem.img,  customTitle: serviceItem.title})
+      if(this._isMounted) this.setState({selectedServiceItem: serviceItem, bgImage: serviceItem.img,  customTitle: serviceItem.title})
       })
     } else {
       //the user has selected custom service, populate title and image with custom service ones
@@ -288,10 +294,11 @@ const styles = StyleSheet.create({
     },
     dateTimeStyle: {
       height: 45,
-      width: WIDTH - 120,
+      width: WIDTH - 110,
       backgroundColor: 'rgba(54, 105, 169, 0.2)',
       justifyContent: 'center',
       marginBottom: 20,
+      marginLeft: 15
     },
     buttonTextStyle: {
       fontFamily:'OpenSans-Semibold',
