@@ -1,4 +1,4 @@
-// This screen shows tasks requested and accepted by the user.
+// This screen shows tasks hosting and attending by the user.
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
@@ -16,11 +16,11 @@ class DashboardScreen extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        active:0, // Determines active tab: Requested Tasks or Accepted Tasks. Default: Accepted.
+        active:0, // Determines active tab: hosting Tasks or attending Tasks. Default: attending.
         fetching:false,
-        acceptedBadge: false,
-        requested:[], // Array of requested services
-        accepted:[], // Array of accepted tasks
+        attendingBadge: false,
+        hosting:[], // Array of hosting services
+        attending:[], // Array of attending tasks
       }
       this.runFirebaseListeners = this.runFirebaseListeners.bind(this);
       this.updateIndex = this.updateIndex.bind(this);
@@ -59,19 +59,19 @@ class DashboardScreen extends Component {
       let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
       //Get all the posts that this user is a host of
       userPostRef.child('host').on('child_added', (snapshot) => {
-        let request  = snapshot.val()
+        let post = snapshot.val()
         //Check for unread msg count START
-        if(request.status != 0)
+        if(post.status != 0)
         {
-          firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(unreadSnapshot)
+          firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
           {
             if(unreadSnapshot.val() != null){
-              request.unreadMsgs = unreadSnapshot.val();
+              post.unreadMsgs = unreadSnapshot.val();
             }
           });
         }
         //Check for unread msg count END
-        this.setState({requested:[request].concat(this.state.requested)});
+        this.setState({hosting:[post].concat(this.state.hosting)});
         if(this._isMounted) this.setState({fetching:false});
       });
 
@@ -80,23 +80,23 @@ class DashboardScreen extends Component {
       userPostRef.child('host').on('child_removed', (snapshot) => {
           // Remove it from both arrays:
           if(this._isMounted)
-          this.setState({requested: this.state.requested.filter(item => item.id !== snapshot.key)});
+          this.setState({hosting: this.state.hosting.filter(item => item.id !== snapshot.key)});
       });
 
       // When a post object that the user is hosting changes on the realtime database, update its local state
       userPostRef.child('host').on('child_changed', (snapshot) => {
-        var request = snapshot.val(); //this is the post object that changed
-        let req = []; // creating a new array for this.state.requested;
+        var post = snapshot.val(); //this is the post object that changed
+        let host_arr = []; // creating a new array for this.state.hosting;
         console.log('host changed. mounted? ', this._isMounted)
         if(this._isMounted)
         {
           //Look for the post locally that changed in the realtime database
-          this.state.requested.map(item =>
+          this.state.hosting.map(item =>
           {
-            if(item.id == request.id) req.push(request); //if we find it, add the updated post to the array
+            if(item.id == post.id) req.push(post); //if we find it, add the updated post to the array
             else req.push(item); // add all other posts as they were into the array
           });
-          this.setState({requested:req});
+          this.setState({hosting:req});
         }
       });
 
@@ -121,47 +121,47 @@ class DashboardScreen extends Component {
 
       //Get all the posts that this user is a guest of
       userPostRef.child('guest').on('child_added', (snapshot) => {
-        let request  = snapshot.val()
+        let post  = snapshot.val()
 
         //Check for unread msg count for guest START
-        if(request.status != 0)
+        if(post.status != 0)
         {
           let unreadAv = false;
-          firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(unreadSnapshot)
+          firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
           {
             if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
-              request.unreadMsgs = unreadSnapshot.val();
+              post.unreadMsgs = unreadSnapshot.val();
               unreadAv = true;
             }
           }).then(result => {
-              if(unreadAv) this.setState({acceptedBadge: true})
+              if(unreadAv) this.setState({attendingBadge: true})
             })
         }
         //Check for unread msg count END
-        this.setState({accepted:[request].concat(this.state.accepted)});
+        this.setState({attending:[post].concat(this.state.attending)});
       });
 
       userPostRef.child('guest').on('child_removed', (snapshot) => {
           // Remove it from both arrays:
           if(this._isMounted)
-          this.setState({accepted: this.state.accepted.filter(item => item.id !== snapshot.key)});
+          this.setState({attending: this.state.attending.filter(item => item.id !== snapshot.key)});
       });
 
 
       // When a post object that the user is hosting changes on the realtime database, update its local state
       userPostRef.child('guest').on('child_changed', (snapshot) => {
-        var request = snapshot.val(); //this is the post object that changed
-        let acc = []; // creating a new array for this.state.requested;
+        var post = snapshot.val(); //this is the post object that changed
+        let guest_arr = []; // creating a new array for this.state.hosting;
 
         if(this._isMounted)
         {
           //Look for the post locally that changed in the realtime database
-          this.state.accepted.map(item =>
+          this.state.attending.map(item =>
           {
-            if(item.id == request.id) acc.push(request); //if we find it, add the updated post to the array
+            if(item.id == post.id) acc.push(post); //if we find it, add the updated post to the array
             else acc.push(item); // add all other posts as they were into the array
           });
-          this.setState({accepted:acc});
+          this.setState({attending:acc});
         }
       });
 
@@ -173,12 +173,12 @@ class DashboardScreen extends Component {
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
         var ob = snapshot.val();
         //iterate through and look for a matching item Id with the changed object
-        let req = [];//this.state.requested;
-        let acc = [];//this.state.accepted;
+        let host_arr = [];//this.state.hosting;
+        let guest_arr = [];//this.state.attending;
 
         if(this._isMounted)
         {
-            this.state.requested.map(item =>
+            this.state.hosting.map(item =>
           {
             if(item.id == ob.taskId){
               item.unreadMsgs = ob.unreadCount;
@@ -186,7 +186,7 @@ class DashboardScreen extends Component {
             }
             else req.push(item);
           });
-          this.state.accepted.map(item =>
+          this.state.attending.map(item =>
           {
             if(item.id == ob.taskId){
               item.unreadMsgs = ob.unreadCount;
@@ -195,15 +195,15 @@ class DashboardScreen extends Component {
             else acc.push(item);
           });
 
-          //If no unread msgs are left in accepted, disable the mini badge
+          //If no unread msgs are left in attending, disable the mini badge
           let unreadMsgTasks = [];
-          unreadMsgTasks = this.state.accepted.filter(item => item.unreadMsgs != 0 && item.unreadMsgs != undefined)
+          unreadMsgTasks = this.state.attending.filter(item => item.unreadMsgs != 0 && item.unreadMsgs != undefined)
           console.log('unreadMsgTasks', unreadMsgTasks);
-          if(unreadMsgTasks.length == 0) this.setState({acceptedBadge: false})
-          if(unreadMsgTasks.length != 0) this.setState({acceptedBadge: true})
+          if(unreadMsgTasks.length == 0) this.setState({attendingBadge: false})
+          if(unreadMsgTasks.length != 0) this.setState({attendingBadge: true})
 
-          this.setState({requested:req});
-          this.setState({accepted:acc});
+          this.setState({hosting:req});
+          this.setState({attending:acc});
         }
 
       })
@@ -218,7 +218,7 @@ class DashboardScreen extends Component {
     userGuideContainer = (active) =>
     {
       if(active){
-          if(this.state.accepted.length == 0) {
+          if(this.state.attending.length == 0) {
             //Get Display Name
             let user = firebase.auth().currentUser;
             let displayName;
@@ -227,14 +227,14 @@ class DashboardScreen extends Component {
             }
             return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                       <Text style={adourStyle.guideText}>
-                      Hello {displayName} {"\n"} {"\n"}You haven't accepted any conversation requests yet. {"\n"} {"\n"}
+                      Hello {displayName} {"\n"} {"\n"}You do not have any upcoming gatherings. {"\n"} {"\n"}
                       "Twenty years from now, you will be more disappointed by the things you didn't do than by the ones you did do." - Mark Twain
                       </Text>
                     </View>
           }
       } else {
 
-        if(this.state.requested.length == 0) {
+        if(this.state.hosting.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                     <Text style={adourStyle.guideText}>
                     It's pitch white in here! {"\n"} {"\n"} Magic lies outside your comfort zone. {"\n"}{"\n"}
@@ -296,7 +296,7 @@ class DashboardScreen extends Component {
     }
 
     render() {
-        const {fetching, accepted, requested, active, acceptedBadge} = this.state
+        const {fetching, attending, hosting, active, attendingBadge} = this.state
         const buttons = ['Hosting', 'Attending']
 
         return (
@@ -309,14 +309,14 @@ class DashboardScreen extends Component {
                   textStyle={adourStyle.buttonText}
                   containerStyle={{height: 45}}
                 />
-                {acceptedBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
+                {attendingBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
             </View>
               {!fetching && this.userGuideContainer(active)}
 
               {
                 !fetching &&  <FlatList
-                    data={(active == 0)?requested:accepted}
-                    extraData={(active == 0)?requested:accepted}
+                    data={(active == 0)?hosting:attending}
+                    extraData={(active == 0)?hosting:attending}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />
