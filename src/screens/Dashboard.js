@@ -1,25 +1,28 @@
-// This screen shows tasks requested and accepted by the user.
+// This screen shows tasks hosting and attending by the user.
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
-import {getAllRelatedTasks, getWhatsapp, getAllServices, countServicesRequests, isConfirmedAcceptor} from "../lib/firebaseUtils";
+import {countallPosts, isConfirmedAcceptor, deleteForever, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
 
+let uid;
+
 class DashboardScreen extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        active:0, // Determines active tab: Requested Tasks or Accepted Tasks. Default: Accepted.
+        active:0, // Determines active tab: hosting Tasks or attending Tasks. Default: attending.
         fetching:false,
-        acceptedBadge: false,
-        requested:[], // Array of requested services
-        accepted:[], // Array of accepted tasks
+        attendingBadge: false,
+        hosting:[], // Array of hosting services
+        attending:[], // Array of attending tasks
       }
-      this.getAllRelatedTasks = this.getAllRelatedTasks.bind(this);
+      this.runFirebaseListeners = this.runFirebaseListeners.bind(this);
       this.updateIndex = this.updateIndex.bind(this);
     }
 
@@ -29,184 +32,181 @@ class DashboardScreen extends Component {
 
     componentDidMount(){
       this._isMounted = true;
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
       this.setState({fetching:true});
-      //countServicesRequests(); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
-      getAllServices().then(services => // Get all possible services, then:
-      {
-        this.setState({services});
-        this.getAllRelatedTasks();
-      });
+
+      //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
+      //this.sendPushNotificationToHosts(hard code network Id here); //THIS IS A MANUAL CLOUD FUNCTION FOR ADMINS ONLY
+
+      this.runFirebaseListeners();
     }
 
     componentWillUnmount(){
       this._isMounted = false;
     }
 
-    // Home to all the listeners for the service request objects:
-    getAllRelatedTasks = () => {
-      const {currentUser: {uid} = {}} = firebase.auth()
+    runFirebaseListeners = () => {
+      this.hostedPostsListeners();
+      this.guestPostsListeners();
+      this.unreadMsgListeners();
+    }
 
-      var ref = firebase.database().ref('servicesRequests')
-
-      // When a new service request object is added:
-      ref.on('child_added', (snapshot) => {
-        if(this._isMounted) this.setState({fetching:false});
-        var request = snapshot.val();
-        //Checking if this task object has the property anonymous. If the task object has the property anonymous that means it is a post from v2 of the app. Posts from old version do not have this property
-        // We do this to ensure we only show posts from the new version of the app
-        if(request.anonymous != undefined)
+    // Home to all the listeners for fetching the user's hosted posts
+    hostedPostsListeners = () => {
+      let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
+      //Get all the posts that this user is a host of
+      userPostRef.child('host').on('child_added', (snapshot) => {
+        let post = snapshot.val()
+        //Check for unread msg count START
+        if(post.status != 0)
         {
-
-
-            //If the user is the requester, and it is not a cancelled activity add to requested array:
-          if(request.clientId == uid && (request.status < 3) && this._isMounted){
-            //Add a new property to see how many unread msgs this user has in this task
-            if(request.status != 0)
-            {
-              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
-              {
-                if(snapshot.val() != null){
-                  request.unreadMsgs = snapshot.val();
-                }
-              });
+          firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
+          {
+            if(unreadSnapshot.val() != null){
+              post.unreadMsgs = unreadSnapshot.val();
             }
-
-            this.setState({requested:[request].concat(this.state.requested)});
-          }
-          //If the user is the confirmed accepter, add to accepted array:
-          isConfirmedAcceptor(uid, request.id).then(result => {
-            if( result && (request.status < 3) && this._isMounted) {
-              //Add a new property to see how many unread msgs this user has in this task
-              if(request.status != 0)
-              {
-                let unreadAv = false;
-                firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
-                {
-
-                  if(snapshot.val() != null && snapshot.val() != 0){
-                    request.unreadMsgs = snapshot.val();
-                    unreadAv = true;
-                  }
-                }).then(result => {
-                  if(unreadAv) this.setState({acceptedBadge: true})
-                })
-              }
-              this.setState({accepted:[request].concat(this.state.accepted)});
-            }
-          })
-
-
+          });
         }
+        //Check for unread msg count END
+        this.setState({hosting:[post].concat(this.state.hosting)});
+        if(this._isMounted) this.setState({fetching:false});
       });
 
-      // When an existing service request object is removed:
-      ref.on('child_removed', (snapshot) => {
+      if(this._isMounted) this.setState({fetching:false});
+
+      userPostRef.child('host').on('child_removed', (snapshot) => {
           // Remove it from both arrays:
           if(this._isMounted)
-          this.setState({
-            requested: this.state.requested.filter(item => item.id !== snapshot.key),
-            accepted: this.state.accepted.filter(item => item.id !== snapshot.key),
-          });
+          this.setState({hosting: this.state.hosting.filter(item => item.id !== snapshot.key)});
       });
 
-      // When contents of an existing service request object are changed:
-      ref.on('child_changed', (snapshot) => {
-        var request = snapshot.val();
-        // If it is a service request the user has recently unmatched, it means the user is neither the server or the client anymore. Remove it from the accepted array:
-        if(request.serverId != uid && request.clientId != uid && this._isMounted){
-          this.setState({accepted: this.state.accepted.filter(function(element) {
-              return element.id !== request.id
-          })});
-        }
-
-        //If the user is the confirmed accepter, add to accepted array:
-        isConfirmedAcceptor(uid, request.id).then(result => {
-          if( result && (request.status < 3) && this._isMounted){
-            //Add a new property to see how many unread msgs this user has in this task
-            //unread msg check start
-            if(request.status != 0)
-            {
-              let unreadAv = false;
-              firebase.database().ref(`/users/${uid}/messages/${request.id}/unreadCount`).once("value", function(snapshot)
-              {
-
-                if(snapshot.val() != null && snapshot.val() != 0){
-                  request.unreadMsgs = snapshot.val();
-                  unreadAv = true;
-                }
-              }).then(result => {
-                if(unreadAv) this.setState({acceptedBadge: true})
-              })
-            }
-            //unread msg check end
-            this.setState({accepted:[request].concat(this.state.accepted)});
-          }
-          // Do nothing if the service request was not related to the user:
-          //if(request.clientId != uid && request.serverId != uid) return;
-          // Else, find it in the arrays and replace it with the new information.
-          else if(this._isMounted)
+      // When a post object that the user is hosting changes on the realtime database, update its local state
+      userPostRef.child('host').on('child_changed', (snapshot) => {
+        var post = snapshot.val(); //this is the post object that changed
+        let hosting_arr = []; // creating a new array for this.state.hosting;
+        console.log('host changed. mounted? ', this._isMounted)
+        if(this._isMounted)
+        {
+          //Look for the post locally that changed in the realtime database
+          this.state.hosting.map(item =>
           {
-            let req = [];//this.state.requested;
-            let acc = [];//this.state.accepted;
-
-            this.state.requested.map(item =>
-            {
-              if(item.id == request.id) req.push(request);
-              else req.push(item);
-            });
-            this.state.accepted.map(item =>
-            {
-              if(item.id == request.id && item.clientId != uid) acc.push(request);
-              else acc.push(item);
-            });
-
-            this.setState({requested:req});
-            this.setState({accepted:acc});
-          }
-        })
-
-
+            if(item.id == post.id) hosting_arr.push(post); //if we find it, add the updated post to the array
+            else hosting_arr.push(item); // add all other posts as they were into the array
+          });
+          this.setState({hosting:hosting_arr});
+        }
       });
 
+    }
+
+    sendPushNotificationToHosts = (networkId) => {
+      const pushNotifyHostOnManual = firebase.functions().httpsCallable('pushNotifyHostOnManual');
+      pushNotifyHostOnManual({networkId: networkId})
+      .then(({ data }) => {
+        console.log('[Client] Server successfully posted')
+        alert('Push notification sent!')
+      })
+      .catch(HttpsError => {
+          console.log(HttpsError.code); // invalid-argument
+      })
+    }
+
+
+    // Home to all the listeners for fetching the user's hosted posts
+    guestPostsListeners = () => {
+      let userPostRef = firebase.database().ref(`/users/${uid}/posts`);
+
+      //Get all the posts that this user is a guest of
+      userPostRef.child('guest').on('child_added', (snapshot) => {
+        let post  = snapshot.val()
+
+        //Check for unread msg count for guest START
+        if(post.status != 0)
+        {
+          let unreadAv = false;
+          firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
+          {
+            if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
+              post.unreadMsgs = unreadSnapshot.val();
+              unreadAv = true;
+            }
+          }).then(result => {
+              if(unreadAv) this.setState({attendingBadge: true})
+            })
+        }
+        //Check for unread msg count END
+        this.setState({attending:[post].concat(this.state.attending)});
+      });
+
+      userPostRef.child('guest').on('child_removed', (snapshot) => {
+          // Remove it from both arrays:
+          if(this._isMounted)
+          this.setState({attending: this.state.attending.filter(item => item.id !== snapshot.key)});
+      });
+
+
+      // When a post object that the user is hosting changes on the realtime database, update its local state
+      userPostRef.child('guest').on('child_changed', (snapshot) => {
+        var post = snapshot.val(); //this is the post object that changed
+        let attending_arr = []; // creating a new array for this.state.attending;
+
+        if(this._isMounted)
+        {
+          //Look for the post locally that changed in the realtime database
+          this.state.attending.map(item =>
+          {
+            if(item.id == post.id) attending_arr.push(post); //if we find it, add the updated post to the array
+            else attending_arr.push(item); // add all other posts as they were into the array
+          });
+          this.setState({attending:attending_arr});
+        }
+      });
+
+}
+
+    // Listener to check for changes in any of the post's unread msg count
+    unreadMsgListeners = () => {
       //If the user object's message is updated, this means the unread count mustve changed
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
         var ob = snapshot.val();
         //iterate through and look for a matching item Id with the changed object
-        let req = [];//this.state.requested;
-        let acc = [];//this.state.accepted;
+        let hosting_arr = [];//this.state.hosting;
+        let attending_arr = [];//this.state.attending;
 
         if(this._isMounted)
         {
-            this.state.requested.map(item =>
+            this.state.hosting.map(item =>
           {
             if(item.id == ob.taskId){
               item.unreadMsgs = ob.unreadCount;
-              req.push(item);
+              hosting_arr.push(item);
             }
-            else req.push(item);
+            else hosting_arr.push(item);
           });
-          this.state.accepted.map(item =>
+          this.state.attending.map(item =>
           {
             if(item.id == ob.taskId){
               item.unreadMsgs = ob.unreadCount;
-              acc.push(item);
+              attending_arr.push(item);
             }
-            else acc.push(item);
+            else attending_arr.push(item);
           });
 
-          //If no unread msgs are left in accepted, disable the mini badge
+          //If no unread msgs are left in attending, disable the mini badge
           let unreadMsgTasks = [];
-          unreadMsgTasks = this.state.accepted.filter(item => item.unreadMsgs != 0 && item.unreadMsgs != undefined)
+          unreadMsgTasks = this.state.attending.filter(item => item.unreadMsgs != 0 && item.unreadMsgs != undefined)
           console.log('unreadMsgTasks', unreadMsgTasks);
-          if(unreadMsgTasks.length == 0) this.setState({acceptedBadge: false})
-          if(unreadMsgTasks.length != 0) this.setState({acceptedBadge: true})
+          if(unreadMsgTasks.length == 0) this.setState({attendingBadge: false})
+          if(unreadMsgTasks.length != 0) this.setState({attendingBadge: true})
 
-          this.setState({requested:req});
-          this.setState({accepted:acc});
+          this.setState({hosting:hosting_arr});
+          this.setState({attending:attending_arr});
         }
 
       })
-
     }
 
     // Open Dashboard Details screen for the task the user has tapped.
@@ -218,18 +218,23 @@ class DashboardScreen extends Component {
     userGuideContainer = (active) =>
     {
       if(active){
-          if(this.state.accepted.length == 0) {
+          if(this.state.attending.length == 0) {
             //Get Display Name
-            const {currentUser: {displayName} = {}} = firebase.auth();
+            let user = firebase.auth().currentUser;
+            let displayName;
+            if (user != null) {
+              displayName = user.displayName;
+            }
             return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                       <Text style={adourStyle.guideText}>
-                      Hello {displayName} {"\n"} {"\n"}You haven't accepted any conversation requests yet. {"\n"} {"\n"}
+                      Hello {displayName} {"\n"} {"\n"}You do not have any upcoming gatherings. {"\n"} {"\n"}
                       "Twenty years from now, you will be more disappointed by the things you didn't do than by the ones you did do." - Mark Twain
                       </Text>
                     </View>
           }
       } else {
-        if(this.state.requested.length == 0) {
+
+        if(this.state.hosting.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                     <Text style={adourStyle.guideText}>
                     It's pitch white in here! {"\n"} {"\n"} Magic lies outside your comfort zone. {"\n"}{"\n"}
@@ -243,9 +248,8 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, created_at, details, custom, customTitle, interestedCount} = item;
-        const {services} = this.state
-        const {currentUser: {uid} = {}} = firebase.auth()
+        const{id, created_at, details, customTitle, interestedCount} = item;
+        const uid = this.state.uid;
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
         if(interestedCount != null && interestedCount != undefined && item.status == 0){
@@ -254,20 +258,7 @@ class DashboardScreen extends Component {
         } else if (item.status != 0 && item.unreadMsgs != undefined){
           notifications = item.unreadMsgs;
         }
-        var serviceTitle = '---';
-        if(!custom)
-        {
-          // Find service title corresponding to the service ID of the service request:
-          services.map(service => {
-              if(service.id == serviceId)
-              {
-                  serviceTitle = service.title;
-              }
-          });
-        } else {
-          //this is a custom post, get title from post instead of global service object
-          serviceTitle = customTitle;
-        }
+
         // Find appropriate status for current status code:
         var statusStr = 'Not available';
         switch(item.status)
@@ -288,7 +279,7 @@ class DashboardScreen extends Component {
           <View key={id}>
             <View>
                   <ListItem
-                    title={serviceTitle}
+                    title={customTitle}
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
                     subtitle={statusStr}
                     subtitleStyle={adourStyle.listItemText}
@@ -298,14 +289,15 @@ class DashboardScreen extends Component {
                     bottomDivider={true}
                     badge={(notifications!=0)? { value: notifications, status: badgeColor } : null}
                   />
+
             </View>
           </View>
         )
     }
 
     render() {
-        const {fetching, accepted, requested, active, acceptedBadge} = this.state
-        const buttons = ['My Activities', 'Accepted Activities']
+        const {fetching, attending, hosting, active, attendingBadge} = this.state
+        const buttons = ['Hosting', 'Attending']
 
         return (
           <View style={styles.mainContainer}>
@@ -317,14 +309,14 @@ class DashboardScreen extends Component {
                   textStyle={adourStyle.buttonText}
                   containerStyle={{height: 45}}
                 />
-                {acceptedBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
+                {attendingBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
             </View>
               {!fetching && this.userGuideContainer(active)}
 
               {
                 !fetching &&  <FlatList
-                    data={(active == 0)?requested:accepted}
-                    extraData={(active == 0)?requested:accepted}
+                    data={(active == 0)?hosting:attending}
+                    extraData={(active == 0)?hosting:attending}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />

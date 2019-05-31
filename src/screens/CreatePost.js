@@ -3,7 +3,7 @@ import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
-import {postServiceRequest,canRequestMore, getServiceItem, getFullName, createCustomService} from "../lib/firebaseUtils";
+import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getFullName} from "../lib/firebaseUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
@@ -12,7 +12,9 @@ const { width: WIDTH } = Dimensions.get('window');
 
 const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 
-class RequestDetails extends Component{
+let uid;
+
+class CreatePost extends Component{
   	constructor(props) {
         super(props);
         this.state = {
@@ -22,6 +24,7 @@ class RequestDetails extends Component{
             anonymous: false,
             selfName:'',
             customTitle: '',
+            bgImage:'http://chillmateapp.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',
@@ -35,12 +38,24 @@ class RequestDetails extends Component{
     }
 
     componentDidMount() {
-      const {currentUser: {uid} = {}} = firebase.auth();
+      this._isMounted = true;
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
+
       // Get name of the user
       getFullName(uid).then(selfName=>
       {
-        this.setState({selfName:selfName});
+        if(this._isMounted) this.setState({selfName:selfName});
+        console.log('selfName ', this.state.selfName)
       });
+
+    }
+
+    componentWillUnmount()
+    {
+        this._isMounted = false;
     }
 
     _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
@@ -78,8 +93,7 @@ class RequestDetails extends Component{
         else
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
-            const {currentUser: {uid} = {}} = firebase.auth();
-            const {when, details, anonymous, selectedServiceId, selectedServiceItem, customTitle} = this.state;
+            const {when, details, anonymous, selectedServiceId, selectedServiceItem, bgImage, customTitle} = this.state;
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
@@ -112,14 +126,46 @@ class RequestDetails extends Component{
             createCustomService(customTitle).then(newServiceId => {
               postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, custom: custom, customTitle: customTitle}).then(res => {
               this.setState({disabledBtn:false}); // Enable the button again
-              this.props.navigation.navigate('Tasks');
+              this.props.navigation.navigate('Home');
               });
             })
           }
           */
+
+          /* DISABLING LOCAL POST FUNCTION
             postServiceRequest({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle}).then(res => {
             this.setState({disabledBtn:false}); // Enable the button again
             this.props.navigation.goBack();
+            });
+            */
+
+            /* TESTER
+
+            getFullName(uid).then(fullName=>
+            {
+              getNetworkId(uid).then(networkId => {
+                console.log(`when: ${when}, details: ${details}, anonymous: ${anonymous}, customTitle: ${customTitle}, fullName: ${fullName}, networkId: ${networkId}, bgImage: ${bgImage}`);
+              })
+            })
+            */
+
+            //ENABLING CLOUD BASED POST FUNCTION
+            const createNewPost = firebase.functions().httpsCallable('createNewPost');
+
+            getFullName(uid).then(fullName=>
+            {
+              getNetworkId(uid).then(networkId => {
+                createNewPost({when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName, networkId: networkId, bgImage: bgImage})
+                .then(({ data }) => {
+                  console.log('[Client] Server successfully posted')
+                  alert('Posted Successfully. You can find it on your Dashboard.')
+                  this.setState({disabledBtn:false}); // Enable the button again
+                  this.props.navigation.goBack();
+                })
+                .catch(HttpsError => {
+                    console.log(HttpsError.code); // invalid-argument
+                })
+              })
             });
         }
     }
@@ -132,15 +178,14 @@ class RequestDetails extends Component{
     }
 
   render(){
-    const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, selfName, customService } = this.state;
+    const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
     const {services = [], fetching} = this.props;
-
 
     //Get the service item of the selected service ID so that we can update the title and image in realtime
     if(selectedServiceId != "custom")
     {
       getServiceItem(selectedServiceId).then(serviceItem => {
-      this.setState({selectedServiceItem: serviceItem})
+      if(this._isMounted) this.setState({selectedServiceItem: serviceItem, bgImage: serviceItem.img,  customTitle: serviceItem.title})
       })
     } else {
       //the user has selected custom service, populate title and image with custom service ones
@@ -236,7 +281,7 @@ const mapStateToProps = ({profile: {fetching, services = []} = {}}, props) => {
     }
 }
 
-export default connect(mapStateToProps, {fetchAllServices})(RequestDetails);
+export default connect(mapStateToProps, {fetchAllServices})(CreatePost);
 
 const styles = StyleSheet.create({
 		backgroundContainer: {
@@ -249,10 +294,11 @@ const styles = StyleSheet.create({
     },
     dateTimeStyle: {
       height: 45,
-      width: WIDTH - 120,
+      width: WIDTH - 110,
       backgroundColor: 'rgba(54, 105, 169, 0.2)',
       justifyContent: 'center',
       marginBottom: 20,
+      marginLeft: 15
     },
     buttonTextStyle: {
       fontFamily:'OpenSans-Semibold',

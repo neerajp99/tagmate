@@ -134,7 +134,7 @@ class Loading extends Component {
             const {authToken = ''} = this.props
             const {notifType} = notification
             if(wasAppClosed && !_.isEmpty(currentUser)) {
-                if(notifType == 'SERVICE_REQUEST') this.props.navigation.navigate('Tasks')
+                if(notifType == 'SERVICE_REQUEST') this.props.navigation.navigate('Home')
                 else if(notifType == 'FOUND_ACCEPTOR') this.props.navigation.navigate('Chat', { whatsapp: notification.whatsapp })
                 //const {_data: {notifType, serviceId} = {}} = notification
             }

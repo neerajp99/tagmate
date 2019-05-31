@@ -4,6 +4,7 @@ import firebase, { config } from 'react-native-firebase';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {connect} from 'react-redux';
 import {loginUser, loginGoogleUser,addNewGoogleUser} from '../../actions';
+import {populateUserServices, addNetworkDetails} from '../../lib/firebaseUtils';
 import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -33,6 +34,7 @@ class Login extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    firebase.database().goOnline()
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
       /*
@@ -86,16 +88,28 @@ class Login extends Component {
       const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);
-      let allow = (currentUser.user.email.slice(-14) === '@ashoka.edu.in');
-      let allowYC = (currentUser.user.email.slice(-16) === '@ycombinator.com');
-      if(allow || allowYC)
+
+      //India
+      let eduIn = (currentUser.user.email.slice(-7) === '.edu.in');
+      let acIn = (currentUser.user.email.slice(-6) === '.ac.in');
+      //USA & others
+      let edu = (currentUser.user.email.slice(-4) === '.edu');
+      //UK
+      let acUk = (currentUser.user.email.slice(-6) === '.ac.uk');
+
+      //let allowYC = (currentUser.user.email.slice(-16) === '@ycombinator.com');
+
+      if(eduIn || acIn || edu || acUk)
       {
         await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
         if(this._isMounted)
         {
-          this.setState({loading:false});
-          this.populateUserServices();
-          this.props.navigation.navigate('MainStack')
+          populateUserServices(currentUser).then(res => {
+            addNetworkDetails(currentUser).then(lastRes => {
+              this.setState({loading:false});
+              this.props.navigation.navigate('MainStack');
+            })
+          })
         }
       }
       else if(this._isMounted)
@@ -118,29 +132,52 @@ class Login extends Component {
     }
   }
 
+  addNetworkDetails = (currentUser) => {
+    let email = currentUser.user.email;
+    let domain = email.substring(email.lastIndexOf("@") +1);
+    let uniqueDomainCode = domain.replace(/\./g,'x')
+    let name = domain.slice(0, domain.indexOf(".") );
+    name = name.charAt(0).toUpperCase() + name.slice(1);
 
-  populateUserServices = () => {
+    let network = {
+      domain: domain,
+      name: name,
+      id: uniqueDomainCode
+    }
+    console.log('network: ', network);
+    console.log('checking if firebase user email stayed intact: ', currentUser.user.email)
+    firebase.database().ref(`/users/${currentUser.user.uid}/network`).update(network).then(res => {
+      firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.user.uid}`).set(true)
+    });
+  }
+
+  populateUserServices = (currentUser) => {
     let servicesCount = 0
     let services = []
-    const {currentUser} = firebase.auth();
+    console.log('currentUser: ', currentUser)
     console.log('Inside populate user services in Login js')
     //userRef.child(`services`).set(myServices);
-    firebase.database().ref(`/users/${currentUser.uid}/services`).once('value').then(snapshot => {
+    firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
+      console.log('inside firebase snapshot 1')
     if (snapshot.val() === null ) {
+      console.log('inside firebase snapshot 2')
       //Get the count of all available services
       firebase.database().ref('/services').once('value', function(snapshot) {
+        console.log('inside firebase snapshot 3')
          servicesCount = snapshot.numChildren();
          for(i = 1; i<servicesCount+1; i++){
            services.push('service' + i)
          }
          console.log('Populating new user object with all services by default')
-         var ref = firebase.database().ref(`/users/${currentUser.uid}`);
+         var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
          ref.child(`services`).set(services);
+         console.log('inside firebase snapshot 4')
 
 
        },
        function(error) {
         // The callback failed.
+        console.log('inside firebase snapshot ERROR')
         console.error(error);
       });
     }
@@ -178,7 +215,7 @@ class Login extends Component {
           {
             this.state.invalid_email &&
             <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
-              Please use your Ashoka email.
+              Please use your university email to login.
             </Text>
           }
           {/*

@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
 import IconWithBadge from "./screens/IconWithBadge";
-import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, RequestDetails, TaskScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import ActivityChat from './screens/ActivityChat';
@@ -78,11 +78,11 @@ export const RequestStack = createStackNavigator(
   }
 )
 
-// Stack Navigator for Tasks screen:
-export const TaskStack = createStackNavigator(
+// Stack Navigator for Home screen:
+export const HomeStack = createStackNavigator(
   {
-    TaskScreen: {
-      screen: TaskScreen,
+    HomeScreen: {
+      screen: HomeScreen,
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: (<Image source={require('./img/logo_black.png')}/>),
@@ -90,8 +90,8 @@ export const TaskStack = createStackNavigator(
         }
       }
     },
-    RequestDetails: {
-      screen: RequestDetails,
+    CreatePost: {
+      screen: CreatePost,
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Create A Post',
@@ -148,7 +148,7 @@ export const DashboardStack = createStackNavigator(
 export const MainTabNav = createBottomTabNavigator(
   {
     Chillmate: {
-      screen: TaskStack,
+      screen: HomeStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (
           <Icon name='call-to-action' size={horizontal ? 20 : 25} color={tintColor} />

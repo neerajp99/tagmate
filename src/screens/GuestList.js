@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Card, ListItem, Button} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking, FlatList, ScrollView, Dimensions, TouchableOpacity} from 'react-native'
-import {getName, getLastName, finalizeGuestList} from "../lib/firebaseUtils";
+import {getName, getLastName, finalizeGuestList, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";
 import {fetchAllServices} from "../actions";
@@ -10,6 +10,7 @@ import {canRequestMore} from '../lib/firebaseUtils.js';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
+let uid;
 
 class GuestList extends Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class GuestList extends Component {
           myTasks: [],
           guestList: [],
           disabledBtn: false,
-          item:{id:this.props.navigation.state.params.taskId}, // Loading service request's ID which was passed on
+          item:{id:this.props.navigation.state.params.taskId, hostId:this.props.navigation.state.params.hostId}, // Loading service request's ID which was passed on
           fetching: false,
       };
   }
@@ -26,8 +27,14 @@ class GuestList extends Component {
   componentDidMount(){
       this._isMounted = true;
       this.setState({fetching:true});
-      this.getGuestList();
-
+      let user = firebase.auth().currentUser;
+      if (user != null) {
+        uid = user.uid;
+      }
+      getNetworkId(uid).then(networkId => {
+        this.setState({networkId});
+        this.getGuestList();
+      })
   }
 
   componentWillUnmount()
@@ -39,7 +46,8 @@ class GuestList extends Component {
     getGuestList = () => {
       if(this._isMounted)
       {
-          var ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds`);
+          let networkId = this.state.networkId;
+          var ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds`);
           console.log('inside getGuestList');
           ref.on('value', (snapshot) => {
           if(snapshot.val() == null){
@@ -65,12 +73,14 @@ class GuestList extends Component {
     }
 
     acceptGuest = (id) => {
-      ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
+      let networkId = this.state.networkId;
+      ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 1})
     }
 
     rejectGuest = (id) => {
-      ref = firebase.database().ref(`servicesRequests/${this.state.item.id}/acceptorIds/${id}`);
+      let networkId = this.state.networkId;
+      ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 2})
     }
 
@@ -85,7 +95,7 @@ class GuestList extends Component {
         return;
       }
       if(!incomplete){
-        finalizeGuestList(this.state.item.id, this.state.item.clientId).then(result => {
+        finalizeGuestList(this.state.item.id, this.state.item.hostId).then(result => {
           if(result){
             alert('Guest List Finalised');
             this.props.navigation.navigate('DashboardDetails',{taskId: this.state.item.id});

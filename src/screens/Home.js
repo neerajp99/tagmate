@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, addServer, appendRejectedTask, getRelatedServices, alreadyAccepted, addAcceptor, getAcceptors, getRejectedTasks} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -17,14 +17,14 @@ const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
 //Test commit
 
 const { width: WIDTH } = Dimensions.get('window')
+let uid;
 
-class TaskScreen extends Component {
+class HomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
             myTasks: [],
-            rejectedTasks: [],
-            myServices: [],
+            hiddenPosts: [],
             fetching: false,
         };
         this.getMyTasks = this.getMyTasks.bind(this);
@@ -33,7 +33,10 @@ class TaskScreen extends Component {
     componentDidMount(){
         this._isMounted = true;
         this.setState({fetching:true});
-        const {currentUser: {uid} = {}} = firebase.auth()
+        let user = firebase.auth().currentUser;
+        if (user != null) {
+          uid = user.uid;
+        }
         // TEMPORARY
         //getAcceptors("testServiceRequest").then(response => {
         //  console.log("Returned from getAcceptors: ", response);
@@ -43,17 +46,15 @@ class TaskScreen extends Component {
         //})
         //addAcceptor("VineetNand999", "testServiceRequest"); //TEMPORARY
 
-        getRelatedServices(uid).then(services =>
-        {
-            this.setState(services);
-            console.log('relatedServices:',services);
-            // Keep updating tasks
-            getRejectedTasks(uid).then(rejectedTaskList => {
-              this.setState({rejectedTasks: rejectedTaskList});
-              console.log('rejectedTasks state: ', this.state.rejectedTasks);
-              this.getMyTasks();
-            })
-        });
+        // Keep updating tasks
+        getHiddenPosts(uid).then(hiddenPostList => {
+          this.setState({hiddenPosts: hiddenPostList});
+
+          getNetworkId(uid).then(networkId => {
+            this.setState({networkId: networkId});
+            this.getMyTasks();
+          })
+        })
         this.tokenFunc();
     }
     componentWillUnmount()
@@ -91,95 +92,28 @@ class TaskScreen extends Component {
     * get all the task requests that this user can perform
     * */
     getMyTasks = () => {
-        const {currentUser: {uid} = {}} = firebase.auth()
+        let networkId = this.state.networkId;
+        let livePostsRef = firebase.database().ref(`networks/${networkId}/livePosts`)
+        livePostsRef.on('child_added', (snapshot) => {
 
-        // Load the service request IDs for the ones the user has rejected and push them to the state.
-        /*
-        firebase.database().ref(`users/${uid}/rejectedTasks`).on('child_added', (snapshot) => {
-            var rejectId = snapshot.val();
-            if(this._isMounted) this.setState({myTasks: this.state.myTasks.filter(item => item.id !== rejectId), rejectedTasks: this.state.rejectedTasks.concat([rejectId])});
-            console.log('triggered',this.state.rejectedTasks);
-        });
-
-
-        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
-            var rejectId = snapshot.val();
-            if(this._isMounted){
-              this.setState({
-                myTasks: this.state.myTasks.filter(item => item.id !== rejectId),
-                rejectedTasks: this.state.rejectedTasks.concat([rejectId])
-              });
-            }
-            console.log('triggered',this.state.rejectedTasks);
-        });
-        */
-
-        var ref = firebase.database().ref('servicesRequests')
-
-        // When a service request object is added to the realtime database:
-        ref.on('child_added', (snapshot) => {
-            if(this._isMounted)
-            {
-                var request = snapshot.val();
-                alreadyAccepted(uid, request.id).then(alreadyAcc => {
-                  if(
-                      request.clientId != uid // This request is not made by same user.
-                      && request.status == 0 // This request is still not set as CONFIRMED by the host
-                      && !alreadyAcc // This user has not already accepted this request
-                      //&& _.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                      && !_.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                      )
-                      this.setState({myTasks:[request].concat(this.state.myTasks)});
-                })
-                // To hide activity indicator:
-                if(this.state.fetching) this.setState({fetching:false});
-            }
-
-        });
-
-        // If a service request object is removed from the realtime database:
-        /*
-        ref.on('child_removed', (snapshot) => {
-            if(this._isMounted)this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
-        });
-        */
-
-        // If an existing service request object is changed in the realtime database:
-        ref.on('child_changed', (snapshot) => {
-            if(this._isMounted)
-            {
-                var request = snapshot.val();
-                if(
-                    request.clientId == uid // This request is not made by same user.
-                    || request.status != 0 // This request is still not set as CONFIRMED by the host
-                    //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                    || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                    )
-                this.setState({myTasks: this.state.myTasks.filter(item => item.id !== request.id)});
-            }
-        });
-
-        // If there is a change noted in the services the user offers:
-        firebase.database().ref(`users/${uid}/services`).on('value', (snapshot) => {
-            if(this._isMounted)
-            {
-                this.setState({myServices: snapshot.val() || []});
-                let myTaskss = this.state.myTasks;
-                let toRemove = [];
-                // Filter the currently shown service requests to adjust to the user's new choices:
-                myTaskss.map(request =>
-                {
-                    if(
-                        request.clientId == uid // This request is not made by same user.
-                        || request.status != 0 // This request is still not taken by anyone
-                        //|| !_.includes(this.state.myServices, request.serviceId) // This service is offered by user.
-                        || _.includes(this.state.rejectedTasks, request.id) // Not rejected already
-                        )
-                        toRemove.push(request.id);
-                });
-                this.setState({myTasks: this.state.myTasks.filter(item => !_.includes(toRemove, item.id))});
-            }
+          let request  = snapshot.val()
+          // Check if this request is not made by same user and it is not already decided upon by this user
+          if(request.hostId != uid && !_.includes(this.state.hiddenPosts, request.id))
+          {
+            this.setState({myTasks:[request].concat(this.state.myTasks) , fetching: false});
+          }
+          if(this.state.fetching) this.setState({fetching:false});
         })
+        if(this._isMounted) this.setState({fetching:false});
+
+        livePostsRef.on('child_removed', (snapshot) => {
+          console.log('child_removed, snapshot key is ', snapshot.key)
+          this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
+        })
+
+        //TODO: child_changed - interested Count may change
+
+
     }
 
 
@@ -191,13 +125,11 @@ class TaskScreen extends Component {
         this.setState({myTasks:filteredTasks})
     }
 
-    // Filter the currently shown service requests to adjust to the user's new choices:
-    // It hides the service request corresponding to the ID and appends the ID to user's list of rejected tasks.
-    rejectTask = (id) =>
+    // The user has decided on this card and hence add this card to the user's hidden tasks list so that the app won't show it again
+    decideOnPost = (id) =>
     {
         //this.hideTask(id);
-        const {currentUser: {uid} = {}} = firebase.auth()
-        if(uid) appendRejectedTask(uid, id); // Write into databse that user {uid} rejected task {id}.
+        if(uid) appendHiddenPosts(uid, id);
     }
 
     // This function takes service request ID as parameter.
@@ -205,7 +137,6 @@ class TaskScreen extends Component {
     // If yes, it assigns it to the user and navigates him/her to the DashboardDetails screen.
     acceptTask = (item) =>
     {
-        const {currentUser: {uid} = {}} = firebase.auth()
         if(uid)
         {
             alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
@@ -213,7 +144,7 @@ class TaskScreen extends Component {
                 //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                    addAcceptor(uid, item.id, item.clientId).then(o =>
+                    addAcceptor(uid, item.id, item.hostId).then(o =>
                     {
                       console.log('added as acceptor')
                         //this.hideTask(item.id);
@@ -226,24 +157,9 @@ class TaskScreen extends Component {
     swipableRender(myTasks) {
 
       return myTasks.map((item) => {
-        const {serviceId, id, when, details, anonymous, custom, customTitle, created_at, hostName, interestedCount} = item;
+        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
-        const {allServices} = this.state
-        var serviceTitle = '---';
-        if(!custom)
-        {
-          allServices.map(service => {
-            if(service.id == serviceId)
-            {
-                serviceTitle = service.title;
-                serviceImg = service.img;
-            }
-          });
-        } else {
-          //this is a custom activity, get custom title from post instead of the global service object
-          serviceTitle = customTitle;
-          serviceImg = CUSTOM_IMG;
-        }
+
         if(details == "" || typeof details == "undefined") detailsAvailable = false
 
         let interestAvailable = false;
@@ -261,8 +177,8 @@ class TaskScreen extends Component {
         }
 
         return (
-          <SwipableCard key={id} onSwipedLeft={() => this.rejectTask(id)} onSwipedRight={() => this.acceptTask(item)}>
-          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+          <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
               <ListItem
               title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
@@ -311,17 +227,8 @@ class TaskScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
+        const {id, when, details, customTitle, bgImage, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
-        const {allServices} = this.state
-        var serviceTitle = '---';
-        allServices.map(service => {
-            if(service.id == serviceId)
-            {
-                serviceTitle = service.title;
-                serviceImg = service.img;
-            }
-        });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
 
         let interestAvailable = false;
@@ -340,7 +247,7 @@ class TaskScreen extends Component {
 
         return (
           <View key={id}>
-          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+          <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
           <View>
               <ListItem
               title={anonymous? "Anonymous": hostName}
@@ -380,7 +287,7 @@ class TaskScreen extends Component {
                 title="Create A Post"
                 titleStyle={adourStyle.listItemText}
                 leftIcon={{ name: 'edit' }}
-                onPress={() => this.props.navigation.navigate('RequestDetails')}
+                onPress={() => this.props.navigation.navigate('CreatePost')}
                 containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               />
             </Card>
@@ -407,7 +314,7 @@ class TaskScreen extends Component {
 
 }
 
-export default connect(null, {setDeviceToken}) (TaskScreen);
+export default connect(null, {setDeviceToken}) (HomeScreen);
 
 /*
 * Styles used in this screen

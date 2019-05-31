@@ -5,6 +5,7 @@ import AddDetails from './auth/AddDetails';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window')
+let uid;
 
 class EditProfileDetails extends Component{
 
@@ -15,7 +16,10 @@ class EditProfileDetails extends Component{
   }
 
   render(){
-    const {currentUser: {uid} = {}} = firebase.auth()
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      uid = user.uid;
+    }
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}

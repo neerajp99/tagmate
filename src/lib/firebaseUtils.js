@@ -4,26 +4,27 @@ import {Alert} from 'react-native'
 import * as _ from 'lodash'
 /*
 * method to post the service request.
+OUTDATED / NOT BEING USED. CLOUD FUNCTION IS BEING USED AND IS UPDATED
 * */
 export const postServiceRequest = ({serviceId: serviceId, when: when, details: details, anonymous: anonymous, customTitle: customTitle}) => new Promise((resolve, reject) => {
     try {
         console.log('inside posting Req')
         const {currentUser: {uid} = {}} = firebase.auth()
           getFullName(uid).then(fullName =>{
-            firebaseReferences.SERVICES_REQUESTS.once('value', (snapshot) => {
-                let servicesRequests = snapshot.val()
+            firebase.database().ref(`networks/${networkId}/allPosts`).once('value', (snapshot) => {
+                let allPosts = snapshot.val()
                 let customBool = false;
-                if (_.isEmpty(servicesRequests)) {
-                    servicesRequests = {}
+                if (_.isEmpty(allPosts)) {
+                    allPosts = {}
                 }
                 if (serviceId === 'custom'){
                   customBool = true;
                 }
                 const id = uuid.v4()
-                servicesRequests[id] = {
+                allPosts[id] = {
                   id,
                   serviceId,
-                  clientId: uid,
+                  hostId: uid,
                   when: when,
                   details: details,
                   anonymous: anonymous,
@@ -34,9 +35,13 @@ export const postServiceRequest = ({serviceId: serviceId, when: when, details: d
                   created_at:firebase.database.ServerValue.TIMESTAMP,
                   hostName: fullName,
                 }
-                firebaseReferences.SERVICES_REQUESTS.update(servicesRequests).then(res => {
-                    Alert.alert('Posted Successfully. You can find it on your Dashboard.')
-                    resolve(true)
+                firebase.database().ref(`networks/${networkId}/allPosts`).update(allPosts).then(res => {
+                    let userHostingRef = firebase.database().ref(`/users/${uid}/posts/host/${id}`);
+                    userHostingRef.update({id: id}).then(finalRes => {
+                      console.log('Posted with ID: ', id);
+                      Alert.alert('Posted Successfully. You can find it on your Dashboard.')
+                      resolve(true)
+                    })
                 })
             })
           })
@@ -80,14 +85,79 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-// get the list of all the task IDs that this user has rejected
-export const getRejectedTasks = (uid) => new Promise((resolve, reject) => {
+export const populateUserServices = (currentUser) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`users/${uid}/rejectedTasks`).once('value', (snapshot) => {
+      let servicesCount = 0
+      let services = []
+      console.log('currentUser: ', currentUser)
+      console.log('Inside populate user services in firebaseUtils')
+      //userRef.child(`services`).set(myServices);
+      firebase.database().ref(`/users/${currentUser.user.uid}/services`).once('value').then(snapshot => {
+        console.log('inside firebase snapshot 1')
+      if (snapshot.val() === null ) {
+        console.log('inside firebase snapshot 2')
+        //Get the count of all available services
+        firebase.database().ref('/services').once('value', function(snapshot) {
+          console.log('inside firebase snapshot 3')
+           servicesCount = snapshot.numChildren();
+           for(i = 1; i<servicesCount+1; i++){
+             services.push('service' + i)
+           }
+           console.log('Populating new user object with all services by default')
+           var ref = firebase.database().ref(`/users/${currentUser.user.uid}`);
+           ref.child(`services`).set(services).then(res => {
+             resolve(true)
+           })
+           console.log('inside firebase snapshot 4')
+
+
+         },
+         function(error) {
+          // The callback failed.
+          console.log('inside firebase snapshot ERROR')
+          console.error(error);
+        });
+      }
+      resolve(true)
+    });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const addNetworkDetails = (currentUser) => new Promise((resolve, reject) => {
+    try {
+      let email = currentUser.user.email;
+      let domain = email.substring(email.lastIndexOf("@") +1);
+      let uniqueDomainCode = domain.replace(/\./g,'x')
+      let name = domain.slice(0, domain.indexOf(".") );
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+
+      let network = {
+        domain: domain,
+        name: name,
+        id: uniqueDomainCode
+      }
+      console.log('network: ', network);
+      console.log('checking if firebase user email stayed intact: ', currentUser.user.email)
+      firebase.database().ref(`/users/${currentUser.user.uid}/network`).update(network).then(res => {
+        firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.user.uid}`).set(true).then(lres => {
+          resolve(true)
+        })
+      });
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// get the list of all the task IDs that this user has rejected or accepted
+export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`users/${uid}/hiddenPosts`).once('value', (snapshot) => {
           if(snapshot.val() != undefined){
             let data = snapshot.val();
-            let rejectedTasks = Object.values(data);
-            resolve(rejectedTasks)
+            let hiddenPosts = Object.values(data);
+            resolve(hiddenPosts)
           } else {
             resolve([])
           }
@@ -129,6 +199,7 @@ export const getTotalInterested = (uid) => new Promise((resolve, reject) => {
 
 /*
 * method toget all the task that user with userId can perform
+TO DO: YET TO DEFINE NETWORKID
 * */
 export const getMyTasks = (userId) => new Promise((resolve, reject) => {
     try {
@@ -139,17 +210,17 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
                 return
             }
             // Fetching all tasks
-            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
-                // Fetching all tasks rejected by user {userId}
-                firebase.database().ref(`/users/${userId}/rejectedTasks`).once('value', (snapshotb) => {
+            firebase.database().ref(`networks/${networkId}/allPosts`).once('value', (snapshot) => {
+                // Fetching all tasks decided upon by user {userId}
+                firebase.database().ref(`/users/${userId}/hiddenPosts`).once('value', (snapshotb) => {
                     let myTasks = []
                     const allRequests = snapshot.val() || {}
                     console.log('allRequests: ', allRequests)
                     const keys = Object.keys(allRequests)
-                    const rejectedTasks = snapshotb.val() || {}
+                    const hiddenPosts = snapshotb.val() || {}
                     for (let key of keys) {
-                    // Generating a list of only those tasks which user {userId} can perform, has not rejected, did not create himself and still are available to be accepted.
-                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(rejectedTasks, allRequests[key].id) && allRequests[key].clientId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
+                    // Generating a list of only those tasks which user {userId} can perform, has not decided upon, did not create himself and still are available to be accepted.
+                        if (_.includes(myServices, allRequests[key].serviceId) && !_.includes(hiddenPosts, allRequests[key].id) && allRequests[key].hostId !== userId && typeof allRequests[key].status != "undefined" && allRequests[key].status == 0) {
 
                                 myTasks.push(allRequests[key])
                             }
@@ -171,23 +242,26 @@ export const getMyTasks = (userId) => new Promise((resolve, reject) => {
 export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
     try {
             // Fetching all tasks
-            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
-                let requestedTasks = []
-                let acceptedTasks = []
-                const allRequests = snapshot.val() || {}
-                const keys = Object.keys(allRequests)
-                for (let key of keys)
-                {
-                    console.log("USERID: ",userId);
-                    console.log(allRequests[key].clientId,allRequests[key].serverId);
+            getNetworkId(userId).then(networkId => {
+              firebase.database().ref(`networks/${networkId}/allPosts`).once('value', (snapshot) => {
+                  let requestedTasks = []
+                  let acceptedTasks = []
+                  const allRequests = snapshot.val() || {}
+                  const keys = Object.keys(allRequests)
+                  for (let key of keys)
+                  {
+                      console.log("USERID: ",userId);
+                      console.log(allRequests[key].hostId,allRequests[key].serverId);
 
-                    if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key])
-                    else if(allRequests[key].clientId == userId) requestedTasks.push(allRequests[key])
-                }
-                let allRelatedTasks = {requestedTasks, acceptedTasks}
-                resolve(allRelatedTasks)
-                return
+                      if(allRequests[key].serverId == userId) acceptedTasks.push(allRequests[key])
+                      else if(allRequests[key].hostId == userId) requestedTasks.push(allRequests[key])
+                  }
+                  let allRelatedTasks = {requestedTasks, acceptedTasks}
+                  resolve(allRelatedTasks)
+                  return
+              })
             })
+
         } catch (e) {
             reject(e)
         }
@@ -198,21 +272,24 @@ export const getAllRelatedTasks = (userId) => new Promise((resolve, reject) => {
 export const canRequestMore = (userId) => new Promise((resolve, reject) => {
     try {
             // Fetching all tasks
-            firebase.database().ref('servicesRequests').once('value', (snapshot) => {
-                const allRequests = snapshot.val() || {}
-                const keys = Object.keys(allRequests)
-                var count = 0;
-                for (let key of keys)
-                {
-                    if(allRequests[key].clientId == userId && (allRequests[key].status == 0 || allRequests[key].status == 1)) count++;
-                }
-                getCoins(userId).then(coins => {
-                    console.log('coins',coins,'reqs',count);
-                    if(count >= coins) resolve(false);
-                    else resolve(true);
-                    return;
-                });
+            getNetworkId(userId).then(networkId => {
+              firebase.database().ref(`networks/${networkId}/allPosts`).once('value', (snapshot) => {
+                  const allRequests = snapshot.val() || {}
+                  const keys = Object.keys(allRequests)
+                  var count = 0;
+                  for (let key of keys)
+                  {
+                      if(allRequests[key].hostId == userId && (allRequests[key].status == 0 || allRequests[key].status == 1)) count++;
+                  }
+                  getCoins(userId).then(coins => {
+                      console.log('coins',coins,'reqs',count);
+                      if(count >= coins) resolve(false);
+                      else resolve(true);
+                      return;
+                  });
+              })
             })
+
         } catch (e) {
             reject(e)
         }
@@ -266,35 +343,44 @@ export const getRelatedServices = (userId) => new Promise((resolve, reject) => {
 })
 
 // Check if given task has already been accepted by someone returns boolean
-export const serverExists = (serviceId) => new Promise((resolve, reject) => {
+export const serverExists = (serviceId, userId) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`/servicesRequests/${serviceId}/serverId`).once('value', (snapshot) => {
-            console.log(snapshot.exists()+" <-- ");
-            resolve(snapshot.exists())
+        getNetworkId(userId).then(networkId => {
+          firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/serverId`).once('value', (snapshot) => {
+              console.log(snapshot.exists()+" <-- ");
+              resolve(snapshot.exists())
+          })
         })
+
     } catch (e) {
         reject(e)
     }
 })
 
 // Check if given task has already been accepted by someone returns boolean
-export const confGuestExists = (taskId) => new Promise((resolve, reject) => {
+export const confGuestExists = (taskId, userId) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`servicesRequests/${taskId}/confirmedGuest`).once('value', (snapshot) => {
-            resolve(snapshot.exists())
+        getNetworkId(userId).then(networkId => {
+          firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/confirmedGuest`).once('value', (snapshot) => {
+              resolve(snapshot.exists())
+          })
         })
+
     } catch (e) {
         reject(e)
     }
 })
 
 // gets the list of all acceptors who have accepted this particular activity with serviceId
-export const getAcceptors = (serviceId) => new Promise((resolve, reject) => {
+export const getAcceptors = (serviceId, userId) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds`).once('value', (snapshot) => {
-            const acceptorIds = snapshot.val() || []
-            resolve(acceptorIds || [])
+        getNetworkId(userId).then(networkId => {
+          firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/acceptorIds`).once('value', (snapshot) => {
+              const acceptorIds = snapshot.val() || []
+              resolve(acceptorIds || [])
+          })
         })
+
     } catch (e) {
         reject(e)
     }
@@ -313,12 +399,15 @@ export const getServiceItem = (serviceId) => new Promise((resolve, reject) => {
 })
 
 // has this user already accepted this activity? returns a boolean if yes
-//Checks if uid exists in the acceptorIds array of serviceId servicesRequests
+//Checks if uid exists in the acceptorIds array of serviceId allPosts
 export const alreadyAccepted = (uid, serviceId) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds`).once('value', (snapshot) => {
-            resolve(snapshot.child(uid).exists());
+        getNetworkId(uid).then(networkId => {
+          firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/acceptorIds`).once('value', (snapshot) => {
+              resolve(snapshot.child(uid).exists());
+          })
         })
+
     } catch (e) {
         reject(e)
     }
@@ -327,9 +416,12 @@ export const alreadyAccepted = (uid, serviceId) => new Promise((resolve, reject)
 // expects an acceptors UID and task ID. Checks if the host has confirmed this acceptor, if yes then return true
 export const isConfirmedAcceptor = (uid, taskId) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`).once('value', (snapshot) => {
-            resolve(snapshot.child(uid).exists());
+        getNetworkId(uid).then(networkId => {
+          firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/confirmedGuests`).once('value', (snapshot) => {
+              resolve(snapshot.child(uid).exists());
+          })
         })
+
     } catch (e) {
         reject(e)
     }
@@ -338,94 +430,100 @@ export const isConfirmedAcceptor = (uid, taskId) => new Promise((resolve, reject
 // Assign user {userId} as acceptor of task {serviceId} and return whatsapp number of requester. No one being used
 export const addServer = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
-        const {currentUser} = firebase.auth();
-        var ref = firebase.database().ref(`/servicesRequests/${serviceId}`);
-        ref.update({serverId:userId,status:1});
-        // Now returning the Whatsapp number of requester (client)
-        ref.child(`clientId`).once("value", function(snapshot) {
-            resolve(getWhatsapp(snapshot.val()));
-        });
+        getNetworkId(userId).then(networkId => {
+          let ref = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}`);
+          ref.update({serverId:userId,status:1});
+          // Now returning the Whatsapp number of requester (client)
+          ref.child(`hostId`).once("value", function(snapshot) {
+              resolve(getWhatsapp(snapshot.val()));
+          });
+        })
+
     } catch (e) {
         reject(e)
     }
 })
 
-export const finalizeGuestList = (taskId, clientId) => new Promise((resolve, reject) => {
+export const finalizeGuestList = (taskId, hostId) => new Promise((resolve, reject) => {
   try {
-    let ref = firebase.database().ref(`/servicesRequests/${taskId}/acceptorIds`);
-    ref.once("value", function(snapshot){
-      let data = snapshot.val();
-      let allGuests = Object.values(data);
-      let confirmedGuests = allGuests.filter(guest => guest.guestStatus == 1);
-      console.log('confirmedGuests: ', confirmedGuests);
-      if(confirmedGuests.length != 0)
-      {
-        let confirmedRef = firebase.database().ref(`/servicesRequests/${taskId}/confirmedGuests`);
-        confirmedGuests.map(guest => confirmedRef.child(guest.id).set(guest) )
-        firebase.database().ref(`/servicesRequests/${taskId}`).update({status: 1});
-        resolve(true)
-      }else{
-        resolve(false);
-      }
-    } )
+    getNetworkId(hostId).then(networkId => {
+      let ref = firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/acceptorIds`);
+      ref.once("value", function(snapshot){
+        let data = snapshot.val();
+        let allGuests = Object.values(data);
+        let confirmedGuests = allGuests.filter(guest => guest.guestStatus == 1);
+        console.log('confirmedGuests: ', confirmedGuests);
+        if(confirmedGuests.length != 0)
+        {
+          let confirmedRef = firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/confirmedGuests`);
+          confirmedGuests.map(guest => confirmedRef.child(guest.id).set(guest) )
+          firebase.database().ref(`networks/${networkId}/allPosts/${taskId}`).update({status: 1});
+          resolve(true)
+        }else{
+          resolve(false);
+        }
+      } )
+    })
+
   } catch(e) {
     reject(e)
   }
 })
 
 // Push this user to the list of acceptors
-export const addAcceptor = (userId, serviceId, clientId) => new Promise((resolve, reject) => {
+export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
-
-        var ref = firebase.database().ref(`/servicesRequests/${serviceId}/acceptorIds/${userId}`);
-        ref.update({id: userId, guestStatus:0});
-        //Get first name of this particular acceptor
-        getName(userId).then(firstName=>
-        {
-          const first = firstName;
-          //Get last name of this particular acceptor
-          getLastName(userId).then(lastName=>
+        getNetworkId(userId).then(networkId => {
+          var ref = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/acceptorIds/${userId}`);
+          ref.update({id: userId, guestStatus:0});
+          //Get first name of this particular acceptor
+          getName(userId).then(firstName=>
           {
-            const fullName = `${firstName} ${lastName}`;
-            ref.update({fullName: fullName})
+            const first = firstName;
+            //Get last name of this particular acceptor
+            getLastName(userId).then(lastName=>
+            {
+              const fullName = `${firstName} ${lastName}`;
+              ref.update({fullName: fullName})
+            });
           });
-        });
 
-        //Increment interested count for this task
-        firebase.database().ref(`/servicesRequests/${serviceId}/interestedCount`).transaction(function(interestedCount){
-          return (interestedCount || 0) + 1;
-        });
+          appendHiddenPosts(userId, serviceId);
+          //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
+          //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
 
-        //Increment total interested count for the client. this is used for notifying the client as well as for showing badge in clients app
-        firebase.database().ref(`/users/${clientId}/totalInterested`).transaction(function(totalInterested){
-          return (totalInterested || 0) + 1;
-        });
+          //Increment interested count for this task
+          firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/interestedCount`).transaction(function(interestedCount){
+            return (interestedCount || 0) + 1;
+          });
+          console.log('pushed user to acceptor list')
 
-        console.log('pushed user to acceptor list')
+        })
+
     } catch (e) {
         reject(e)
     }
 })
 
-// Expects service request ID in parameter
-// Marks request as done and CREDITS coins to requester
-// as well as to the acceptor
-export const markRequestDone = (id) => new Promise((resolve, reject) => {
+// No longer being used. Cloud function is being used instead.
+export const markRequestDone = (id, uid) => new Promise((resolve, reject) => {
     try {
-        var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        ref.update({status:2});
-        ref.once("value", function(snapshot) {
-            const {clientId, serverId} = snapshot.val();
-            firebase.database().ref(`/users/${clientId}/coins`).transaction(function(coins){
-              return (coins || 0) + 1;
-              //previously was return (coins || 0) - 1;
-            });
-            firebase.database().ref(`/users/${serverId}/coins`).transaction(function(coins){
-              return (coins || 0) + 1;
-            });
-            resolve(true);
-        });
+        getNetworkId(uid).then(networkId => {
+          let ref = firebase.database().ref(`networks/${networkId}/allPosts/${id}`);
+          ref.update({status:2});
+          ref.once("value", function(snapshot) {
+              const {hostId, serverId} = snapshot.val();
+              firebase.database().ref(`/users/${hostId}/coins`).transaction(function(coins){
+                return (coins || 0) + 1;
+                //previously was return (coins || 0) - 1;
+              });
+              firebase.database().ref(`/users/${serverId}/coins`).transaction(function(coins){
+                return (coins || 0) + 1;
+              });
+              resolve(true);
+          });
+        })
     } catch (e) {
         reject(e)
     }
@@ -435,27 +533,47 @@ export const markRequestDone = (id) => new Promise((resolve, reject) => {
 // Marks service request cancelled
 export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve, reject) => {
     try {
-        var ref = firebase.database().ref(`/servicesRequests/${id}`);
-        if(isClient){
-          ref.update({status:3});
-          incUserDarkScore(uid, 2);
+        getNetworkId(uid).then(networkId => {
+          var ref = firebase.database().ref(`networks/${networkId}/allPosts/${id}`);
+          if(isClient){
+            ref.update({status:3}).then(res => {
+              //incUserDarkScore(uid, 2);
+              deletePostFromUser(uid, id, 'host').then(lastRes => {
+                resolve(true)
+              })
+            })
 
-          //Decrease (notification) interested count for this user
-          firebase.database().ref(`/servicesRequests/${id}/interestedCount`).once("value", function(snapshot){
-            let interestedCount = snapshot.val();
-            firebase.database().ref(`/users/${uid}/totalInterested`).transaction(function(totalInterested){
-              return (totalInterested || 0) - interestedCount;
-            });
-          })
+          }else{
+            //Guest is cancelling
+            ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3}).then(res => {
+              deletePostFromUser(uid, id, 'guest').then(secRes => {
+                incUserDarkScore(uid, 1).then(lastRes => {
+                  resolve(true)
+                })
+                //Also add it to the users decided upon list
+                //appendHiddenPosts(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right
+              })
+            })
 
-        }else{
-          //Guest is cancelling
-          ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3})
-          incUserDarkScore(uid, 1);
-          //Also add it to the users rejected list
-          appendRejectedTask(uid, id);
-        }
-        resolve(true);
+          }
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const deletePostFromUser = (uid, taskId, deletedBy) => new Promise((resolve, reject) => {
+    try {
+      console.log('Inside deletePostFromUser')
+      if(deletedBy === 'host'){
+        //Its cancelled by the host
+        console.log(`Removing the task ${taskId} from the users host object`)
+        firebase.database().ref(`/users/${uid}/posts/host/${taskId}`).remove().then( res => {resolve(true)})
+      }else if(deletedBy === 'guest'){
+        //guest opted out
+        firebase.database().ref(`/users/${uid}/posts/guest/${taskId}`).remove().then( res => {resolve(true)})
+      }
+
     } catch (e) {
         reject(e)
     }
@@ -518,13 +636,42 @@ export const getFullName = (userId) => new Promise((resolve, reject) => {
     }
 })
 
-// To note in database that user {userId} has rejected task {serviceId}
-export const appendRejectedTask = (userId, serviceId) => new Promise((resolve, reject) => {
+// To note in database that user {userId} has rejected or accepted a post{serviceId} . The app wont show these tasks to this user again
+export const appendHiddenPosts = (userId, serviceId) => new Promise((resolve, reject) => {
     try {
-        resolve(firebase.database().ref(`/users/${userId}/rejectedTasks`).push(serviceId));
+        resolve(firebase.database().ref(`/users/${userId}/hiddenPosts`).push(serviceId));
     } catch (e) {
         reject(e)
     }
+})
+
+export const rejectTask = (userId, serviceId) => new Promise((resolve, reject) => {
+  try {
+    resolve(
+      //Since the user has rejected this post, we won't be showing this on the user's live post screen anymore
+      firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove()
+    )
+  } catch (e) {
+    reject(e)
+  }
+})
+
+//If this user is the host of this post, do not show it / remove it from livePosts
+export const removeSelfHostedPosts = (userId, serviceId) => new Promise((resolve, reject) => {
+  try{
+      firebase.database().ref(`users/${userId}/posts/host/${serviceId}`).once('value', (userIsTheHost) => {
+        console.log('userIsTheHost: ', userIsTheHost)
+        if(userIsTheHost.exists()){
+          firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove()
+          resolve(true)
+        }else{
+          resolve(false)
+        }
+      })
+
+  } catch(e){
+    reject(e)
+  }
 })
 
 // user has done some malicious behavior. Increase their Dark Score by score
@@ -534,6 +681,16 @@ export const incUserDarkScore = (userId, score) => new Promise((resolve, reject)
     } catch (e) {
         reject(e)
     }
+})
+
+export const getNetworkId = (uid) => new Promise((resolve, reject) => {
+  try{
+    firebase.database().ref(`/users/${uid}/network/id`).once('value', (snapshot) => {
+      resolve(snapshot.val());
+    })
+  } catch(e) {
+    reject(e)
+  }
 })
 
 // Expects user Id in parameters
@@ -550,25 +707,28 @@ export const getCoins = (userId) => new Promise((resolve, reject) => {
 //checks if the uid was a confirmed acceptor that has now opted out
 export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject) => {
     try {
-      let clientId;
-      firebase.database().ref(`servicesRequests/${taskId}/clientId`).once("value", function(snapshot) {
-        clientId = snapshot.val();
-      })
-      if(uid != clientId)
-      {
-        let result;
-        let ref = firebase.database().ref(`servicesRequests/${taskId}/confirmedGuests/${uid}/guestStatus`);
-        ref.once("value", function(snapshot){
-          if(snapshot.val() == 3){
-            result = true;
-          } else {
-            result = false;
-          }
-          resolve(result);
+      getNetworkId(uid).then(networkId => {
+        let hostId;
+        firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/hostId`).once("value", function(snapshot) {
+          hostId = snapshot.val();
         })
-      } else {
-        resolve(null);
-      }
+        if(uid != hostId)
+        {
+          let result;
+          let ref = firebase.database().ref(`networks/${networkId}/allPosts/${taskId}/confirmedGuests/${uid}/guestStatus`);
+          ref.once("value", function(snapshot){
+            if(snapshot.val() == 3){
+              result = true;
+            } else {
+              result = false;
+            }
+            resolve(result);
+          })
+        } else {
+          resolve(null);
+        }
+      })
+
     } catch (e) {
         reject(e)
     }
@@ -578,7 +738,7 @@ export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject)
 //Stats
 
 // Count number of serviceRequests
-export const countServicesRequests = () => {
+export const countallPosts = (networkId) => {
   let countAcc = 0;
   let countReq = 0;
   let countDone = 0;
@@ -589,17 +749,17 @@ export const countServicesRequests = () => {
   let debugPosts = [];
 
   //Count various statuses
-  var srRef = firebase.database().ref("servicesRequests");
+  var srRef = firebase.database().ref(`networks/${networkId}/allPosts`);
   srRef.once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
-      const {status, clientId, id} = childSnapshot.val();
+      const {status, hostId, id} = childSnapshot.val();
       if(status == 4) countAcc++;
       else if (status == 3) countReq++;
       else if (status == 2) countDone++;
       else if (status == 1){
         /*
-        if(clientId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
+        if(hostId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
           debugPosts.push(id);
         }
         */
@@ -607,9 +767,9 @@ export const countServicesRequests = () => {
       }
       else if (status == 0) {
         countOpen++;
-        openPostUsers.push(clientId);
+        openPostUsers.push(hostId);
         openPosts.push(id)
-        if(clientId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
+        if(hostId == "2J9aK7aFFFgK4SphheV1jRrFiVv2"){
           debugPosts.push(id);
         }
       }
@@ -630,9 +790,9 @@ export const countServicesRequests = () => {
   srRef.once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
-      const {clientId} = childSnapshot.val();
-      if (!userPostCounted.includes(clientId)){
-        userPostCounted.push(clientId);
+      const {hostId} = childSnapshot.val();
+      if (!userPostCounted.includes(hostId)){
+        userPostCounted.push(hostId);
       }
     });
     console.log('number of activity posts created by unique users: ', userPostCounted.length);
@@ -644,10 +804,10 @@ export const countServicesRequests = () => {
   srRef.once("value")
   .then(function(snapshot) {
     var servicesReqCount = snapshot.numChildren();
-    console.log('number of servicesRequests: ', servicesReqCount);
+    console.log('number of allPosts: ', servicesReqCount);
   });
 
-  var msgsRef = firebase.database().ref("messages");
+  var msgsRef = firebase.database().ref(`networks/${networkId}/messages`);
   msgsRef.once("value")
   .then(function(snapshot) {
     var msgsNum = snapshot.numChildren();
@@ -672,5 +832,5 @@ export const countServicesRequests = () => {
 export const firebaseReferences = {
     USERS: firebase.database().ref('/users'),
     SERVICES: firebase.database().ref('/services'),
-    SERVICES_REQUESTS: firebase.database().ref('/servicesRequests')
+    SERVICES_REQUESTS: firebase.database().ref('/allPosts')
 }

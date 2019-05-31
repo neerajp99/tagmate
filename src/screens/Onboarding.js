@@ -12,7 +12,11 @@ class Onboarding extends Component{
   }*/
 
   render(){
-    const {currentUser: {uid} = {}} = firebase.auth()
+    let user = firebase.auth().currentUser;
+    let uid;
+    if (user != null) {
+      uid = user.uid;
+    }
     return(
       <View style={styles.backgroundContainer}>
         {/* <Text>{firebase.auth().currentUser.uid}</Text> */}

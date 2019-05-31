@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {getTotalUnread, getTotalInterested} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 
+let uid;
 
 class IconWithBadge extends React.Component {
   constructor(props) {
@@ -15,7 +16,11 @@ class IconWithBadge extends React.Component {
     }
   }
   componentDidMount(){
-    const {currentUser: {uid} = {}} = firebase.auth()
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      uid = user.uid;
+    }
+
     getTotalUnread(uid).then(result => {
       this.setState({unreadNotifs: result})
     });
@@ -27,7 +32,6 @@ class IconWithBadge extends React.Component {
   }
 
   liveUpdates = () => {
-    const {currentUser: {uid} = {}} = firebase.auth()
 
     //Live update for unread chat count
     let ref = firebase.database().ref(`users/${uid}/messages/`);
