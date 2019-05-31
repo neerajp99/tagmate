@@ -248,7 +248,7 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{serviceId, id, created_at, details, customTitle, interestedCount} = item;
+        const{id, created_at, details, customTitle, interestedCount} = item;
         const uid = this.state.uid;
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
@@ -258,8 +258,6 @@ class DashboardScreen extends Component {
         } else if (item.status != 0 && item.unreadMsgs != undefined){
           notifications = item.unreadMsgs;
         }
-        //this is a custom post, get title from post instead of global service object
-        let serviceTitle = customTitle;
 
         // Find appropriate status for current status code:
         var statusStr = 'Not available';
@@ -281,7 +279,7 @@ class DashboardScreen extends Component {
           <View key={id}>
             <View>
                   <ListItem
-                    title={serviceTitle}
+                    title={customTitle}
                     titleStyle={(item.status<2)?adourStyle.listItemTextBold:adourStyle.fadedText}
                     subtitle={statusStr}
                     subtitleStyle={adourStyle.listItemText}

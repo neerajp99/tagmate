@@ -3,7 +3,7 @@ import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
-import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getFullName, createCustomService} from "../lib/firebaseUtils";
+import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getFullName} from "../lib/firebaseUtils";
 import {connect} from "react-redux";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
@@ -24,6 +24,7 @@ class CreatePost extends Component{
             anonymous: false,
             selfName:'',
             customTitle: '',
+            bgImage:'http://chillmateapp.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',
@@ -87,7 +88,7 @@ class CreatePost extends Component{
         else
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
-            const {when, details, anonymous, selectedServiceId, selectedServiceItem, customTitle} = this.state;
+            const {when, details, anonymous, selectedServiceId, selectedServiceItem, bgImage, customTitle} = this.state;
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
@@ -133,13 +134,21 @@ class CreatePost extends Component{
             });
             */
 
+            getFullName(uid).then(fullName=>
+            {
+              getNetworkId(uid).then(networkId => {
+                console.log(`when: ${when}, details: ${details}, anonymous: ${anonymous}, customTitle: ${customTitle}, fullName: ${fullName}, networkId: ${networkId}, bgImage: ${bgImage}`);
+              })
+            })
+
             //ENABLING CLOUD BASED POST FUNCTION
+            /*
             const createNewPost = firebase.functions().httpsCallable('createNewPost');
 
             getFullName(uid).then(fullName=>
             {
               getNetworkId(uid).then(networkId => {
-                createNewPost({serviceId:selectedServiceId, when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName, networkId: networkId})
+                createNewPost({when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName, networkId: networkId, bgImage: bgImage})
                 .then(({ data }) => {
                   console.log('[Client] Server successfully posted')
                   alert('Posted Successfully. You can find it on your Dashboard.')
@@ -151,6 +160,7 @@ class CreatePost extends Component{
                 })
               })
             });
+            */
         }
     }
 
@@ -162,15 +172,14 @@ class CreatePost extends Component{
     }
 
   render(){
-    const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, selfName, customService } = this.state;
+    const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
     const {services = [], fetching} = this.props;
-
 
     //Get the service item of the selected service ID so that we can update the title and image in realtime
     if(selectedServiceId != "custom")
     {
       getServiceItem(selectedServiceId).then(serviceItem => {
-      this.setState({selectedServiceItem: serviceItem})
+      this.setState({selectedServiceItem: serviceItem, bgImage: serviceItem.img,  customTitle: serviceItem.title})
       })
     } else {
       //the user has selected custom service, populate title and image with custom service ones

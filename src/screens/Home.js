@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, getNetworkId, addServer, appendHiddenPosts, getRelatedServices, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -25,7 +25,6 @@ class HomeScreen extends Component {
         this.state = {
             myTasks: [],
             hiddenPosts: [],
-            myServices: [],
             fetching: false,
         };
         this.getMyTasks = this.getMyTasks.bind(this);
@@ -47,19 +46,15 @@ class HomeScreen extends Component {
         //})
         //addAcceptor("VineetNand999", "testServiceRequest"); //TEMPORARY
 
-        getRelatedServices(uid).then(services =>
-        {
-            this.setState(services);
-            // Keep updating tasks
-            getHiddenPosts(uid).then(hiddenPostList => {
-              this.setState({hiddenPosts: hiddenPostList});
+        // Keep updating tasks
+        getHiddenPosts(uid).then(hiddenPostList => {
+          this.setState({hiddenPosts: hiddenPostList});
 
-              getNetworkId(uid).then(networkId => {
-                this.setState({networkId: networkId});
-                this.getMyTasks();
-              })
-            })
-        });
+          getNetworkId(uid).then(networkId => {
+            this.setState({networkId: networkId});
+            this.getMyTasks();
+          })
+        })
         this.tokenFunc();
     }
     componentWillUnmount()
@@ -162,24 +157,9 @@ class HomeScreen extends Component {
     swipableRender(myTasks) {
 
       return myTasks.map((item) => {
-        const {serviceId, id, when, details, anonymous, custom, customTitle, created_at, hostName, interestedCount} = item;
+        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
-        const {allServices} = this.state
-        var serviceTitle = '---';
-        if(!custom)
-        {
-          allServices.map(service => {
-            if(service.id == serviceId)
-            {
-                serviceTitle = service.title;
-                serviceImg = service.img;
-            }
-          });
-        } else {
-          //this is a custom activity, get custom title from post instead of the global service object
-          serviceTitle = customTitle;
-          serviceImg = CUSTOM_IMG;
-        }
+
         if(details == "" || typeof details == "undefined") detailsAvailable = false
 
         let interestAvailable = false;
@@ -198,7 +178,7 @@ class HomeScreen extends Component {
 
         return (
           <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTask(item)}>
-          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+          <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
               <ListItem
               title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
@@ -247,17 +227,8 @@ class HomeScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {serviceId, id, when, details, anonymous, created_at, hostName, interestedCount} = item;
+        const {id, when, details, customTitle, bgImage, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
-        const {allServices} = this.state
-        var serviceTitle = '---';
-        allServices.map(service => {
-            if(service.id == serviceId)
-            {
-                serviceTitle = service.title;
-                serviceImg = service.img;
-            }
-        });
         if(details == "" || typeof details == "undefined") detailsAvailable = false
 
         let interestAvailable = false;
@@ -276,7 +247,7 @@ class HomeScreen extends Component {
 
         return (
           <View key={id}>
-          <Card image={{uri: serviceImg}} featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} >
+          <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
           <View>
               <ListItem
               title={anonymous? "Anonymous": hostName}

@@ -74,20 +74,15 @@ admin.initializeApp();
 
       const uid = context.auth.uid;
 
-      let customBool = false;
-      if (data.serviceId === 'custom'){
-        customBool = true;
-      }
       const id_gen = uuid.v4()
       let post = {
         id: id_gen,
-        serviceId: data.serviceId,
         hostId: uid,
         when: data.when,
         details: data.details,
         anonymous: data.anonymous,
-        custom: customBool,
         customTitle: data.customTitle,
+        bgImage: data.bgImage,
         status: 0,
         interestedCount: 0,
         created_at:admin.database.ServerValue.TIMESTAMP,

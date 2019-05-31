@@ -5,7 +5,7 @@ import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Button, Card, ListItem, Text, Divider, Badge, withBadge } from 'react-native-elements';
 import * as _ from 'lodash';
-import {getAllServices, getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
+import {getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
@@ -22,11 +22,8 @@ class DashboardDetails extends Component {
       hide:false,
       nameAvailable:false,
       confirmedGuestList: [],
-      itemService: [],
       optedOut: false,
-      serviceTitle: '',
       unreadChatCount: 0,
-      serviceImg: 'http://chillmateapp.com/assets/item_img/custom.jpg',
       whatsappAvailable:false, // Whatsapp number is not yet loaded
     }
     this.liveUpdates = this.liveUpdates.bind(this);
@@ -38,20 +35,12 @@ class DashboardDetails extends Component {
     if (user != null) {
       uid = user.uid;
     }
-    console.log('this.state.item 1 : ', this.state.item);
 
-    getAllServices().then(services => // Get list of all services, then:
-    {
-      console.log('this.state.item 2 :  ', this.state.item);
-      this.setState({services}); // Make services list available to the screen
-      getNetworkId(uid).then(networkId => {
-        console.log('this.state.item 3 : ', this.state.item);
-        this.setState({networkId});
-        this.getTaskItem();
-        this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
-      })
-    });
-    //this.getServiceItem();
+    getNetworkId(uid).then(networkId => {
+      this.setState({networkId});
+      this.getTaskItem();
+      this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
+    })
   }
 
   componentWillUnmount()
@@ -71,21 +60,7 @@ class DashboardDetails extends Component {
         this.getConfirmedGuests();
         this.getUnreadChatCount();
       }
-      // Fetching service's title:
-      if(!this.state.item.custom){
-        //this is not a custom activity, match the serviceId of the post with the service Id of the global list of services
-        //then fetch the image and title from the global service object
-        this.state.services.map(service =>
-          {
-          if(this.state.item.serviceId == service.id){
-            this.setState({serviceTitle: service.title});
-            this.setState({serviceImg: service.img});
-            }
-          })
-      } else {
-        //this is a custom activity, get the title from post object, get image from the hard coded constant
-        this.setState({serviceTitle: this.state.item.customTitle, serviceImg: CUSTOM_IMG});
-      }
+
     })
 
     //Check if the current user is a guest and has recently opted out
@@ -97,15 +72,6 @@ class DashboardDetails extends Component {
     })
 
 
-  }
-
-  getServiceItem = () => {
-    var ref = firebase.database().ref(`services`);
-    ref.on('value', (snapshot) => {
-      let data = snapshot.val();
-      this.setState({ services: data});
-      console.log('inside getServiceItem');
-    })
   }
 
   getUnreadChatCount = () =>
@@ -151,29 +117,6 @@ class DashboardDetails extends Component {
           // The user is neither requester nor acceptor
           this.setState({hide:true});
           return;
-        }
-        item.serviceTitle = '';
-
-        if(!item.custom)
-        {
-          //get services object
-          firebase.database().ref(`/services/${this.state.item.serviceId}`).on('value', (snapshot) => {
-            let serviceData = snapshot.val();
-            let serviceItem = Object.values(serviceData);
-            this.setState({ itemService: serviceItem});
-          })
-          // Fetching service's title:
-          this.state.services.map(service =>
-          {
-            if(item.serviceId == service.id){
-              item.serviceTitle = service.title;
-              item.serviceImg = service.img;
-            }
-          })
-        } else {
-          //this is a custom post, get title from the post object instead of fetching it from the global service object
-          item.serviceTitle = item.customTitle;
-          item.serviceImg = CUSTOM_IMG;
         }
 
         this.setState({item:item});
@@ -346,7 +289,7 @@ class DashboardDetails extends Component {
 
   render()
   {
-    const {item, confirmedGuestList, itemService, serviceTitle, serviceImg, unreadChatCount, optedOut} = this.state;
+    const {item, confirmedGuestList, customTitle, bgImage, unreadChatCount, optedOut} = this.state;
     console.log('DashboardScreen is displaying the item with ID: ', item.id);
     var statusStr = 'Not available';
     let host = 'Anonymous';
@@ -365,7 +308,7 @@ class DashboardDetails extends Component {
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
-      <Card featuredTitle={serviceTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: serviceImg}}>
+      <Card featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: bgImage}}>
           <ListItem
               title={host}
               titleStyle={adourStyle.listItemText}
