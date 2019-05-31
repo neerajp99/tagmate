@@ -93,10 +93,10 @@ class DashboardScreen extends Component {
           //Look for the post locally that changed in the realtime database
           this.state.hosting.map(item =>
           {
-            if(item.id == post.id) req.push(post); //if we find it, add the updated post to the array
-            else req.push(item); // add all other posts as they were into the array
+            if(item.id == post.id) hosting_arr.push(post); //if we find it, add the updated post to the array
+            else hosting_arr.push(item); // add all other posts as they were into the array
           });
-          this.setState({hosting:req});
+          this.setState({hosting:hosting_arr});
         }
       });
 
@@ -158,10 +158,10 @@ class DashboardScreen extends Component {
           //Look for the post locally that changed in the realtime database
           this.state.attending.map(item =>
           {
-            if(item.id == post.id) acc.push(post); //if we find it, add the updated post to the array
-            else acc.push(item); // add all other posts as they were into the array
+            if(item.id == post.id) attending_arr.push(post); //if we find it, add the updated post to the array
+            else attending_arr.push(item); // add all other posts as they were into the array
           });
-          this.setState({attending:acc});
+          this.setState({attending:attending_arr});
         }
       });
 
@@ -182,17 +182,17 @@ class DashboardScreen extends Component {
           {
             if(item.id == ob.taskId){
               item.unreadMsgs = ob.unreadCount;
-              req.push(item);
+              hosting_arr.push(item);
             }
-            else req.push(item);
+            else hosting_arr.push(item);
           });
           this.state.attending.map(item =>
           {
             if(item.id == ob.taskId){
               item.unreadMsgs = ob.unreadCount;
-              acc.push(item);
+              attending_arr.push(item);
             }
-            else acc.push(item);
+            else attending_arr.push(item);
           });
 
           //If no unread msgs are left in attending, disable the mini badge
@@ -202,8 +202,8 @@ class DashboardScreen extends Component {
           if(unreadMsgTasks.length == 0) this.setState({attendingBadge: false})
           if(unreadMsgTasks.length != 0) this.setState({attendingBadge: true})
 
-          this.setState({hosting:req});
-          this.setState({attending:acc});
+          this.setState({hosting:hosting_arr});
+          this.setState({attending:attending_arr});
         }
 
       })
