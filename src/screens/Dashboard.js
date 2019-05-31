@@ -1,4 +1,4 @@
-// This screen shows tasks hosting and attending by the user.
+attending_arr // This screen shows tasks hosting and attending by the user.
 
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
@@ -86,7 +86,7 @@ class DashboardScreen extends Component {
       // When a post object that the user is hosting changes on the realtime database, update its local state
       userPostRef.child('host').on('child_changed', (snapshot) => {
         var post = snapshot.val(); //this is the post object that changed
-        let host_arr = []; // creating a new array for this.state.hosting;
+        let hosting_arr = []; // creating a new array for this.state.hosting;
         console.log('host changed. mounted? ', this._isMounted)
         if(this._isMounted)
         {
@@ -151,7 +151,7 @@ class DashboardScreen extends Component {
       // When a post object that the user is hosting changes on the realtime database, update its local state
       userPostRef.child('guest').on('child_changed', (snapshot) => {
         var post = snapshot.val(); //this is the post object that changed
-        let guest_arr = []; // creating a new array for this.state.hosting;
+        let attending_arr = []; // creating a new array for this.state.hosting;
 
         if(this._isMounted)
         {
@@ -173,8 +173,8 @@ class DashboardScreen extends Component {
       firebase.database().ref(`/users/${uid}/messages/`).on('child_changed', (snapshot) => {
         var ob = snapshot.val();
         //iterate through and look for a matching item Id with the changed object
-        let host_arr = [];//this.state.hosting;
-        let guest_arr = [];//this.state.attending;
+        let hosting_arr = [];//this.state.hosting;
+        let attending_arr = [];//this.state.attending;
 
         if(this._isMounted)
         {
