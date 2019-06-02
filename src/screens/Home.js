@@ -36,6 +36,8 @@ class HomeScreen extends Component {
         let user = firebase.auth().currentUser;
         if (user != null) {
           uid = user.uid;
+        } else {
+          this.props.navigation.navigate('Login')
         }
         // TEMPORARY
         //getAcceptors("testServiceRequest").then(response => {

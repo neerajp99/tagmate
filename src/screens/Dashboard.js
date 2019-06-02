@@ -35,6 +35,8 @@ class DashboardScreen extends Component {
       let user = firebase.auth().currentUser;
       if (user != null) {
         uid = user.uid;
+      } else {
+        this.props.navigation.navigate('Login')
       }
       this.setState({fetching:true});
 

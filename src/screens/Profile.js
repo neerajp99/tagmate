@@ -34,6 +34,8 @@ class ProfileScreen extends Component{
       displayName = user.displayName;
       photoURL = user.photoURL;
       this.setState({displayName, photoURL});
+    } else {
+      this.props.navigation.navigate('Login')
     }
 
     /* Cloud Function Test
