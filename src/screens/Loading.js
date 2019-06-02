@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
-import {View, Text, ActivityIndicator, AsyncStorage, StyleSheet, ImageBackground, Image} from 'react-native'
+import {View, Text, ActivityIndicator, StyleSheet, ImageBackground, Image} from 'react-native'
 import firebase from 'react-native-firebase';
+import AsyncStorage from '@react-native-community/async-storage';
 import Notification from '../lib/Notification'
 import connect from "react-redux/es/connect/connect";
 import {fetchAllServices, setDeviceToken, submitUserServices} from "../actions";
