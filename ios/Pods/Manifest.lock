@@ -99,11 +99,6 @@ PODS:
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
   - Protobuf (3.8.0)
-  - React (0.11.0):
-    - React/Core (= 0.11.0)
-  - React/Core (0.11.0)
-  - RNCAsyncStorage (1.4.2):
-    - React
 
 DEPENDENCIES:
   - Firebase/Auth (~> 5.20.1)
@@ -112,7 +107,6 @@ DEPENDENCIES:
   - Firebase/Functions (~> 5.20.1)
   - Firebase/Messaging (~> 5.20.1)
   - GoogleSignIn (~> 4.4.0)
-  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -134,11 +128,6 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - Protobuf
-    - React
-
-EXTERNAL SOURCES:
-  RNCAsyncStorage:
-    :path: "../node_modules/@react-native-community/async-storage"
 
 SPEC CHECKSUMS:
   Firebase: 0c8cf33f266410c61ab3e2265cfa412200351d9c
@@ -159,9 +148,7 @@ SPEC CHECKSUMS:
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
   Protobuf: 3f617b9a6e73605565086864c9bc26b2bf2dd5a3
-  React: ab1a2e21deb34965c38328d5ec40cc7d12c6050a
-  RNCAsyncStorage: 0d2b0cf659d2def90d8ed7de76f502d335268156
 
-PODFILE CHECKSUM: 2965d2a3ca80ab80a5ad7bb074cb152a42583140
+PODFILE CHECKSUM: 347c64a84909417c2c445e4ecd0e8d95b1f1197d
 
 COCOAPODS: 1.6.1

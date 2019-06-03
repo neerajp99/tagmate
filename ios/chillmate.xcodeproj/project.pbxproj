@@ -56,6 +56,15 @@
 		79331FC222A40EDF003FC251 /* JavaScriptCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79331F9522A40EDF003FC251 /* JavaScriptCore.framework */; };
 		79331FC422A41AEC003FC251 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79331FC322A41AEC003FC251 /* GoogleService-Info.plist */; };
 		795584D722A4B4B400773FAC /* RNGoogleSignin.xcodeproj in Frameworks */ = {isa = PBXBuildFile; fileRef = 8308B6D0A816463694E88A7C /* RNGoogleSignin.xcodeproj */; };
+		795585C822A4CA7000773FAC /* React.xcodeproj in Frameworks */ = {isa = PBXBuildFile; fileRef = 146833FF1AC3E56700842450 /* React.xcodeproj */; };
+		795585C922A4D02500773FAC /* RNCAsyncStorage.xcodeproj in Frameworks */ = {isa = PBXBuildFile; fileRef = 227BBC342ADD4713B38ECC79 /* RNCAsyncStorage.xcodeproj */; };
+		79B98F9522A4D72A00280586 /* libFirebaseAuth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B98F9422A4D72A00280586 /* libFirebaseAuth.a */; };
+		79B98F9722A4D72A00280586 /* libFirebaseCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B98F9622A4D72A00280586 /* libFirebaseCore.a */; };
+		79B98F9922A4D72A00280586 /* libFirebaseDatabase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B98F9822A4D72A00280586 /* libFirebaseDatabase.a */; };
+		79B98F9B22A4D72A00280586 /* libFirebaseFunctions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B98F9A22A4D72A00280586 /* libFirebaseFunctions.a */; };
+		79B98F9D22A4D72A00280586 /* libFirebaseInstanceID.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B98F9C22A4D72A00280586 /* libFirebaseInstanceID.a */; };
+		79B98F9F22A4D72A00280586 /* libFirebaseMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 79B98F9E22A4D72A00280586 /* libFirebaseMessaging.a */; };
+		79B98FB422A4DCD500280586 /* RNFirebase.xcodeproj in Frameworks */ = {isa = PBXBuildFile; fileRef = B22D6E042ABF4C72B5B3261C /* RNFirebase.xcodeproj */; };
 		7A0E4523CCAE47AFA6450064 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA6321673F704E1C8FAADC9F /* libRNGestureHandler.a */; };
 		8041D8CCCE2E424886BD4A69 /* OpenSans-SemiboldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 463E9417B6AC4456838253BF /* OpenSans-SemiboldItalic.ttf */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
@@ -439,7 +448,7 @@
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
 		13AFF060E4DC4BAEA659C612 /* OpenSans-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-ExtraBold.ttf"; path = "../assets/fonts/OpenSans-ExtraBold.ttf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* adourapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = adourapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* chillmate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chillmate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = adourapp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = adourapp/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -473,6 +482,18 @@
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		79331F9522A40EDF003FC251 /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		79331FC322A41AEC003FC251 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		795585CA22A4D0EA00773FAC /* libFirebaseAuth.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseAuth.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		795585CC22A4D0EA00773FAC /* libFirebaseCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		795585CE22A4D0EA00773FAC /* libFirebaseDatabase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseDatabase.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		795585D022A4D0EA00773FAC /* libFirebaseFunctions.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseFunctions.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		795585D222A4D0EA00773FAC /* libFirebaseInstanceID.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseInstanceID.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		795585D422A4D0EA00773FAC /* libFirebaseMessaging.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseMessaging.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79B98F9422A4D72A00280586 /* libFirebaseAuth.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseAuth.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79B98F9622A4D72A00280586 /* libFirebaseCore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseCore.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79B98F9822A4D72A00280586 /* libFirebaseDatabase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseDatabase.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79B98F9A22A4D72A00280586 /* libFirebaseFunctions.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseFunctions.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79B98F9C22A4D72A00280586 /* libFirebaseInstanceID.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseInstanceID.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		79B98F9E22A4D72A00280586 /* libFirebaseMessaging.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseMessaging.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7ADFFAC46D72435689E75E6E /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNGestureHandler.xcodeproj; path = "../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; };
 		7BAE18F846F78A393B2DCB8E /* libPods-adourapp-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-adourapp-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		811DE5E7B6884AAD84E835BC /* OpenSans-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-LightItalic.ttf"; path = "../assets/fonts/OpenSans-LightItalic.ttf"; sourceTree = "<group>"; };
@@ -520,6 +541,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79B98FB422A4DCD500280586 /* RNFirebase.xcodeproj in Frameworks */,
+				79B98F9522A4D72A00280586 /* libFirebaseAuth.a in Frameworks */,
+				79B98F9722A4D72A00280586 /* libFirebaseCore.a in Frameworks */,
+				79B98F9922A4D72A00280586 /* libFirebaseDatabase.a in Frameworks */,
+				79B98F9B22A4D72A00280586 /* libFirebaseFunctions.a in Frameworks */,
+				79B98F9D22A4D72A00280586 /* libFirebaseInstanceID.a in Frameworks */,
+				79B98F9F22A4D72A00280586 /* libFirebaseMessaging.a in Frameworks */,
+				795585C922A4D02500773FAC /* RNCAsyncStorage.xcodeproj in Frameworks */,
+				795585C822A4CA7000773FAC /* React.xcodeproj in Frameworks */,
 				795584D722A4B4B400773FAC /* RNGoogleSignin.xcodeproj in Frameworks */,
 				79331FC222A40EDF003FC251 /* JavaScriptCore.framework in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
@@ -692,6 +722,18 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				79B98F9422A4D72A00280586 /* libFirebaseAuth.a */,
+				79B98F9622A4D72A00280586 /* libFirebaseCore.a */,
+				79B98F9822A4D72A00280586 /* libFirebaseDatabase.a */,
+				79B98F9A22A4D72A00280586 /* libFirebaseFunctions.a */,
+				79B98F9C22A4D72A00280586 /* libFirebaseInstanceID.a */,
+				79B98F9E22A4D72A00280586 /* libFirebaseMessaging.a */,
+				795585CA22A4D0EA00773FAC /* libFirebaseAuth.a */,
+				795585CC22A4D0EA00773FAC /* libFirebaseCore.a */,
+				795585CE22A4D0EA00773FAC /* libFirebaseDatabase.a */,
+				795585D022A4D0EA00773FAC /* libFirebaseFunctions.a */,
+				795585D222A4D0EA00773FAC /* libFirebaseInstanceID.a */,
+				795585D422A4D0EA00773FAC /* libFirebaseMessaging.a */,
 				79331F9522A40EDF003FC251 /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				607D3E904A5D501889D5FB8C /* libPods-adourapp.a */,
@@ -840,7 +882,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* adourapp.app */,
+				13B07F961A680F5B00A75B9A /* chillmate.app */,
 				00E356EE1AD99517003FC87E /* adourappTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* adourapp-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* adourapp-tvOSTests.xctest */,
@@ -944,7 +986,7 @@
 			);
 			name = adourapp;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* adourapp.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* chillmate.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* adourapp-tvOS */ = {
@@ -1785,12 +1827,24 @@
 				DEAD_CODE_STRIPPING = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)..\node_modules\neact-native-firebaseiosRNFirebase/**",
-					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-firebaseiosRNFirebase/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-gesture-handlerios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin",
-					"$(SRCROOT)..\node_modules\neact-native-vector-iconsRNVectorIconsManager",
-					"$(SRCROOT)..\node_modules\neact-native-videoios/**",
-					"$(SRCROOT)..\node_modules@react-native-community\async-storageios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-vector-iconsRNVectorIconsManager",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-videoios/**",
+					"$(SRCROOT)..",
+					"ode_modules@react-native-community\async-storageios",
+					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase",
+					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/messaging",
+					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/notifications",
 				);
 				INFOPLIST_FILE = adourapp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1800,7 +1854,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chillmate;
-				PRODUCT_NAME = adourapp;
+				PRODUCT_NAME = chillmate;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1813,12 +1867,24 @@
 				CURRENT_PROJECT_VERSION = 1;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)..\node_modules\neact-native-firebaseiosRNFirebase/**",
-					"$(SRCROOT)..\node_modules\neact-native-gesture-handlerios/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-firebaseiosRNFirebase/**",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-gesture-handlerios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-signin/ios/RNGoogleSignin",
-					"$(SRCROOT)..\node_modules\neact-native-vector-iconsRNVectorIconsManager",
-					"$(SRCROOT)..\node_modules\neact-native-videoios/**",
-					"$(SRCROOT)..\node_modules@react-native-community\async-storageios",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-vector-iconsRNVectorIconsManager",
+					"$(SRCROOT)..",
+					ode_modules,
+					"eact-native-videoios/**",
+					"$(SRCROOT)..",
+					"ode_modules@react-native-community\async-storageios",
+					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase",
+					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/messaging",
+					"$(SRCROOT)/../node_modules/react-native-firebase/ios/RNFirebase/notifications",
 				);
 				INFOPLIST_FILE = adourapp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1828,7 +1894,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chillmate;
-				PRODUCT_NAME = adourapp;
+				PRODUCT_NAME = chillmate;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
