@@ -5,7 +5,7 @@ target 'chillmate' do
   # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
   # use_frameworks!
 
-  # Pods for adourapp
+  # Pods for chillmate
 
   pod 'GoogleSignIn', '~> 4.4.0'
 
@@ -31,7 +31,7 @@ target 'chillmate-tvOS' do
   # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
   # use_frameworks!
 
-  # Pods for adourapp-tvOS
+  # Pods for chillmate-tvOS
 
   target 'chillmate-tvOSTests' do
     inherit! :search_paths
