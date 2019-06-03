@@ -10,13 +10,13 @@ export const BRAND_COLOR_TWO = '#4A8FE7';
 
 export const routerStyle = StyleSheet.create({
   headerText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     fontSize: 24,
     paddingLeft: 8
   },
   bottomTabLabelStyle: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200'
   }
 

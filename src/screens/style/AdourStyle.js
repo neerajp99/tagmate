@@ -21,17 +21,17 @@ const { width: WIDTH } = Dimensions.get('window');
 
 export const adourStyle = StyleSheet.create({
   listItemText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200'
   },
   cardOverText:{
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     alignSelf: 'center',
     justifyContent: 'center'
   },
   timeAgoText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     alignSelf:'flex-end',
     marginBottom: 10,
@@ -43,19 +43,19 @@ export const adourStyle = StyleSheet.create({
     fontWeight:'200'
   },
   fadedText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     color: '#bfbfbf',
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid'
   },
   greyText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     color: '#bfbfbf'
   },
   defaultText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     marginLeft: 14,
     marginBottom: 10,
     marginTop: 10,
@@ -70,7 +70,7 @@ export const adourStyle = StyleSheet.create({
     width: WIDTH -108,
   },
   titleText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     fontSize: 28
   },
@@ -82,12 +82,12 @@ export const adourStyle = StyleSheet.create({
     marginBottom: 10
   },
   headerText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     fontSize: 24
   },
   buttonText: {
-    fontFamily:'OpenSans-Regular'
+    fontFamily:'OpenSans'
   },
   buttonTextBold: {
     fontFamily:'OpenSans-Semibold',
@@ -147,12 +147,12 @@ export const adourStyle = StyleSheet.create({
     fontWeight: '200'
   },
   onboardingTitle: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     fontSize: 35
   },
   cardTitle: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     fontSize:20,
     marginLeft: 18,
@@ -166,7 +166,7 @@ export const adourStyle = StyleSheet.create({
     textAlign:'left',
   },
   cardSubtitle: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontSize: 16,
     fontWeight: '100',
     marginBottom: 8
@@ -194,7 +194,7 @@ export const adourStyle = StyleSheet.create({
     marginTop: 20
   },
   btnText: {
-    fontFamily:'OpenSans-Regular',
+    fontFamily:'OpenSans',
     fontWeight:'200',
     color: 'rgba(255, 255, 255, 1)',
     fontSize: 16,
