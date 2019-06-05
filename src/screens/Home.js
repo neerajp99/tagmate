@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, getNetworkId, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {connect} from "react-redux";
-import {setDeviceToken} from "../actions";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
@@ -57,25 +56,23 @@ class HomeScreen extends Component {
             this.getMyTasks();
           })
         })
-        this.tokenFunc();
+        this.tokenFunc(uid);
     }
     componentWillUnmount()
     {
         this._isMounted = false;
     }
 
-    async tokenFunc() {
-      const {setDeviceToken} = this.props
-      let {currentUser} = await firebase.auth();
+    async tokenFunc(uid) {
       // configure push notification capability & get deviceToken
       Notification.configure((token) => {
-        if(currentUser) setDeviceToken(token)
+        saveDeviceToken(uid, token)
       })
 
       //listener to listen token refresh
       this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(token => {
           Notification.onTokenRefresh(token)
-          if(currentUser) setDeviceToken(token)
+          saveDeviceToken(uid, token)
       })
     }
 
@@ -316,7 +313,7 @@ class HomeScreen extends Component {
 
 }
 
-export default connect(null, {setDeviceToken}) (HomeScreen);
+export default HomeScreen;
 
 /*
 * Styles used in this screen

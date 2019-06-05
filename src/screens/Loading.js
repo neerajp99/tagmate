@@ -3,6 +3,7 @@ import {View, Text, ActivityIndicator, StyleSheet, ImageBackground, Image} from 
 import firebase from 'react-native-firebase';
 import AsyncStorage from '@react-native-community/async-storage';
 import Notification from '../lib/Notification'
+import {saveDeviceToken} from "../lib/firebaseUtils"
 import connect from "react-redux/es/connect/connect";
 import {fetchAllServices, submitUserServices} from "../actions";
 import bgImage from '../img/background.jpg'
@@ -75,13 +76,13 @@ class Loading extends Component {
 
       // configure push notification capability & get deviceToken
       Notification.configure((token) => {
-        //if(currentUser) setDeviceToken(token)
+        if(currentUser) saveDeviceToken(currentUser.uid, token)
       })
 
       //listener to listen token refresh
       this.onTokenRefreshListener = firebase.messaging().onTokenRefresh(token => {
           Notification.onTokenRefresh(token)
-          //if(currentUser) setDeviceToken(token)
+          if(currentUser) saveDeviceToken(currentUser.uid, token)
       })
 
       //listener to listen for push notifications

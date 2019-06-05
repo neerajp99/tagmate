@@ -16,19 +16,25 @@ class IconWithBadge extends React.Component {
     }
   }
   componentDidMount(){
+    this._isMounted = true;
     let user = firebase.auth().currentUser;
     if (user != null) {
       uid = user.uid;
     }
 
     getTotalUnread(uid).then(result => {
-      this.setState({unreadNotifs: result})
+      if(this._isMounted) this.setState({unreadNotifs: result})
     });
     getTotalInterested(uid).then(result => {
-      this.setState({totalInterestCount: result})
+      if(this._isMounted) this.setState({totalInterestCount: result})
     })
 
     this.liveUpdates();
+  }
+
+  componentWillUnmount()
+  {
+      this._isMounted = false;
   }
 
   liveUpdates = () => {
@@ -37,7 +43,7 @@ class IconWithBadge extends React.Component {
     let ref = firebase.database().ref(`users/${uid}/messages/`);
     ref.on('value', (snapshot) => {
       getTotalUnread(uid).then(result => {
-        this.setState({unreadNotifs: result})
+        if(this._isMounted) this.setState({unreadNotifs: result})
       });
     })
 
@@ -45,7 +51,7 @@ class IconWithBadge extends React.Component {
     let interestRef = firebase.database().ref(`users/${uid}/totalInterested/`);
     interestRef.on('value', (snapshot) => {
       getTotalInterested(uid).then(result => {
-        this.setState({totalInterestCount: result})
+        if(this._isMounted) this.setState({totalInterestCount: result})
       });
     })
 

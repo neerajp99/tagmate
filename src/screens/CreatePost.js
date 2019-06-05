@@ -5,6 +5,7 @@ import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
 import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getFullName} from "../lib/firebaseUtils";
 import {connect} from "react-redux";
+import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 
@@ -24,12 +25,20 @@ class CreatePost extends Component{
             anonymous: false,
             selfName:'',
             customTitle: '',
+            serviceTitle: '',
             bgImage:'http://chillmateapp.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',
             isDateTimePickerVisible: false,
         }
+
+        this.inputRefs = {
+          firstTextInput: null,
+          selectedServiceId: null,
+          selectedServiceId1: null,
+          lastTextInput: null,
+        };
     }
 
     componentWillMount() {
@@ -93,19 +102,28 @@ class CreatePost extends Component{
         else
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
-            const {when, details, anonymous, selectedServiceId, selectedServiceItem, bgImage, customTitle} = this.state;
+            const {when, details, anonymous, selectedServiceId, selectedServiceItem, serviceTitle, bgImage, customTitle} = this.state;
+            let postTitle = '';
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
             if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
             if(customTitle.length > 15) return this.erred('Title should not exceed 15 characters. Use description to specify more details.');
+            //Check if title is not blank if custom
+            //Set postTitle to customTitle if its a custom post else set postTitle to serviceTitle
             if(selectedServiceId === 'custom'){
               if(customTitle == '')
                 {
                   this.erred('You must put a post title');
                   this.setState({disabledBtn:false});
                   return
+                }else{
+                  postTitle = customTitle;
                 }
+            } else {
+              //Its not a custom post
+                postTitle = serviceTitle;
             }
+
 
             /* PREVENTS USER FROM CREATING POSTS IF USER DOES NOT HAVE ENOUGH COINS - DISABLED TEMPORARILY
               canRequestMore(uid).then(requestMore => {  // If the user can post more service requests:
@@ -139,15 +157,15 @@ class CreatePost extends Component{
             });
             */
 
-            /* TESTER
-
+            /* // TESTER
             getFullName(uid).then(fullName=>
             {
               getNetworkId(uid).then(networkId => {
-                console.log(`when: ${when}, details: ${details}, anonymous: ${anonymous}, customTitle: ${customTitle}, fullName: ${fullName}, networkId: ${networkId}, bgImage: ${bgImage}`);
+                console.log(`when: ${when}, details: ${details}, anonymous: ${anonymous}, customTitle: ${postTitle}, fullName: ${fullName}, networkId: ${networkId}, bgImage: ${bgImage}`);
               })
             })
             */
+
 
             //ENABLING CLOUD BASED POST FUNCTION
             const createNewPost = firebase.functions().httpsCallable('createNewPost');
@@ -167,6 +185,7 @@ class CreatePost extends Component{
                 })
               })
             });
+
         }
     }
 
@@ -181,11 +200,28 @@ class CreatePost extends Component{
     const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
     const {services = [], fetching} = this.props;
 
+    let servicesArray = [];
+    services.map((item, i) => {
+        servicesArray.push({
+          label: item.description,
+          value: item.id,
+          key: i
+        })
+    })
+
+    servicesArray.push({
+      label: 'Custom',
+      value: 'custom',
+      key: 'custom'
+    })
+
     //Get the service item of the selected service ID so that we can update the title and image in realtime
+
     if(selectedServiceId != "custom")
     {
       getServiceItem(selectedServiceId).then(serviceItem => {
-      if(this._isMounted) this.setState({selectedServiceItem: serviceItem, bgImage: serviceItem.img,  customTitle: serviceItem.title})
+      if(this._isMounted) this.setState({selectedServiceItem: serviceItem, bgImage: serviceItem.img, serviceTitle: serviceItem.title})
+      selectedServiceItem.title = serviceItem.title;
       })
     } else {
       //the user has selected custom service, populate title and image with custom service ones
@@ -212,7 +248,9 @@ class CreatePost extends Component{
           <View style={styles.cardSubtitle}>
 
           </View>
-          <Picker
+
+          { /*
+            <Picker
             selectedValue={selectedServiceId}
             style={adourStyle.pickerStyle}
             onValueChange={(itemValue, itemIndex) =>
@@ -225,6 +263,22 @@ class CreatePost extends Component{
             }
             <Picker.Item label="Custom" value={"custom"} />
           </Picker>
+        */}
+
+        <View style={{marginLeft: 15, marginBottom: 8, marginRight: 15}} >
+          <RNPickerSelect
+            selectedValue={selectedServiceId}
+            items={servicesArray}
+            useNativeAndroidPickerStyle={false}
+            onValueChange={value => {
+              this.setState({
+                selectedServiceId: value,
+              });
+            }}
+            style={pickerSelectStyles}
+            value={this.state.selectedServiceId}
+          />
+          </View>
 
           { selectedServiceId === "custom" &&
             <TextInput
@@ -324,3 +378,26 @@ const styles = StyleSheet.create({
       marginLeft: 18
     },
 })
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderRadius: 4,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: 'grey',
+    borderRadius: 8,
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});

@@ -1,4 +1,4 @@
-import {AsyncStorage} from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
 import * as _ from 'lodash'
 import firebase from 'react-native-firebase'
 

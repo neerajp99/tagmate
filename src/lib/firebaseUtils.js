@@ -85,6 +85,28 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+// Saves device token to the user's object
+export const saveDeviceToken = (uid, deviceToken) => new Promise((resolve, reject) => {
+    try {
+        let devTokensRef = firebase.database().ref(`/users/${uid}/deviceTokens`);
+        devTokensRef.once('value', (snapshot) => {
+          let deviceTokens = snapshot.val()
+          if (!Array.isArray(deviceTokens)) {
+              deviceTokens = []
+          }
+          //If the given deviceToken is not found in the deviceTokens array in the firebase database
+          if (!_.includes(deviceTokens, deviceToken)) {
+              deviceTokens.push(deviceToken)
+              devTokensRef.set(deviceTokens).then(res => {
+                resolve(true)
+              })
+          }
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 export const populateUserServices = (currentUser) => new Promise((resolve, reject) => {
     try {
       let servicesCount = 0
