@@ -1,13 +1,24 @@
 import firebase from "react-native-firebase";
+import {getAvatar, getFullName} from './firebaseUtils'
 
 class ChatLib {
   uid = "";
+  name = "";
   taskId = "";
+  avatar = "";
   messagesRef = null;
   constructor() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setUid(user.uid);
+        getAvatar(user.uid).then(avatarURL => {
+          this.avatar = avatarURL;
+          console.log('got avatar: ', avatarURL)
+        })
+        getFullName(user.uid).then(fullName => {
+          this.name = fullName;
+          console.log('got fullName: ', fullName)
+        })
       } else {
         console.log('user not logged in: ChatLib');
       }
@@ -25,6 +36,15 @@ class ChatLib {
   getUid() {
     return this.uid;
   }
+
+  getName() {
+    return this.name;
+  }
+
+  getAvatar() {
+    return this.avatar;
+  }
+
   // retrieve the messages from the Backend
   loadMessages(callback) {
     console.log(this.taskId);
@@ -38,7 +58,8 @@ class ChatLib {
         createdAt: new Date(message.createdAt),
         user: {
           _id: message.user._id,
-          name: message.user.name
+          name: message.user.name,
+          avatar: message.user.avatar
         }
       });
     };

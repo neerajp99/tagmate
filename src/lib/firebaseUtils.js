@@ -614,6 +614,17 @@ export const getWhatsapp = (userId) => new Promise((resolve, reject) => {
 })
 
 // Expects user ID in parameters
+// Returns the avatar of the user
+export const getAvatar = (userId) => new Promise((resolve, reject) => {
+    try {
+        var avatarRef = firebase.database().ref(`/users/${userId}/profilePicture`);
+        avatarRef.once("value", function(avatar){resolve(avatar.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// Expects user ID in parameters
 // Returns firstname of the user
 export const getName = (userId) => new Promise((resolve, reject) => {
     try {
@@ -624,6 +635,7 @@ export const getName = (userId) => new Promise((resolve, reject) => {
         reject(e)
     }
 })
+
 
 // Expects user ID in parameters
 // Returns lastname of the user

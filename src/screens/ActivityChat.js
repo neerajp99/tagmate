@@ -1,9 +1,11 @@
 import React, { Component, PropTypes } from 'react';
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Platform } from "react-native";
 import {connect} from 'react-redux';
 import {chatScreenMounted, chatScreenUnmounted} from '../actions';
 import ChatLib from "../lib/ChatLib";
+import ChatMessage from '../lib/ChatMessage';
 
+import emojiUtils from 'emoji-utils';
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
 class ActivityChat extends React.Component {
@@ -49,18 +51,38 @@ class ActivityChat extends React.Component {
     )
   }
 
+  renderMessage(props) {
+  const { currentMessage: { text: currText } } = props;
+
+  let messageTextStyle;
+
+  // Make "pure emoji" messages much bigger than plain text.
+  if (currText && emojiUtils.isPureEmojiString(currText)) {
+    messageTextStyle = {
+      fontSize: 28,
+      // Emoji get clipped if lineHeight isn't increased; make it consistent across platforms.
+      lineHeight: Platform.OS === 'android' ? 34 : 30,
+    };
+  }
+
+    return (
+      <ChatMessage {...props} messageTextStyle={messageTextStyle} />
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <GiftedChat
           messages={this.state.messages}
-          renderBubble={this.renderBubble}
+          renderMessage={this.renderMessage}
           onSend={message => {
             ChatLib.sendMessage(message, this.state.userList);
           }}
           user={{
             _id: ChatLib.getUid(),
-            name: this.state.name
+            name: ChatLib.getName(),
+            avatar: ChatLib.getAvatar()
           }}
         />
       </View>
