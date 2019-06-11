@@ -3,6 +3,8 @@ package com.chillmate;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnative.ivpusic.imagepicker.PickerPackage;
+import com.imagepicker.ImagePickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.brentvatne.react.ReactVideoPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
@@ -14,6 +16,7 @@ import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 import io.invertase.firebase.functions.RNFirebaseFunctionsPackage;
+import io.invertase.firebase.storage.RNFirebaseStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -34,6 +37,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new PickerPackage(),
+            new ImagePickerPackage(),
             new AsyncStoragePackage(),
             new ReactVideoPackage(),
             new RNGoogleSigninPackage(),
@@ -43,7 +48,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RNFirebaseDatabasePackage(),
               new RNFirebaseMessagingPackage(),
               new RNFirebaseNotificationsPackage(),
-              new RNFirebaseFunctionsPackage()
+              new RNFirebaseFunctionsPackage(),
+              new RNFirebaseStoragePackage()
       );
     }
 

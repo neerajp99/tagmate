@@ -61,6 +61,14 @@ export const adourStyle = StyleSheet.create({
     marginTop: 10,
     fontWeight:'200'
   },
+  reputationText: {
+    fontFamily:'OpenSans',
+    marginBottom: 10,
+    marginTop: 5,
+    fontSize: 16,
+    alignSelf: 'center',
+    fontWeight:'200'
+  },
   pickerStyle: {
     marginLeft: 14,
     backgroundColor: 'rgba(54, 105, 169, 0.2)',
@@ -72,6 +80,12 @@ export const adourStyle = StyleSheet.create({
   titleText: {
     fontFamily:'OpenSans',
     fontWeight:'200',
+    fontSize: 28
+  },
+  titleTextCenter: {
+    fontFamily:'OpenSans',
+    fontWeight:'200',
+    alignSelf: 'center',
     fontSize: 28
   },
   guideText: {
@@ -128,6 +142,18 @@ export const adourStyle = StyleSheet.create({
     backgroundColor: 'rgba(54, 105, 169, 0.2)',
     color: 'rgba(0, 0, 0, 0.35)',
     textAlign: 'center'
+  },
+  bioInputCenter: {
+    height: 100,
+    width: WIDTH -108,
+    marginLeft: 15,
+    marginBottom: 15,
+    fontSize: 16,
+    fontFamily:'OpenSans-Semibold',
+    paddingLeft: 25,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    color: 'rgba(0, 0, 0, 0.35)',
+    textAlign: 'left'
   },
   picker: {
     fontFamily:'OpenSans-Semibold',

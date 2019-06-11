@@ -1,6 +1,7 @@
 //Test Commit
 export * from './Profile';
 export * from './EditProfileDetails';
+export * from './EditBio';
 export * from './Support';
 export * from './PrivacyPolicy'
 export * from './ToS'

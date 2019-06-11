@@ -20,6 +20,10 @@ target 'chillmate' do
 
   pod 'Firebase/Database', '~> 5.20.1'
 
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+
+  pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
+
   target 'chillmateTests' do
     inherit! :search_paths
     # Pods for testing

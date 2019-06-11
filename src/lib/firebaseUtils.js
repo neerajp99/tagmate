@@ -85,6 +85,23 @@ export const creditCoins = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+
+export const setUserBio = (userId, bio) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${userId}`).update({bio:bio}).then(res=>{resolve(true)});
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const updateAvatar = (userId, url) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${userId}`).update({profilePicture:url}).then(res=>{resolve(true)});
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // Saves device token to the user's object
 export const saveDeviceToken = (uid, deviceToken) => new Promise((resolve, reject) => {
     try {
@@ -619,6 +636,15 @@ export const getAvatar = (userId) => new Promise((resolve, reject) => {
     try {
         var avatarRef = firebase.database().ref(`/users/${userId}/profilePicture`);
         avatarRef.once("value", function(avatar){resolve(avatar.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const getBio = (userId) => new Promise((resolve, reject) => {
+    try {
+        var nameRef = firebase.database().ref(`/users/${userId}/bio`);
+        nameRef.once("value", function(bio){resolve(bio.val() || '' );})
     } catch (e) {
         reject(e)
     }

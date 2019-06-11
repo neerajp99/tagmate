@@ -107,6 +107,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 11
         versionName "1.1"
+        vectorDrawables.useSupportLibrary = true
     }
     signingConfigs {
         release {
@@ -153,6 +154,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-image-crop-picker')
+    implementation project(':react-native-image-picker')
     implementation project(':@react-native-community_async-storage')
     compile project(':react-native-video')
     compile project(':react-native-google-signin')
@@ -160,12 +163,13 @@ dependencies {
     compile project(':react-native-gesture-handler')
     implementation project(':react-native-firebase')
     // Firebase dependencies
-    implementation "com.google.android.gms:play-services-base:16.0.1"
-    implementation "com.google.firebase:firebase-core:16.0.4"
-    implementation "com.google.firebase:firebase-auth:16.0.5"
-    implementation "com.google.firebase:firebase-database:16.0.4"
-    implementation "com.google.firebase:firebase-messaging:17.3.4"
-    implementation "com.google.firebase:firebase-functions:16.3.0"
+    implementation "com.google.android.gms:play-services-base:16.1.0"
+    implementation "com.google.firebase:firebase-core:16.0.9"
+    implementation "com.google.firebase:firebase-auth:17.0.0"
+    implementation "com.google.firebase:firebase-database:17.0.0"
+    implementation "com.google.firebase:firebase-messaging:18.0.0"
+    implementation "com.google.firebase:firebase-functions:17.0.0"
+    implementation "com.google.firebase:firebase-storage:17.0.0"
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"

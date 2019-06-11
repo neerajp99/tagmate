@@ -1,7 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { Text, View, StyleSheet, Platform } from "react-native";
+import firebase from "react-native-firebase";
 import {connect} from 'react-redux';
 import {chatScreenMounted, chatScreenUnmounted} from '../actions';
+import {getAvatar} from '../lib/firebaseUtils'
 import ChatLib from "../lib/ChatLib";
 import ChatMessage from '../lib/ChatMessage';
 
@@ -9,6 +11,8 @@ import emojiUtils from 'emoji-utils';
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
 class ActivityChat extends React.Component {
+  selfAvatar = "";
+
   constructor(props){
     super(props);
     this.state = {
@@ -29,6 +33,19 @@ class ActivityChat extends React.Component {
     ChatLib.setTaskId(this.state.taskId);
     ChatLib.resetUnread(this.state.taskId);
     this.props.chatScreenMounted();
+
+    /*
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        getAvatar(user.uid).then(avatarURL => {
+          this.selfAvatar = avatarURL;
+        })
+      } else {
+        console.log('user not logged in: ActivityLib');
+      }
+    });
+    */
+
     ChatLib.loadMessages(message => {
       this.setState(previousState => {
         return {
