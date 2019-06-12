@@ -46,6 +46,54 @@ admin.initializeApp();
     });
   })
 
+  exports.blockUser = functions.https.onCall((data, context) => {
+    if (!data.selfUid || !data.toBlockUid) {
+        throw new functions.https.HttpsError(
+          'invalid-argument', // code
+          'Please ensure you have filled all the fields' // message
+        );
+    }
+    admin.database().ref(`users/${data.selfUid}/block/blocked/${data.toBlockUid}`).update({id:data.toBlockUid}).then(result => {
+      admin.database().ref(`users/${data.toBlockUid}/block/blockedBy/${data.selfUid}`).update({id:data.selfUid}).then(finRes => {
+        return admin.database().ref(`users/${data.toBlockUid}/blockCount`).transaction(function(blockCount){
+          return (blockCount || 0) + 1;
+        });
+      })
+    })
+  })
+
+  exports.unblockUser = functions.https.onCall((data, context) => {
+    if (!data.selfUid || !data.toUnblockUid) {
+        throw new functions.https.HttpsError(
+          'invalid-argument', // code
+          'Please ensure you have filled all the fields' // message
+        );
+    }
+    admin.database().ref(`users/${data.selfUid}/block/blocked/${data.toUnblockUid}`).remove().then(result => {
+      admin.database().ref(`users/${data.toUnblockUid}/block/blockedBy/${data.selfUid}`).remove().then(finRes => {
+        return admin.database().ref(`users/${data.toUnblockUid}/blockCount`).transaction(function(blockCount){
+          return (blockCount || 0) - 1;
+        });
+      })
+    })
+  })
+
+  //Handles both post reports and user reports
+  exports.report = functions.https.onCall((data, context) => {
+    if (!data.uid || !data.reportID || !data.contentType || !data.reportType) {
+        throw new functions.https.HttpsError(
+          'invalid-argument', // code
+          'Please ensure you have filled all the fields' // message
+        );
+    }
+    return admin.database().ref(`reports/${data.contentType}/${data.reportID}`).update({
+      id: data.reportID,
+      reportedBy: data.uid,
+      contentType: data.contentType, //user or post
+      reportType: data.reportType // inapproperiate or spam
+    })
+  })
+
   exports.getNetworkId = functions.https.onCall((data, context) => {
     if (!data.uid) {
         throw new functions.https.HttpsError(
@@ -95,6 +143,53 @@ admin.initializeApp();
           })
       })
   });
+
+  //This function runs when a user blocks another user.
+  // If the blocked user (blockedUid) is an unconfirmed guest who is interested in a post hosted by user (uid), we coerce the blocked user to be rejected
+  exports.onBlock = functions.database
+  .ref('/users/{uid}/block/blocked/{blockedUid}')
+  .onCreate((snapshot, context) => {
+    const {uid, blockedUid} = context.params;
+    if (!uid || !blockedUid) {
+        return console.log('missing mandatory params')
+    }
+    let networkId;
+    let allPostsRef;
+    let hostedPostsList = []
+
+    //Get network ID
+    admin.database().ref(`/users/${uid}/network/id`).once('value', (snapshot) => {
+      networkId = snapshot.val();
+      allPostsRef = admin.database().ref(`networks/${networkId}/allPosts`);
+    }).then(resA => {
+      //Get all the posts hosted by this user
+      //Complying with the standard guidelines, modify the main post (from allPosts) instead of the local one so that all duplicates are also updated
+      admin.database().ref(`users/${uid}/posts/host`).once('value', (snapshot) => {
+        let data = snapshot.val()
+        let hostedPosts = Object.keys(data).map(function(key) {
+            return data[key];
+        });
+        hostedPosts.map(post => {
+          hostedPostsList.push(post.id)
+        })
+        for(let i=0; i<hostedPostsList.length; i++){
+          let postId = hostedPostsList[i];
+          allPostsRef.child(`${postId}/acceptorIds`).once('value', (snapshotB) => {
+            let acceptorIds = snapshotB.val();
+
+            acceptorIds.forEach(function(guest) {
+              guestUid = guest.id;
+              if(blockedUid === guestUid){
+                //Automatically mark this guest as rejected since this guest is now blocked
+                return allPostsRef.child(`${postId}/acceptorIds/${blockedUid}`).update({guestStatus: 2})
+              }
+            })
+          })
+        }
+        return true
+      })
+    })
+  })
 
   //This function takes care of adding the notification badge on the host app when a new guest accepts the host's post
   exports.notifyHostOnNewGuest = functions.database

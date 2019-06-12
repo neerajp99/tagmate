@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
 import IconWithBadge from "./screens/IconWithBadge";
-import {ProfileScreen, EditProfileDetails, EditBio, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import ActivityChat from './screens/ActivityChat';
@@ -29,6 +29,15 @@ export const ProfileStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'My Interests',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    BlockList: {
+      screen: BlockList,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Blocked Users',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -107,7 +116,16 @@ export const HomeStack = createStackNavigator(
           headerTitleStyle: routerStyle.headerText
         }
       }
-    }
+    },
+    ViewProfileHome: {
+      screen: ViewProfile,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Host Details',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
   }
 )
 
@@ -146,6 +164,15 @@ export const DashboardStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Chat',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    ViewProfile: {
+      screen: ViewProfile,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'View Profile',
           headerTitleStyle: routerStyle.headerText
         }
       }

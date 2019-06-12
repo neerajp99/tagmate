@@ -166,6 +166,13 @@ class ProfileScreen extends Component{
             onPress={()=>{this.loadWhatsapp()}}
           />
           <ListItem
+            title='Blocked Users'
+            titleStyle={adourStyle.listItemText}
+            leftIcon={{ name: 'help-outline' }}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
+            onPress={() => this.props.navigation.navigate('BlockList')}
+          />
+          <ListItem
             title='Support'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'help-outline' }}

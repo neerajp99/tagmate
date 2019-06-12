@@ -206,6 +206,50 @@ export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
     }
 })
 
+// get the list of all the task IDs that this user has rejected or accepted
+export const getBlockedList = (uid) => new Promise((resolve, reject) => {
+    try {
+        let blockedList = [];
+        let blockRef = firebase.database().ref(`users/${uid}/block`);
+        //get the list of users that has been blocked by the current user
+        blockRef.child('blocked').once('value', (snapshot) => {
+          if(snapshot.val() != undefined){
+            let data = snapshot.val();
+            let users = Object.values(data);
+            users.map(user => {
+              blockedList.push(user.id)
+            })
+          }
+        }).then(res => {
+          //get the list of users that has blocked the current user
+          blockRef.child('blockedBy').once('value', (snapshot) => {
+            if(snapshot.val() != undefined){
+              let data = snapshot.val();
+              let users = Object.values(data);
+              users.map(user => {
+                blockedList.push(user.id)
+              })
+            }
+          }).then(finRes => {
+            //get the list of users that the admin has soft blocked
+            blockRef.child('softBlocked').once('value', (snapshot) => {
+              if(snapshot.val() != undefined){
+                let data = snapshot.val();
+                let users = Object.values(data);
+                users.map(user => {
+                  blockedList.push(user.id)
+                })
+              }
+            }).then(result => {
+              resolve(blockedList)
+            })
+          })
+        })
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // get the total number of unread chat msgs by this user
 export const getTotalUnread = (uid) => new Promise((resolve, reject) => {
     try {

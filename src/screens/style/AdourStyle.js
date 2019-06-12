@@ -204,6 +204,21 @@ export const adourStyle = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
+  redButton: {
+    borderRadius: 15,
+    height: 45,
+    backgroundColor: 'indianred',
+    justifyContent: 'center',
+    marginTop: 20
+  },
+  textWhite: {
+    color: 'white',
+    fontFamily:'OpenSans-Semibold',
+    fontSize: 16,
+    fontWeight: '200',
+    marginLeft: 5,
+    marginRight: 5
+  },
   btnGeneralBadge: {
     borderRadius: 25,
     height: 45,

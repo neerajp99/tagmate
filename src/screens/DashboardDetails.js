@@ -223,6 +223,11 @@ class DashboardDetails extends Component {
     })
   }
 
+  openProfile = (uid) =>
+  {
+    this.props.navigation.navigate('ViewProfile',{profileUid: uid})
+  }
+
   confirmCancel = (item) => {
     if(item.status ==1)
     {
@@ -264,6 +269,38 @@ class DashboardDetails extends Component {
 
   }
 
+  onReportPress = () => {
+    Alert.alert(
+    'Confirmation',
+    'You may report this post if you think it is inappropriate or it violates our Terms of Service',
+    [
+      {text: 'Cancel', onPress: () => console.log('Report Revoked')},
+      {text: 'Report', onPress: () => this.onReportConfirm()}
+    ]
+  );
+  }
+
+  onReportConfirm = () => {
+    const {id} = this.state.item;
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      let selfUid = user.uid;
+      const report = firebase.functions().httpsCallable('report');
+      report({uid: selfUid, reportID: id, contentType: 'post' , reportType: 'inappropriate'})
+      .then(({ data }) => {
+        console.log('[Client] Report Success')
+        alert('This post has been reported as inappropriate. Our team will look into it.')
+        this.props.navigation.goBack();
+      })
+      .catch(HttpsError => {
+          console.log(HttpsError.code); // invalid-argument
+      })
+    } else {
+      alert('Please signin')
+      this.props.navigation.navigate('Login')
+    }
+  }
+
   renderGuests = ({item}) => {
       const {id, fullName, guestStatus} = item;
 
@@ -273,6 +310,7 @@ class DashboardDetails extends Component {
           title={fullName}
           titleStyle={adourStyle.listItemText}
           chevron={false}
+          onPress={() => this.openProfile(id)}
           containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
           leftIcon={{ name: 'person'}}
         />}
@@ -316,6 +354,7 @@ class DashboardDetails extends Component {
               subtitleStyle={adourStyle.listItemText}
               rightTitle={statusStr}
               rightTitleStyle={adourStyle.listItemText}
+              onPress={() => this.openProfile(item.hostId)}
               chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
@@ -426,6 +465,11 @@ class DashboardDetails extends Component {
                 />
           }
         </Card>}
+        {
+            !item.isClient && !this.state.fetching && <View style={{alignItems: 'center', justifyContent: 'center'}}>
+            <Text style={adourStyle.defaultText} onPress={() => this.onReportPress()}>Flag as inappropriate</Text>
+            </View>
+        }
       </View>
       </ScrollView>
     )

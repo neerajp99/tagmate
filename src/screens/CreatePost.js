@@ -173,7 +173,7 @@ class CreatePost extends Component{
             getFullName(uid).then(fullName=>
             {
               getNetworkId(uid).then(networkId => {
-                createNewPost({when:when,details:details, anonymous: anonymous, customTitle: customTitle, fullName: fullName, networkId: networkId, bgImage: bgImage})
+                createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage})
                 .then(({ data }) => {
                   console.log('[Client] Server successfully posted')
                   alert('Posted Successfully. You can find it on your Dashboard.')

@@ -1,129 +1,172 @@
 import React, {Component} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image, ScrollView} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image, Alert, ScrollView} from 'react-native';
 import { ListItem, Card, Divider, Avatar, Icon as IconElements } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import ActionSheet from 'react-native-actionsheet'
 import AddDetails from './auth/AddDetails';
-import {getCoins, getBio, listenForChange} from '../lib/firebaseUtils.js';
+import {getCoins, getBio, getFullName, getAvatar, getName, listenForChange, getBlockedList} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
 const PLACEHOLDER_AVATAR = "https://firebasestorage.googleapis.com/v0/b/chillmate-241a3.appspot.com/o/general%2Favatar.jpg?alt=media&token=4dcdfa81-fea1-4106-9306-26d67f55d62c";
 
-class ProfileScreen extends Component{
+
+class ViewProfile extends Component{
+
   constructor(props) {
     super(props);
     this.state = {
       loading: true,
+      profileUid:this.props.navigation.state.params.profileUid,
       coins: 'Loading...',
       displayName: '_____ _____',
       bio: '_____ _____ _____ ___ ______',
-      photoURL: PLACEHOLDER_AVATAR
+      photoURL: PLACEHOLDER_AVATAR,
+      selectedOption: '',
+      blocked: false, //if blocked is false the profile is displayed, if it is true, it means this user is blocked and hence we will not show this profile
     }; // Message to show while Adour coins are being loaded
-    this.firebaseListeners = this.firebaseListeners.bind(this);
-  }
 
-  handleSignout = () => {
-      firebase
-        .auth()
-        .signOut().then(
-          this.props.navigation.navigate('Login')
-        )
   }
 
   componentDidMount(){
     this._isMounted = true;
     //Fetching name and photo URL
+    const {profileUid} = this.state;
+    console.log('profileUid: ', profileUid)
+
+    // If this profileUid user is in the user's blocked list, do not show the page
     let user = firebase.auth().currentUser;
     if (user != null) {
-      displayName = user.displayName;
-      getBio(user.uid).then(bio => {
-        this.setState({displayName, bio, loading: false});
+      let uid = user.uid;
+      getBlockedList(uid).then(blockedList => {
+        if(blockedList.includes(profileUid)){
+          this.setState({blocked: true})
+        }
       })
-    } else {
-      this.props.navigation.navigate('Login')
     }
 
-    /* Cloud Function Test
-    const httpsCallable = firebase.functions().httpsCallable('cloudFuncTest');
-
-    httpsCallable({ some: 'args' })
-    .then(({ data }) => {
-        console.log(data.someResponse); // hello world
+    getFullName(profileUid).then(displayName => {
+      getBio(profileUid).then(bio => {
+        getAvatar(profileUid).then(photoURL => {
+          getCoins(profileUid).then(coins => {
+            this.setState({displayName, bio, coins, photoURL, loading: false});
+          })
+        })
+      })
     })
-    .catch(httpsError => {
-        console.log(httpsError.code); // invalid-argument
-    })
-    */
 
-    this.firebaseListeners();
 
-    GoogleSignin.configure({
-      //It is mandatory to call this method before attempting to call signIn()
-      /*
-      Scope used earlier:
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-      */
-      scopes: [],
-      // Repleace with your webClientId generated from Firebase console
-      webClientId:
-        '522194578751-bobqbcmj48345s6klfkpi07rjkoni7a6.apps.googleusercontent.com',//'768462231622-jhd3lqdcujeoene1768arlnhepe11t3g.apps.googleusercontent.com',
-      hostedDomain: '', // specifies a hosted domain restriction
-      loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
-      forceConsentPrompt: true, // [Android] if you want to show the authorization prompt at each login.
-    });
+
   }
 
   componentWillUnmount(){
     this._isMounted = false;
   }
 
-  loadWhatsapp = () =>
-  {
-    // Triggering the app to open whatsapp with a preloaded message.
-    Linking.openURL('whatsapp://send?text=Hey, checkout Chillmate. I use it to meet new people over activities - http://ChillmateApp.com')
+  showActionSheet = () => {
+    this.ActionSheet.show()
   }
 
-  // This functions expects the user to be logged in.
-  // It, in real-time, updates the Adour coin balance of the user.
-  firebaseListeners = () =>
-  {
-    if(this._isMounted)
-    {
-      let user = firebase.auth().currentUser;
-      if (user != null) {
-        uid = user.uid;
-        //Get profile picture
-        firebase.database().ref(`/users/${uid}/profilePicture`).on("value", function(snapshot)
-        {
-          if(this._isMounted) this.setState({photoURL: snapshot.val() || PLACEHOLDER_AVATAR});
-        }.bind(this));
-        //Get Reputation
-        firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
-        {
-          if(this._isMounted) this.setState({coins: snapshot.val() || "0"});
-        }.bind(this));
-        //Get Bio
-        firebase.database().ref(`/users/${uid}/bio`).on("value", function(snapshot)
-        {
-          if(this._isMounted) this.setState({bio: snapshot.val() || ""});
-        }.bind(this));
+  onBlockPress = () => {
+    getName(this.state.profileUid).then(name => {
+      Alert.alert(
+        'Confirmation',
+        `If you block ${name}, both you and ${name} won\'t be able to see each other\'s posts in the future. Please confirm.`,
+        [
+          {text: 'Cancel', onPress: () => console.log('Block cancelled')},
+          {text: 'Block', onPress: () => this.onBlockConfirm(name)}
+        ]
+      );
+    })
+  }
 
-      }
-
-
-
+  onBlockConfirm = (name) => {
+    const {profileUid} = this.state;
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      let selfUid = user.uid;
+      const blockUser = firebase.functions().httpsCallable('blockUser');
+      blockUser({selfUid: selfUid, toBlockUid: profileUid })
+      .then(({ data }) => {
+        console.log('[Client] Report Success')
+        alert(`${name} has been blocked`)
+        this.props.navigation.goBack();
+      })
+      .catch(HttpsError => {
+          console.log(HttpsError.code); // invalid-argument
+      })
+    } else {
+      alert('Please signin')
+      this.props.navigation.navigate('Login')
     }
   }
 
+  onReportPress = () => {
+    Alert.alert(
+    'Confirmation',
+    'You may report this profile if you think it is inappropriate or it violates our Terms of Service',
+    [
+      {text: 'Cancel', onPress: () => console.log('Report Revoked')},
+      {text: 'Report', onPress: () => this.onReportConfirm()}
+    ]
+  );
+  }
+
+  onReportConfirm = () => {
+    const {profileUid} = this.state;
+    let user = firebase.auth().currentUser;
+    if (user != null) {
+      let selfUid = user.uid;
+      const report = firebase.functions().httpsCallable('report');
+      report({uid: selfUid, reportID: profileUid, contentType: 'user' , reportType: 'abuse'})
+      .then(({ data }) => {
+        console.log('[Client] Report Success')
+        alert('Thank you for reporting. Our team will look into it and take appropriate actions. We will contact you if we need your input. Please block this user if you do not want to see their posts or do not want to be seen by them.')
+        this.props.navigation.goBack();
+      })
+      .catch(HttpsError => {
+          console.log(HttpsError.code); // invalid-argument
+      })
+    } else {
+      alert('Please signin')
+      this.props.navigation.navigate('Login')
+    }
+  }
 
   render(){
     return(
       <ScrollView>
       <View style={styles.backgroundContainer}>
             <Card>
+                {this.state.blocked? <Text style={adourStyle.defaultText}>Sorry, there was a problem displaying this profile.</Text> :
+
+                <View>
+                <View style={{alignItems: 'flex-end', justifyContent: 'flex-end'}} >
+                  <IconElements
+                    name="dots-horizontal"
+                    type="material-community"
+                    color={BRAND_COLOR_TWO}
+                    onPress={this.showActionSheet}
+                    raised
+                    />
+                    <ActionSheet
+                      ref={o => this.ActionSheet = o}
+                      options={['Report Abuse', 'Block', 'Cancel']}
+                      cancelButtonIndex={2}
+                      destructiveButtonIndex={1}
+                      onPress={(index) => {
+                        if(index === 1){
+                          this.onBlockPress()
+                        }else if (index === 0){
+                          this.onReportPress()
+                        }
+                    }}
+                    />
+
+                </View>
                 <View style={{alignItems: 'center', justifyContent: 'center', marginBottom: 8}} >
                 <Avatar
                 size="xlarge"
@@ -145,75 +188,10 @@ class ProfileScreen extends Component{
                 <Text style={adourStyle.defaultText}>{this.state.bio}</Text>
               </View>
 
-              <View style={{alignItems: 'flex-end', justifyContent: 'flex-end'}} >
-                <IconElements
-                  name="edit"
-                  type="material"
-                  color={BRAND_COLOR_TWO}
-                  onPress={() => this.props.navigation.navigate('EditBio')}
-                  raised
-                  />
               </View>
-
+            }
             </Card>
 
-        <Card title="Account" titleStyle={adourStyle.cardTitleSmall}>
-          <ListItem
-            title='Invite A Friend'
-            titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'person-add' }}
-            containerStyle={{borderBottomColor: '#e6e6e6'}}
-            onPress={()=>{this.loadWhatsapp()}}
-          />
-          <ListItem
-            title='Support'
-            titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'help-outline' }}
-            containerStyle={{borderBottomColor: '#e6e6e6'}}
-            onPress={() => this.props.navigation.navigate('SupportScreen')}
-          />
-
-          </Card>
-
-          <Card title="Legal" titleStyle={adourStyle.cardTitleSmall}>
-          <ListItem
-            title='Privacy Policy'
-            titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'https' }}
-            containerStyle={{borderBottomColor: '#e6e6e6'}}
-            onPress={() => this.props.navigation.navigate('PrivacyPolicyScreen')}
-          />
-          <ListItem
-            title='Terms of Service'
-            titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'info-outline' }}
-            containerStyle={{borderBottomColor: '#e6e6e6'}}
-            onPress={() => this.props.navigation.navigate('ToS')}
-          />
-
-          </Card>
-
-          <Card>
-          <ListItem
-            title='Logout'
-            titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'exit-to-app' }}
-            containerStyle={{borderBottomColor: '#e6e6e6'}}
-            onPress={async () => {
-              try {
-                const isSignedIn = await GoogleSignin.isSignedIn();
-                if(isSignedIn == true){
-                  await GoogleSignin.signOut();
-                  this.props.navigation.navigate('Login')
-                }
-                firebase.auth().signOut();
-              }
-              catch (error) {
-                console.log(error);
-              }
-            }}
-          />
-        </Card>
         <View style={{marginTop: 25}} />
       </View>
       </ScrollView>
@@ -254,5 +232,26 @@ const styles = StyleSheet.create({
   }
 })
 
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderRadius: 4,
+    color: 'black',
 
-export {ProfileScreen};
+  },
+  inputAndroid: {
+    fontSize: 16,
+    borderWidth: 0.5,
+    borderColor: 'grey',
+    borderRadius: 8,
+    color: 'black',
+  },
+  iconContainer: {
+              top: 10,
+              right: 12,
+            },
+});
+
+export {ViewProfile};

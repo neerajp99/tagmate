@@ -42,6 +42,11 @@ class GuestList extends Component {
       this._isMounted = false;
   }
 
+  openProfile = (uid) =>
+  {
+    this.props.navigation.navigate('ViewProfile',{profileUid: uid})
+  }
+
     // Home to all the listeners for the guest list object for this serviceRequest ID
     getGuestList = () => {
       if(this._isMounted)
@@ -118,7 +123,8 @@ class GuestList extends Component {
           <View>
           <Card>
             <View style={styles.guestContainer}>
-            <Text style={guestStatus < 2 ? adourStyle.listItemTextBold:adourStyle.fadedText }>{fullName}</Text>
+
+            <Text onPress={() => this.openProfile(id)} style={guestStatus < 2 ? adourStyle.listItemTextBold:adourStyle.fadedText }>{fullName}</Text>
 
             { guestStatus == 0 && <View style={styles.buttonsContainer}>
               <View>

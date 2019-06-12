@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
-import {serverExists, getNetworkId, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, getBlockedList, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card } from 'react-native-elements';
@@ -24,6 +24,8 @@ class HomeScreen extends Component {
         this.state = {
             myTasks: [],
             hiddenPosts: [],
+            blockedList: [],
+            networkId: '',
             fetching: false,
         };
         this.getMyTasks = this.getMyTasks.bind(this);
@@ -38,6 +40,7 @@ class HomeScreen extends Component {
         } else {
           this.props.navigation.navigate('Login')
         }
+
         // TEMPORARY
         //getAcceptors("testServiceRequest").then(response => {
         //  console.log("Returned from getAcceptors: ", response);
@@ -47,13 +50,14 @@ class HomeScreen extends Component {
         //})
         //addAcceptor("VineetNand999", "testServiceRequest"); //TEMPORARY
 
-        // Keep updating tasks
-        getHiddenPosts(uid).then(hiddenPostList => {
-          this.setState({hiddenPosts: hiddenPostList});
-
-          getNetworkId(uid).then(networkId => {
-            this.setState({networkId: networkId});
-            this.getMyTasks();
+        // Get the necessary lists to filter the posts
+        getHiddenPosts(uid).then(hiddenPosts => {
+          getBlockedList(uid).then(blockedList => {
+            getNetworkId(uid).then(networkId => {
+              this.setState({networkId, blockedList, hiddenPosts});
+              this.getMyTasks();
+              this.blockedListListener();
+            })
           })
         })
         this.tokenFunc(uid);
@@ -76,6 +80,11 @@ class HomeScreen extends Component {
       })
     }
 
+    openProfile = (uid) =>
+    {
+      this.props.navigation.navigate('ViewProfileHome',{profileUid: uid})
+    }
+
     userGuideContainer = () =>
     {
       if(this.state.myTasks.length == 0) {
@@ -87,6 +96,49 @@ class HomeScreen extends Component {
                 </View>
           }
     }
+
+    //If there is a change in blocked list while the user is on this screen, update the blockedList state
+    blockedListListener = () => {
+      let blockedRef = firebase.database().ref(`users/${uid}/block/`);
+      //When the user blocks someone new
+      blockedRef.child('blocked').on('child_added', (snapshot) => {
+        //If there is a change, use the function getBlockedList to create the updated combined blockedList
+        getBlockedList(uid).then(blockedList => {
+          //Update the state with this new updated list
+          this.setState({blockedList});
+          //Remove any posts hosted by the blockedUid
+          const {myTasks} = this.state;
+          let tempArr = [];
+          if(this._isMounted)
+          {
+            //Look for the post locally that changed in the realtime database
+            this.state.hosting.map(item =>
+            {
+              if(item.id == post.id) tempArr.push(post); //if we find it, add the updated post to the array
+              else tempArr.push(item); // add all other posts as they were into the array
+            });
+            this.setState({myTasks:tempArr});
+          }
+
+        })
+      })
+      //Listen for changes in the list of users that has blocked the current user
+      blockedRef.child('blockedBy').on('value', (snapshot) => {
+        //If there is a change, use the function getBlockedList to create the updated combined blockedList
+        getBlockedList(uid).then(blockedList => {
+          //Update the state with this new updated list
+          this.setState({blockedList});
+        })
+      })
+      //listen for changes in the list of users that the admin has soft blocked
+      blockedRef.child('softBlocked').on('value', (snapshot) => {
+        //If there is a change, use the function getBlockedList to create the updated combined blockedList
+        getBlockedList(uid).then(blockedList => {
+          //Update the state with this new updated list
+          this.setState({blockedList});
+        })
+      })
+    }
     /*
     * get all the task requests that this user can perform
     * */
@@ -96,8 +148,8 @@ class HomeScreen extends Component {
         livePostsRef.on('child_added', (snapshot) => {
 
           let request  = snapshot.val()
-          // Check if this request is not made by same user and it is not already decided upon by this user
-          if(request.hostId != uid && !_.includes(this.state.hiddenPosts, request.id))
+          // Check if this request is not made by same user, it is not by a host who has blocked this user or vice versa and it is not already decided upon by this user
+          if(request.hostId != uid && !_.includes(this.state.blockedList, request.hostId) && !_.includes(this.state.hiddenPosts, request.id))
           {
             this.setState({myTasks:[request].concat(this.state.myTasks) , fetching: false});
           }
@@ -156,7 +208,7 @@ class HomeScreen extends Component {
     swipableRender(myTasks) {
 
       return myTasks.map((item) => {
-        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, interestedCount} = item;
+        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, hostId, interestedCount} = item;
         var detailsAvailable = true;
 
         if(details == "" || typeof details == "undefined") detailsAvailable = false
@@ -184,6 +236,7 @@ class HomeScreen extends Component {
               subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
               chevron={false}
+              onPress={() => this.openProfile(hostId)}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
 
