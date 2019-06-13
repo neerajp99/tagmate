@@ -3,7 +3,7 @@ import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, D
 import {serverExists, getNetworkId, getBlockedList, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
-import { Button, ListItem, Card } from 'react-native-elements';
+import { Button, ListItem, Card, Icon as IconElements } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {connect} from "react-redux";
 import * as _ from 'lodash';
@@ -99,45 +99,28 @@ class HomeScreen extends Component {
 
     //If there is a change in blocked list while the user is on this screen, update the blockedList state
     blockedListListener = () => {
+      //Currently only taking care of when the user blocks someone new. Does not work when user unblocks. S/he must reload the app in that case.
       let blockedRef = firebase.database().ref(`users/${uid}/block/`);
       //When the user blocks someone new
       blockedRef.child('blocked').on('child_added', (snapshot) => {
         //If there is a change, use the function getBlockedList to create the updated combined blockedList
-        getBlockedList(uid).then(blockedList => {
-          //Update the state with this new updated list
-          this.setState({blockedList});
           //Remove any posts hosted by the blockedUid
-          const {myTasks} = this.state;
-          let tempArr = [];
-          if(this._isMounted)
-          {
-            //Look for the post locally that changed in the realtime database
-            this.state.hosting.map(item =>
-            {
-              if(item.id == post.id) tempArr.push(post); //if we find it, add the updated post to the array
-              else tempArr.push(item); // add all other posts as they were into the array
-            });
-            this.setState({myTasks:tempArr});
-          }
-
-        })
+          let blockedUid = snapshot.val();
+          this.setState({myTasks: this.state.myTasks.filter(item => item.hostId !== snapshot.key)});
       })
       //Listen for changes in the list of users that has blocked the current user
-      blockedRef.child('blockedBy').on('value', (snapshot) => {
-        //If there is a change, use the function getBlockedList to create the updated combined blockedList
-        getBlockedList(uid).then(blockedList => {
-          //Update the state with this new updated list
-          this.setState({blockedList});
-        })
+      blockedRef.child('blockedBy').on('child_added', (snapshot) => {
+        //Remove any posts hosted by the blockedUid
+        let blockedUid = snapshot.val();
+        this.setState({myTasks: this.state.myTasks.filter(item => item.hostId !== snapshot.key)});
       })
       //listen for changes in the list of users that the admin has soft blocked
-      blockedRef.child('softBlocked').on('value', (snapshot) => {
-        //If there is a change, use the function getBlockedList to create the updated combined blockedList
-        getBlockedList(uid).then(blockedList => {
-          //Update the state with this new updated list
-          this.setState({blockedList});
-        })
+      blockedRef.child('softBlocked').on('child_added', (snapshot) => {
+        //Remove any posts hosted by the blockedUid
+        let blockedUid = snapshot.val();
+        this.setState({myTasks: this.state.myTasks.filter(item => item.hostId !== snapshot.key)});
       })
+
     }
     /*
     * get all the task requests that this user can perform

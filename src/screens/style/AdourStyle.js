@@ -204,6 +204,13 @@ export const adourStyle = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
+  btnGeneralT: {
+    borderRadius: 25,
+    height: 45,
+    backgroundColor: BRAND_COLOR_TWO,
+    justifyContent: 'center',
+    marginTop: 10
+  },
   redButton: {
     borderRadius: 15,
     height: 45,

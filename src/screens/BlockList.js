@@ -53,14 +53,16 @@ class BlockList extends Component {
                   id: blockedUser.id,
                   fullName: fullName
                 };
-                this.setState({blockList:[blockedUserObj].concat(this.state.blockList) , fetching: false});
+                if(this._isMounted) this.setState({blockList:[blockedUserObj].concat(this.state.blockList) , fetching: false});
               })
             }
         });
 
+        if(this.state.fetching && this._isMounted) this.setState({fetching: false});
+
         //when a user is unblocked
         ref.on('child_removed', (snapshot) => {
-          this.setState({blockList: this.state.blockList.filter(item => item.id !== snapshot.key)});
+          if(this._isMounted) this.setState({blockList: this.state.blockList.filter(item => item.id !== snapshot.key)});
         });
       }
 
@@ -81,11 +83,13 @@ class BlockList extends Component {
 
     onUnblockConfirm = (id, name) => {
       let user = firebase.auth().currentUser;
+      if(this._isMounted) this.setState({fetching: true});
       if (user != null) {
         let selfUid = user.uid;
         const unblockUser = firebase.functions().httpsCallable('unblockUser');
         unblockUser({selfUid: selfUid, toUnblockUid: id })
         .then(({ data }) => {
+          if(this._isMounted) this.setState({fetching: false});
           console.log('[Client] Report Success')
           alert(`${name} has been unblocked`)
         })
@@ -132,7 +136,7 @@ class BlockList extends Component {
           <View style={{flex: 2, marginBottom: 8}}>
           <ScrollView>
             <View style={styles.mainContainer}>
-                {(blockList.length == 0) && <Text style={adourStyle.defaultText}>No blocked users.</Text>}
+                {(blockList.length == 0) && !fetching && <Text style={adourStyle.defaultText}>No blocked users.</Text>}
                 {(blockList.length != 0) && <FlatList
                     data={blockList}
                     extraData={blockList}
@@ -172,5 +176,13 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 2,
     flex: 2
+    },
+    progressContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        marginTop: 100
     },
 })

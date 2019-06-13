@@ -174,18 +174,18 @@ admin.initializeApp();
         })
         for(let i=0; i<hostedPostsList.length; i++){
           let postId = hostedPostsList[i];
-          allPostsRef.child(`${postId}/acceptorIds`).once('value', (snapshotB) => {
-            let acceptorIds = snapshotB.val();
-
-            acceptorIds.forEach(function(guest) {
-              guestUid = guest.id;
-              if(blockedUid === guestUid){
+          return allPostsRef.child(`${postId}/acceptorIds`).once('value', (acceptorIds) => {
+            return acceptorIds.forEach(function(guest) {
+              if(blockedUid === guest.id){
                 //Automatically mark this guest as rejected since this guest is now blocked
+                console.log('about to end my job')
                 return allPostsRef.child(`${postId}/acceptorIds/${blockedUid}`).update({guestStatus: 2})
               }
             })
           })
         }
+      }).then(finRes => {
+        console.log('finRes')
         return true
       })
     })

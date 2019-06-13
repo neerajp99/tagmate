@@ -37,7 +37,7 @@ class DashboardDetails extends Component {
     }
 
     getNetworkId(uid).then(networkId => {
-      this.setState({networkId});
+      if(this._isMounted) this.setState({networkId});
       this.getTaskItem();
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     })
@@ -54,7 +54,7 @@ class DashboardDetails extends Component {
     var ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}`);
     ref.on('value', (snapshot) => {
       let data = snapshot.val();
-      this.setState({ item: data});
+      if(this._isMounted) this.setState({ item: data});
 
       if(this.state.item.status != 0 && this.state.item.status != 3){
         this.getConfirmedGuests();
@@ -67,7 +67,7 @@ class DashboardDetails extends Component {
     hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
     if(result != null){
       console.log('hasOptedOutAsGuest result is ', result);
-      this.setState({optedOut: result})
+      if(this._isMounted) this.setState({optedOut: result})
       }
     })
 
@@ -92,7 +92,7 @@ class DashboardDetails extends Component {
         ref.on('value', (snapshot) => {
           let data = snapshot.val();
           let guestItems = Object.values(data);
-          this.setState({ confirmedGuestList: guestItems});
+          if(this._isMounted) this.setState({ confirmedGuestList: guestItems});
         })
       }
 
@@ -109,24 +109,24 @@ class DashboardDetails extends Component {
       if(this._isMounted)
       {
         var item = snapshot.val();
-        this.setState({fetching:false});
+        if(this._isMounted) this.setState({fetching:false});
         if(item.hostId == uid) item.isClient = true; // The user is requester
         else if(item.serverId == uid) item.isClient = false; // The user is acceptor
         else
         {
           // The user is neither requester nor acceptor
-          this.setState({hide:true});
+          if(this._isMounted) this.setState({hide:true});
           return;
         }
 
-        this.setState({item:item});
+        if(this._isMounted) this.setState({item:item});
 
         // Get name of the user involved in this service request:
         getName(uid).then(selfName=>
         {
           // Then, update the name:
           item.selfName = selfName;
-          this.setState({item:item});
+          if(this._isMounted) this.setState({item:item});
         });
 
         //If guest list is finalized, check if there are unread chat msgs
@@ -140,7 +140,7 @@ class DashboardDetails extends Component {
           {
             // Then, update the name:
             item.name = name;
-            this.setState({item:item, nameAvailable:true});
+            if(this._isMounted) this.setState({item:item, nameAvailable:true});
           });
         }
 
@@ -148,7 +148,7 @@ class DashboardDetails extends Component {
         hasOptedOutAsGuest(uid, this.state.item.id).then(result =>{
         if(result != null){
           console.log('hasOptedOutAsGuest result is ', result);
-          this.setState({optedOut: result})
+          if(this._isMounted) this.setState({optedOut: result})
           }
         })
 
@@ -157,7 +157,7 @@ class DashboardDetails extends Component {
         {
           // Then, update the coins:
           item.coins = coins;
-          this.setState({item:item});
+          if(this._isMounted) this.setState({item:item});
         });
 
         // If whatsapp number is not available yet:
@@ -168,7 +168,7 @@ class DashboardDetails extends Component {
           {
             // Then, update the whatsapp number:
             item.whatsapp = whatsapp;
-            this.setState({item:item, whatsappAvailable:true});
+            if(this._isMounted) this.setState({item:item, whatsappAvailable:true});
           });
         }
       }
@@ -183,7 +183,7 @@ class DashboardDetails extends Component {
     if(this.state.disabledDone == true) return;
     else // Only if the button is not disabled:
     {
-      this.setState({disabledDone:true});
+      if(this._isMounted) this.setState({disabledDone:true});
       let networkId = this.state.networkId;
       const markRequestDone = firebase.functions().httpsCallable('markRequestDone');
 
@@ -260,7 +260,7 @@ class DashboardDetails extends Component {
       {
         console.log('cancelled');
         if(!item.isClient){
-          this.setState({optedOut: true});
+          if(this._isMounted) this.setState({optedOut: true});
         }
         //Do nothing
         //this.props.navigation.navigate('DashboardScreen')

@@ -43,7 +43,7 @@ class ViewProfile extends Component{
       let uid = user.uid;
       getBlockedList(uid).then(blockedList => {
         if(blockedList.includes(profileUid)){
-          this.setState({blocked: true})
+          if(this._isMounted) this.setState({blocked: true})
         }
       })
     }
@@ -52,7 +52,7 @@ class ViewProfile extends Component{
       getBio(profileUid).then(bio => {
         getAvatar(profileUid).then(photoURL => {
           getCoins(profileUid).then(coins => {
-            this.setState({displayName, bio, coins, photoURL, loading: false});
+            if(this._isMounted) this.setState({displayName, bio, coins, photoURL, loading: false});
           })
         })
       })

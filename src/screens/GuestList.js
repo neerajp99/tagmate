@@ -32,15 +32,42 @@ class GuestList extends Component {
         uid = user.uid;
       }
       getNetworkId(uid).then(networkId => {
-        this.setState({networkId});
+        if(this._isMounted) this.setState({networkId});
         this.getGuestList();
       })
+      this.blockedListener();
+
   }
 
   componentWillUnmount()
   {
       this._isMounted = false;
   }
+
+  //Listen for new blocked users and then automatically reject them (needed for iOS review)
+  // Possible issue: this runs even if the blocked user is NOT in the guest list
+  blockedListener = () => {
+    let blockedRef = firebase.database().ref(`users/${uid}/block/`);
+    //REALTIME
+    //When the user blocks someone new
+    blockedRef.child('blocked').on('child_added', (snapshot) => {
+        let blockedUser = snapshot.val();
+        if(this._isMounted) this.rejectGuest(blockedUser.id);
+    })
+  }
+
+
+    /* DOESNT WORK: Tried to solve the above issue
+    blockedRef.child('blocked').on('child_added', (snapshot) => {
+      //If there is a change, use the function getBlockedList to create the updated combined blockedList
+        //Remove any posts hosted by the blockedUid
+        let blockedUser = snapshot.val();
+        guestList.map(guest => {
+          if(guest.id === blockedUser.id) this.rejectGuest(blockedUser.id);
+        })
+    })
+    */
+
 
   openProfile = (uid) =>
   {
@@ -57,13 +84,13 @@ class GuestList extends Component {
           ref.on('value', (snapshot) => {
           if(snapshot.val() == null){
             //no potential guests available
-            this.setState({fetching:false, disabledBtn: true});
+            if(this._isMounted) this.setState({fetching:false, disabledBtn: true});
             return;
            }
           console.log('snapshot.val(): ', snapshot.val());
           let data = snapshot.val();
           let guestItems = Object.values(data);
-          this.setState({ guestList: guestItems, fetching:false });
+          if(this._isMounted) this.setState({ guestList: guestItems, fetching:false });
           console.log('guestList state: ', this.state.guestList);
         });
 
@@ -71,7 +98,7 @@ class GuestList extends Component {
         ref.on('child_changed', (snapshot) => {
           let data = snapshot.val();
           let guestItems = Object.values(data);
-          this.setState({ guestList: guestItems });
+          if(this._isMounted) this.setState({ guestList: guestItems });
         });
       }
 
@@ -168,9 +195,10 @@ class GuestList extends Component {
             </View>
             </ScrollView>
 
+            <View style={{marginLeft: 15, marginRight: 15, marginBottom: 8}} >
             <Button
                 onPress={()=>this.confirmGuestList()}
-                buttonStyle={adourStyle.btnGeneral}
+                buttonStyle={adourStyle.btnGeneralT}
                 titleStyle={adourStyle.btnText}
                 disabled={this.state.disabledBtn}
                 title="Finalize List"
@@ -178,10 +206,11 @@ class GuestList extends Component {
 
             <Button
                 onPress={()=>this.props.navigation.goBack()}
-                buttonStyle={adourStyle.btnGeneral}
+                buttonStyle={adourStyle.btnGeneralT}
                 titleStyle={adourStyle.btnText}
                 title="Wait for More People to Join"
             />
+            </View>
 
             </View>
         )

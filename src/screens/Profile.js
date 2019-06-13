@@ -168,7 +168,7 @@ class ProfileScreen extends Component{
           <ListItem
             title='Blocked Users'
             titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'help-outline' }}
+            leftIcon={{ name: 'block' }}
             containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={() => this.props.navigation.navigate('BlockList')}
           />
