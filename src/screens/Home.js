@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
+import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
 import {serverExists, getNetworkId, getBlockedList, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import { Button, ListItem, Card, Icon as IconElements } from 'react-native-elements';
+import ActionSheet from 'react-native-actionsheet'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {connect} from "react-redux";
 import * as _ from 'lodash';
 import TimeAgo from 'react-native-timeago';
@@ -188,6 +190,42 @@ class HomeScreen extends Component {
         }
     }
 
+    showActionSheet = () => {
+      this.ActionSheet.show()
+    }
+
+
+      onReportPress = (id) => {
+        Alert.alert(
+        'Confirmation',
+        'You may report this post if you think it is inappropriate or it violates our Terms of Service',
+        [
+          {text: 'Cancel', onPress: () => console.log('Report Revoked')},
+          {text: 'Report', onPress: () => this.onReportConfirm(id)}
+        ]
+      );
+      }
+
+      onReportConfirm = (id) => {
+        let user = firebase.auth().currentUser;
+        if (user != null) {
+          let selfUid = user.uid;
+          const report = firebase.functions().httpsCallable('report');
+          report({uid: selfUid, reportID: id, contentType: 'post' , reportType: 'inappropriate'})
+          .then(({ data }) => {
+            console.log('[Client] Report Success')
+            alert('This post has been reported as inappropriate. Our team will look into it.')
+            this.props.navigation.goBack();
+          })
+          .catch(HttpsError => {
+              console.log(HttpsError.code); // invalid-argument
+          })
+        } else {
+          alert('Please signin')
+          this.props.navigation.navigate('Login')
+        }
+      }
+
     swipableRender(myTasks) {
 
       return myTasks.map((item) => {
@@ -212,7 +250,35 @@ class HomeScreen extends Component {
 
         return (
           <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <View>
+
+
+
           <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
+
+          {/* Report Feature */}
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-115 , top: -152, position: 'absolute'}} >
+            <IconElements
+              name="dots-horizontal"
+              type="material-community"
+              color={'rgba(41, 89, 165, 0.2)'}
+              onPress={this.showActionSheet}
+              reverse
+              raised
+              />
+              <ActionSheet
+                ref={o => this.ActionSheet = o}
+                options={['Report', 'Cancel']}
+                cancelButtonIndex={1}
+                destructiveButtonIndex={0}
+                onPress={(index) => {
+                  if(index === 0){
+                    this.onReportPress(id)
+                  }
+              }}
+              />
+          </View>
+
               <ListItem
               title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
@@ -252,6 +318,7 @@ class HomeScreen extends Component {
               </View>
 
               </Card>
+              </View>
             </SwipableCard>
         )
       })
