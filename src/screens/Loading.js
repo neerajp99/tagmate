@@ -36,6 +36,11 @@ class Loading extends Component {
         //const {setDeviceToken} = this.props
         let {currentUser} = await firebase.auth();
         // If the user exists and does not have to go to OnboardingSplash:
+        //SEND THE USER DIRECTLY WITHOUT CHECKING EMAIL AGAIN
+        this.props.navigation.navigate('MainStack');
+
+        //IF you want to check the user's email again and verify its university affiliation then uncomment the below code
+        /*
         if(currentUser)
         {
                     firebase.auth().onAuthStateChanged(user => {
@@ -49,7 +54,8 @@ class Loading extends Component {
                     else
                     {
                       this.props.navigation.navigate('MainStack');
-                      /* IF YOU WANT TO CHECK IF THE USER HAS FILLED CERTAIN PROFILE DETAILS BEFORE ALLOWING ACCESS INTO THE APP ENABLE THIS
+                      // IF YOU WANT TO CHECK IF THE USER HAS FILLED CERTAIN PROFILE DETAILS BEFORE ALLOWING ACCESS INTO THE APP ENABLE THIS
+                      //DISABLE C START
                         firebase.database().ref(`/users/${uid}`).once('value', (snapshot) =>
                         {
                             let vals = snapshot.val();
@@ -64,7 +70,7 @@ class Loading extends Component {
                                 this.props.navigation.navigate('MainStack');
                             }
                         })
-                        */
+                        //DISABLE C END
                     }
 
             //this.props.navigation.navigate(user ? 'MainStack' : 'SignUp')
@@ -73,6 +79,9 @@ class Loading extends Component {
         //Else do the following if the user is not signed In
         this.props.navigation.navigate('Login');
       }
+      DISABLE B END */
+
+
 
       // configure push notification capability & get deviceToken
       Notification.configure((token) => {

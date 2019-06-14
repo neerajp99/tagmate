@@ -164,30 +164,47 @@ export const populateUserServices = (currentUser) => new Promise((resolve, rejec
     }
 })
 
+
 export const addNetworkDetails = (currentUser) => new Promise((resolve, reject) => {
     try {
-      let email = currentUser.user.email;
-      let domain = email.substring(email.lastIndexOf("@") +1);
-      let uniqueDomainCode = domain.replace(/\./g,'x')
-      let name = domain.slice(0, domain.indexOf(".") );
-      name = name.charAt(0).toUpperCase() + name.slice(1);
+      console.log('Inside addNetworkDetails');
+      let networkInfoExists = false;
+      //does network object already exist?
+      firebase.database().ref(`/users/${currentUser.user.uid}/network`).once('value', (snapshot) => {
+        console.log('snapshot.exists(): ',snapshot.exists());
+        networkInfoExists = snapshot.exists();
+        resolve(snapshot.exists())
+      }).then(result => {
+        console.log('networkInfoExists: ', networkInfoExists);
+        //Only update network Info if it doesn't exist
+        if(!networkInfoExists){
+          let email = currentUser.user.email;
+          let domain = email.substring(email.lastIndexOf("@") +1);
+          let uniqueDomainCode = domain.replace(/\./g,'x')
+          let name = domain.slice(0, domain.indexOf(".") );
+          name = name.charAt(0).toUpperCase() + name.slice(1);
 
-      let network = {
-        domain: domain,
-        name: name,
-        id: uniqueDomainCode
-      }
-      console.log('network: ', network);
-      console.log('checking if firebase user email stayed intact: ', currentUser.user.email)
-      firebase.database().ref(`/users/${currentUser.user.uid}/network`).update(network).then(res => {
-        firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.user.uid}`).set(true).then(lres => {
-          resolve(true)
-        })
-      });
+          let network = {
+            domain: domain,
+            name: name,
+            id: uniqueDomainCode
+          }
+          console.log('network: ', network);
+          console.log('checking if firebase user email stayed intact: ', currentUser.user.email)
+          firebase.database().ref(`/users/${currentUser.user.uid}/network`).update(network).then(res => {
+            firebase.database().ref(`/networks/${uniqueDomainCode}/users/${currentUser.user.uid}`).set(true).then(lres => {
+              resolve(true)
+            })
+          });
+        }
+
+      })
+
     } catch (e) {
         reject(e)
     }
 })
+
 
 // get the list of all the task IDs that this user has rejected or accepted
 export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {

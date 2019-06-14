@@ -89,6 +89,8 @@ class Login extends Component {
       // login with credential
       const currentUser = await firebase.auth().signInWithCredential(credential);
 
+      //NOTE: Any change here must also be in Loading.js
+      
       //India
       let eduIn = (currentUser.user.email.slice(-7) === '.edu.in');
       let acIn = (currentUser.user.email.slice(-6) === '.ac.in');
@@ -97,9 +99,9 @@ class Login extends Component {
       //UK
       let acUk = (currentUser.user.email.slice(-6) === '.ac.uk');
 
-      //let allowYC = (currentUser.user.email.slice(-16) === '@ycombinator.com');
+      let testAccount = (currentUser.user.email === 'chillmateapp@gmail.com');
 
-      if(eduIn || acIn || edu || acUk)
+      if(eduIn || acIn || edu || acUk || testAccount)
       {
         await addNewGoogleUser(currentUser.user.uid,this.state.g_first_name, this.state.g_last_name, this.state.g_profile);
         if(this._isMounted)
