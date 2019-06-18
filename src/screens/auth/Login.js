@@ -90,7 +90,7 @@ class Login extends Component {
       const currentUser = await firebase.auth().signInWithCredential(credential);
 
       //NOTE: Any change here must also be in Loading.js
-      
+
       //India
       let eduIn = (currentUser.user.email.slice(-7) === '.edu.in');
       let acIn = (currentUser.user.email.slice(-6) === '.ac.in');
@@ -268,9 +268,9 @@ class Login extends Component {
 
 
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Light} onPress={this._signIn}/>
-        <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
+        {/* <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
           Intro
-        </Text>
+        </Text> */}
       </View>
       </View>
     )
