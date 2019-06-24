@@ -183,7 +183,7 @@ export const DashboardStack = createStackNavigator(
 // Bottom Tab Navigator connecting all the above navigators as siblings:
 export const MainTabNav = createBottomTabNavigator(
   {
-    Chillmate: {
+    Home: {
       screen: HomeStack,
       navigationOptions: {
         tabBarIcon: ({  focused, horizontal, tintColor  }) => (

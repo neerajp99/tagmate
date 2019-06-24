@@ -83,7 +83,7 @@ class ProfileScreen extends Component{
   loadWhatsapp = () =>
   {
     // Triggering the app to open whatsapp with a preloaded message.
-    Linking.openURL('whatsapp://send?text=Hey, checkout Chillmate. I use it to meet new people over activities - http://ChillmateApp.com')
+    Linking.openURL('whatsapp://send?text=Hey, checkout Instajude. I use it know what events are happening on campus - http://instajude.com')
   }
 
   // This functions expects the user to be logged in.

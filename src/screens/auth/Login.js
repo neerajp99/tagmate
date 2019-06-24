@@ -209,7 +209,7 @@ class Login extends Component {
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <View style={styles.logoContainer}>
           <Image source={logo} style={styles.logo} />
-          {/* TAGLINE DISABLED <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text> */}
+          <Text style={adourStyle.logoSubtitle}>Know what's happening on your campus</Text>
         </View>
           <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
             {this.props.error}
@@ -298,9 +298,9 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   logo: {
-    height: 61,
+    height: 71,
     width: 250,
-    marginBottom: 8
+    marginBottom: 2
   },
   inputIcon: {
     position: 'absolute',

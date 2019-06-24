@@ -111,7 +111,7 @@ export const adourStyle = StyleSheet.create({
     fontFamily:'OpenSans-Semibold',
     fontSize: 16,
     fontWeight: '200',
-    marginTop: 10,
+    marginTop: 2,
     opacity: 0.8
   },
   placeholderStyle: {

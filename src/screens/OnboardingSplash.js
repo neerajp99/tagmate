@@ -7,7 +7,7 @@ import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE} from './style/AdourStyle
 
 const FIRST_SLIDE_DESCRIPTION = 'All profiles are verified profiles from your specific university.';
 const SECOND_SLIDE_DESCRIPTION = 'Go on a walk, get chai, or smoke a cig with someone new. Want to play foosball, tennis or chess at a particular time? Find someone to play with you!';
-//const THIRD_SLIDE_DESCRIPTION = 'Chillmate is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
+//const THIRD_SLIDE_DESCRIPTION = 'Instajude is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
 
 
 class OnboardingSplash extends Component {
@@ -25,7 +25,7 @@ render() {
                   ),
             title: 'Hi',
             titleStyles: adourStyle.onboardingTitle,
-            subtitle: 'Chillmate is your tool to meet new people over activities you enjoy.',
+            subtitle: 'Instajude is your tool to meet new people over activities you enjoy.',
             subTitleStyles: adourStyle.onboardingSubtitle
           },
           {

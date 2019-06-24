@@ -336,11 +336,11 @@ class DashboardDetails extends Component {
     {
       switch(item.status)
       {
-        case 0: statusStr = 'Looking for Chillmates'; break;
+        case 0: statusStr = 'Looking for attendees'; break;
         case 1: statusStr = (item.isClient)?'Upcoming activity':'Upcoming activity'; break;
         case 2: statusStr = 'Completed'; break;
         case 3: statusStr = (item.isClient)?'Cancelled by you':'Cancelled by the host'; break;
-        case 4: statusStr = (item.isClient)?'Cancelled by your Chillmate':'Cancelled by you';break; //case 4 is useless now
+        case 4: statusStr = (item.isClient)?'Cancelled by your attendee':'Cancelled by you';break; //case 4 is useless now
       }
     }
     return (
