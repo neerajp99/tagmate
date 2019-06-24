@@ -28,6 +28,6 @@
         </view>
     </objects>
     <resources>
-        <image name="logo" width="250" height="61"/>
+        <image name="logo" width="250" height="71"/>
     </resources>
 </document>

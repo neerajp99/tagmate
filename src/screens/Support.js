@@ -9,7 +9,7 @@ class SupportScreen extends Component{
 
   launchEmail = () =>
   {
-      Linking.openURL('mailto:support@chillmateapp.com?subject=Instajude Customer Support&body=Please type your feedback/question below: ')
+      Linking.openURL('mailto:support@instajude.com?subject=Instajude Customer Support&body=Please type your feedback/question below: ')
   }
 
   launchPhone = () =>

@@ -9,7 +9,7 @@ import {getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 
-const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "http://instajude.com/assets/item_img/custom.jpg";
 let uid;
 
 class DashboardDetails extends Component {

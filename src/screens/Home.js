@@ -13,7 +13,7 @@ import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
 import CardStack, { Card as SwipableCard } from 'react-native-card-stack-swiper';
 
-const CUSTOM_IMG = "http://chillmateapp.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "http://instajude.com/assets/item_img/custom.jpg";
 
 //Test commit
 
