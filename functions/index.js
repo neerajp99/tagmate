@@ -341,10 +341,11 @@ admin.initializeApp();
 
     })
 
+// TODO: Change onCreate to onUpdate
 // This function sends push notifications when there are new unread chat messages for this user.
   exports.sendUnreadPushNotification = functions.database
   .ref('/users/{userId}/messages/{pushId}/unreadCount')
-  .onCreate((snapshot, context) => {
+  .onUpdate((change, context) => {
       const pushId = context.params.pushId;
       const userId = context.params.userId;
       if (!pushId || !userId) {
