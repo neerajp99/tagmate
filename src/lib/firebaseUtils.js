@@ -855,6 +855,20 @@ export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject)
     }
 })
 
+/* Deletes all user objects that do not have a firstName parameter and hence signify dummy users
+export const massJobs = () => {
+  firebase.database().ref('users').once("value")
+  .then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const uid = childSnapshot.key;
+      if(!childSnapshot.val().firstName){
+        console.log(uid, ' has no firstName. Deleting this user object');
+        firebase.database().ref(`users/${uid}`).remove()
+      }
+    })
+  })
+}
+*/
 
 //Stats
 
