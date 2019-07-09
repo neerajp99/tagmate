@@ -302,7 +302,7 @@ class DashboardDetails extends Component {
   }
 
   renderGuests = ({item}) => {
-      const {id, fullName, guestStatus} = item;
+      const {id, fullName, guestStatus, thumbnail} = item;
 
       return (
         <View>
@@ -312,14 +312,14 @@ class DashboardDetails extends Component {
           chevron={false}
           onPress={() => this.openProfile(id)}
           containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
-          leftIcon={{ name: 'person'}}
+          leftAvatar={{ source: { uri: thumbnail } }}
         />}
         {guestStatus == 3 && <ListItem
           title={fullName + " has left"}
           titleStyle={adourStyle.greyText}
           chevron={false}
           containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 2}}
-          leftIcon={{ name: 'person'}}
+          leftAvatar={{ source: { uri: thumbnail } }}
         />}
         </View>
       )

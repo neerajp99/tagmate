@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, ListItem, Button} from 'react-native-elements';
+import {Card, ListItem, Button, Avatar} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking, FlatList, ScrollView, Dimensions, TouchableOpacity} from 'react-native'
 import {getName, getLastName, finalizeGuestList, getNetworkId} from "../lib/firebaseUtils";
@@ -144,26 +144,34 @@ class GuestList extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const {id, guestStatus, fullName} = item;
+        const {id, guestStatus, fullName, thumbnail} = item;
 
         return (
           <View>
           <Card>
             <View style={styles.guestContainer}>
-
-            <Text onPress={() => this.openProfile(id)} style={guestStatus < 2 ? adourStyle.listItemTextBold:adourStyle.fadedText }>{fullName}</Text>
+            <View style={{marginRight: 12, marginTop: 4}}>
+              <Avatar
+                rounded
+                size="small"
+                source={{uri: thumbnail}}
+                onPress={() => this.openProfile(id)}
+              />
+            </View>
+            <Text onPress={() => this.openProfile(id)} style={guestStatus < 2 ? adourStyle.listItemTextBoldL:adourStyle.fadedTextL }>{fullName}</Text>
 
             { guestStatus == 0 && <View style={styles.buttonsContainer}>
-              <View>
-                <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptGuest(id) }}>
-                  <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
-                </TouchableOpacity>
-              </View>
               <View>
                 <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectGuest(id) }} >
                   <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
                 </TouchableOpacity>
               </View>
+              <View>
+                <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptGuest(id) }}>
+                  <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
+                </TouchableOpacity>
+              </View>
+              
             </View>}
 
             { guestStatus == 1 && <Text>CONFIRMED</Text>}
@@ -246,7 +254,6 @@ const styles = StyleSheet.create({
     buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: 10,
     flex: 2
     },
 })

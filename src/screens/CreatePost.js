@@ -106,8 +106,8 @@ class CreatePost extends Component{
             let postTitle = '';
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
-            if(details.length > 60) return this.erred('Details should not exceed 60 characters.');
-            if(customTitle.length > 15) return this.erred('Title should not exceed 15 characters. Use description to specify more details.');
+            if(details.length > 142) return this.erred('Details should not exceed 142 characters.');
+            if(customTitle.length > 24) return this.erred('Title should not exceed 24 characters. Use description to specify more details.');
             //Check if title is not blank if custom
             //Set postTitle to customTitle if its a custom post else set postTitle to serviceTitle
             if(selectedServiceId === 'custom'){
@@ -172,16 +172,18 @@ class CreatePost extends Component{
 
             getFullName(uid).then(fullName=>
             {
-              getNetworkId(uid).then(networkId => {
-                createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage})
-                .then(({ data }) => {
-                  console.log('[Client] Server successfully posted')
-                  alert('Posted Successfully. You can find it on your Dashboard.')
-                  this.setState({disabledBtn:false}); // Enable the button again
-                  this.props.navigation.goBack();
-                })
-                .catch(HttpsError => {
-                    console.log(HttpsError.code); // invalid-argument
+              getThumbURL(uid).then(hostThumb=> {
+                getNetworkId(uid).then(networkId => {
+                  createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: hostThumb})
+                  .then(({ data }) => {
+                    console.log('[Client] Server successfully posted')
+                    alert('Posted Successfully. You can find it on your Dashboard.')
+                    this.setState({disabledBtn:false}); // Enable the button again
+                    this.props.navigation.goBack();
+                  })
+                  .catch(HttpsError => {
+                      console.log(HttpsError.code); // invalid-argument
+                  })
                 })
               })
             });

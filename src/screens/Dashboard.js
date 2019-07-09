@@ -42,6 +42,7 @@ class DashboardScreen extends Component {
 
       //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       //this.sendPushNotificationToHosts(hard code network Id here); //THIS IS A MANUAL CLOUD FUNCTION FOR ADMINS ONLY
+      //massJobs();
 
       this.runFirebaseListeners();
     }

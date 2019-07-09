@@ -94,9 +94,9 @@ export const setUserBio = (userId, bio) => new Promise((resolve, reject) => {
     }
 })
 
-export const updateAvatar = (userId, url) => new Promise((resolve, reject) => {
+export const updateAvatar = (userId, url, thumbURL) => new Promise((resolve, reject) => {
     try {
-        firebase.database().ref(`/users/${userId}`).update({profilePicture:url}).then(res=>{resolve(true)});
+        firebase.database().ref(`/users/${userId}`).update({profilePicture:url, thumbnail: thumbURL}).then(res=>{resolve(true)});
     } catch (e) {
         reject(e)
     }
@@ -119,6 +119,34 @@ export const saveDeviceToken = (uid, deviceToken) => new Promise((resolve, rejec
               })
           }
         })
+    } catch (e) {
+        reject(e)
+    }
+})
+
+// Copies profile pic URL to thumbnail
+
+export const setInitialThumbnail = (currentUser) => new Promise((resolve, reject) => {
+    try {
+      console.log('Inside setInitialThumbnail');
+      let thumbnailExists = false;
+      //does the thumbnail object already exist?
+      firebase.database().ref(`/users/${currentUser.user.uid}/thumbnail`).once('value', (snapshot) => {
+        console.log('snapshot.exists(): ',snapshot.exists());
+        thumbnailExists = snapshot.exists();
+        if(thumbnailExists === true){
+          resolve(true)
+        }
+      }).then(result => {
+        console.log('thumbnailExists: ', thumbnailExists);
+        if(!thumbnailExists){
+          firebase.database().ref(`/users/${currentUser.user.uid}/thumbnail`).update({
+            thumbnail: currentUser.user.photoURL
+          }).then(res => resolve(true))
+        }
+
+      })
+
     } catch (e) {
         reject(e)
     }
@@ -584,8 +612,10 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
             //Get last name of this particular acceptor
             getLastName(userId).then(lastName=>
             {
-              const fullName = `${firstName} ${lastName}`;
-              ref.update({fullName: fullName})
+              getThumbURL(userId).then(thumbnail => {
+                const fullName = `${firstName} ${lastName}`;
+                ref.update({fullName: fullName, thumbnail: thumbnail})
+              })
             });
           });
 
@@ -706,6 +736,15 @@ export const getBio = (userId) => new Promise((resolve, reject) => {
     try {
         var nameRef = firebase.database().ref(`/users/${userId}/bio`);
         nameRef.once("value", function(bio){resolve(bio.val() || '' );})
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const getThumbURL = (userId) => new Promise((resolve, reject) => {
+    try {
+        let nameRef = firebase.database().ref(`/users/${userId}/thumbnail`);
+        nameRef.once("value", function(thumbnail){resolve(thumbnail.val());})
     } catch (e) {
         reject(e)
     }
@@ -855,20 +894,26 @@ export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject)
     }
 })
 
-/* Deletes all user objects that do not have a firstName parameter and hence signify dummy users
+/*
 export const massJobs = () => {
   firebase.database().ref('users').once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
       const uid = childSnapshot.key;
-      if(!childSnapshot.val().firstName){
-        console.log(uid, ' has no firstName. Deleting this user object');
-        firebase.database().ref(`users/${uid}`).remove()
+      const profilePic = childSnapshot.val().profilePicture;
+      if(!childSnapshot.val().thumbnail){
+        console.log('will update thumbnail to ', profilePic)
+        if(profilePic != undefined){
+          firebase.database().ref(`users/${uid}`).update({thumbnail: profilePic })
+          console.log('done')
+        }
+
       }
     })
   })
 }
 */
+
 
 //Stats
 

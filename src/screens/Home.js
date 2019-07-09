@@ -63,6 +63,8 @@ class HomeScreen extends Component {
           })
         })
         this.tokenFunc(uid);
+
+
     }
     componentWillUnmount()
     {
@@ -229,7 +231,7 @@ class HomeScreen extends Component {
     swipableRender(myTasks) {
 
       return myTasks.map((item) => {
-        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, hostId, interestedCount} = item;
+        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, hostThumb, hostId, interestedCount} = item;
         var detailsAvailable = true;
 
         if(details == "" || typeof details == "undefined") detailsAvailable = false
@@ -279,29 +281,31 @@ class HomeScreen extends Component {
               />
           </View>
 
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-132 , top: -35, position: 'absolute'}} >
+            <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
+          </View>
+
+
               <ListItem
               title={anonymous? "Anonymous": hostName}
               titleStyle={adourStyle.listItemText}
               subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
+              leftAvatar={{ source: { uri: hostThumb } }}
               chevron={false}
               onPress={() => this.openProfile(hostId)}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
 
-            { (scheduledFor != "null") && <Text style={adourStyle.defaultText}>{scheduledFor}</Text> }
-            {interestAvailable && <Text style={adourStyle.defaultText}>{interestNumText}</Text>}
-            <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
 
             {
-                detailsAvailable && <ListItem
-                  subtitle={ details }
-                  subtitleStyle={adourStyle.listItemText}
-                  chevron={false}
-                  containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                  subtitleProps={{ numberOfLines: 2 }}
-                />
+                detailsAvailable && <Text style={adourStyle.cardText}>{details}</Text>
+
             }
+
+            { (scheduledFor != "null") && <Text style={adourStyle.cardText}>{scheduledFor}</Text> }
+            {interestAvailable && <Text style={adourStyle.cardText}>{interestNumText}</Text>}
+
               <View>
               </View>
               <View style={styles.buttonsContainer}>

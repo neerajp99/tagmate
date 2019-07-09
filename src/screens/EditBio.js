@@ -114,8 +114,12 @@ class EditBio extends Component{
   uploadImage(image) {
     console.log("FirebaseStorageService :: image.path ", image.path );
     const imageId = uuid.v4();
+
     var firebaseStorageRef = firebase.storage().ref(`${this.state.networkId}/imgs`);
     const imageRef = firebaseStorageRef.child(imageId + ".jpeg");
+
+    //A thumbnail is created for any image created with thumb_NAME.jpeg. This is done on the cloud.
+    const thumbRef = firebaseStorageRef.child("thumb_" + imageId + ".jpeg");
 
     console.log("FirebaseStorageService :: imageRef ", imageRef);
 
@@ -124,7 +128,10 @@ class EditBio extends Component{
         return imageRef.getDownloadURL();
     }).then(function(url){
         console.log("Image url", url);
-        updateAvatar(uid, url)
+        thumbRef.getDownloadURL().then(thumbURL => {
+          console.log("thumbURL: ", thumbURL);
+          updateAvatar(uid, url, thumbURL)
+        })
     }).catch(function(error){
         console.log("Error while saving the image.. ", error);
         //onError(error);

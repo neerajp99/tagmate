@@ -49,6 +49,20 @@ export const adourStyle = StyleSheet.create({
     textDecorationLine: 'line-through',
     textDecorationStyle: 'solid'
   },
+  listItemTextBoldL: {
+    fontFamily:'OpenSans',
+    fontWeight:'200',
+    marginTop: 8,
+    fontSize: 18
+  },
+  fadedTextL: {
+    fontFamily:'OpenSans',
+    fontWeight:'200',
+    fontSize: 18,
+    color: '#bfbfbf',
+    textDecorationLine: 'line-through',
+    textDecorationStyle: 'solid'
+  },
   greyText: {
     fontFamily:'OpenSans',
     fontWeight:'200',
@@ -57,6 +71,13 @@ export const adourStyle = StyleSheet.create({
   defaultText: {
     fontFamily:'OpenSans',
     marginLeft: 14,
+    marginBottom: 10,
+    marginTop: 10,
+    fontWeight:'200'
+  },
+  cardText: {
+    fontFamily:'OpenSans',
+    marginLeft: 74,
     marginBottom: 10,
     marginTop: 10,
     fontWeight:'200'
