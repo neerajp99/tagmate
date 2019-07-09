@@ -171,6 +171,7 @@ class ViewProfile extends Component{
                 <Avatar
                 size="xlarge"
                 rounded
+                onPress={() => this.props.navigation.navigate('ViewImage',{imgURL: this.state.photoURL})}
                 source={{uri: this.state.photoURL}}
                 activeOpacity={0.7}
                 />

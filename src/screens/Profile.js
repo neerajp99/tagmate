@@ -4,6 +4,7 @@ import { ListItem, Card, Divider, Avatar, Icon as IconElements } from 'react-nat
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import ImagePicker from 'react-native-image-crop-picker';
 import AddDetails from './auth/AddDetails';
 import {getCoins, getBio, listenForChange} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
@@ -86,6 +87,58 @@ class ProfileScreen extends Component{
     Linking.openURL('whatsapp://send?text=Hey, checkout Instajude. I use it know what events are happening on campus - http://instajude.com')
   }
 
+  /**
+ * Select image method
+ */
+  pickImage() {
+    ImagePicker.openPicker({
+      mediaType: 'photo',
+      width: 500,
+      height: 500,
+      compressImageMaxWidth: 500,
+      compressImageMaxHeight: 500,
+      compressImageQuality: 0.5,
+      cropping: true
+    }).then(image => {
+      this.setState({
+        loading: true
+      })
+      console.log('selected image.path: ', image.path)
+      this.uploadImage(image);
+    }).catch(e => {
+      console.log(e);
+      //alert(e.message ? e.message : e);
+    });
+  }
+
+  //For Image picking
+  uploadImage(image) {
+    console.log("FirebaseStorageService :: image.path ", image.path );
+    const imageId = uuid.v4();
+
+    var firebaseStorageRef = firebase.storage().ref(`${this.state.networkId}/imgs`);
+    const imageRef = firebaseStorageRef.child(imageId + ".jpeg");
+
+    //A thumbnail is created for any image created with thumb_NAME.jpeg. This is done on the cloud.
+    const thumbRef = firebaseStorageRef.child("thumb_" + imageId + ".jpeg");
+
+    console.log("FirebaseStorageService :: imageRef ", imageRef);
+
+
+    imageRef.putFile(image.path, {contentType: 'image/jpeg'}).then(function(){
+        return imageRef.getDownloadURL();
+    }).then(function(url){
+        console.log("Image url", url);
+        thumbRef.getDownloadURL().then(thumbURL => {
+          console.log("thumbURL: ", thumbURL);
+          updateAvatar(uid, url, thumbURL)
+        })
+    }).catch(function(error){
+        console.log("Error while saving the image.. ", error);
+        //onError(error);
+    });
+  }
+
   // This functions expects the user to be logged in.
   // It, in real-time, updates the Adour coin balance of the user.
   firebaseListeners = () =>
@@ -128,6 +181,9 @@ class ProfileScreen extends Component{
                 <Avatar
                 size="xlarge"
                 rounded
+                onPress={() => this.props.navigation.navigate('ViewImage',{imgURL: this.state.photoURL})}
+                editButton={{onPress: this.pickImage.bind(this) }}
+                showEditButton
                 source={{uri: this.state.photoURL}}
                 activeOpacity={0.7}
                 />

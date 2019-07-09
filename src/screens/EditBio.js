@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {setUserBio, updateAvatar, getNetworkId} from '../lib/firebaseUtils.js';
+import {setUserBio, updateAvatar, getBio, getNetworkId} from '../lib/firebaseUtils.js';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
@@ -46,7 +46,9 @@ class EditBio extends Component{
       this.uid = user.uid;
       displayName = user.displayName;
       getNetworkId(user.uid).then(networkId => {
-        this.setState({displayName, networkId, loading: false});
+        getBio(user.uid).then(bio => {
+          this.setState({displayName, bio, networkId, loading: false});
+        })
       })
     } else {
       this.props.navigation.navigate('Login')
@@ -106,7 +108,7 @@ class EditBio extends Component{
       this.uploadImage(image);
     }).catch(e => {
       console.log(e);
-      alert(e.message ? e.message : e);
+      //alert(e.message ? e.message : e);
     });
   }
 
@@ -153,6 +155,7 @@ class EditBio extends Component{
                 size="large"
                 rounded
                 showEditButton
+                editButton={{onPress: this.pickImage.bind(this) }}
                 source={{uri: this.state.photoURL}}
                 onPress={this.pickImage.bind(this)}
                 activeOpacity={0.7}
@@ -173,6 +176,7 @@ class EditBio extends Component{
             placeholderStyle={adourStyle.placeholderStyle}
             placeholderTextColor={'rgba(255, 255, 255, 1)'}
             underlineColorAndroid='transparent'
+            value={this.state.bio}
             onChangeText={bio => this.setState({ bio: bio })}
           />
 

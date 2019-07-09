@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
 import IconWithBadge from "./screens/IconWithBadge";
-import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, SupportScreen, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, SupportScreen, ViewImage, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import ActivityChat from './screens/ActivityChat';
@@ -173,6 +173,15 @@ export const DashboardStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'View Profile',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    ViewImage: {
+      screen: ViewImage,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'View Image',
           headerTitleStyle: routerStyle.headerText
         }
       }

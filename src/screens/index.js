@@ -5,6 +5,7 @@ export * from './EditProfileDetails';
 export * from './EditBio';
 export * from './Support';
 export * from './PrivacyPolicy'
+export * from './ViewImage'
 export * from './ToS'
 export RequestScreen from './Request';
 export CreatePost from './CreatePost';
