@@ -172,9 +172,16 @@ class CreatePost extends Component{
 
             getFullName(uid).then(fullName=>
             {
-              getThumbURL(uid).then(hostThumb=> {
+              getThumbURL(uid).then(thumbRes=> {
+                //If its an anonymous post then use a dummy thumbnail instead of the user's thumbnail
+                let thumbnail = '';
+                if(anonymous){
+                  thumbnail = "https://firebasestorage.googleapis.com/v0/b/chillmate-241a3.appspot.com/o/general%2Favatar.jpg?alt=media&token=4dcdfa81-fea1-4106-9306-26d67f55d62c";
+                }else{
+                  thumbnail = thumbRes;
+                }
                 getNetworkId(uid).then(networkId => {
-                  createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: hostThumb})
+                  createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
                   .then(({ data }) => {
                     console.log('[Client] Server successfully posted')
                     alert('Posted Successfully. You can find it on your Dashboard.')

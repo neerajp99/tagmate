@@ -354,6 +354,7 @@ class DashboardDetails extends Component {
               subtitleStyle={adourStyle.listItemText}
               rightTitle={statusStr}
               rightTitleStyle={adourStyle.listItemText}
+              leftAvatar={{ source: { uri: item.hostThumb } }}
               onPress={() => this.openProfile(item.hostId)}
               chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
