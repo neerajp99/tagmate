@@ -6,6 +6,7 @@ import {chatScreenMounted, chatScreenUnmounted} from '../actions';
 import {getAvatar} from '../lib/firebaseUtils'
 import ChatLib from "../lib/ChatLib";
 import ChatMessage from '../lib/ChatMessage';
+import OfflineNotice from './OfflineNotice';
 
 import emojiUtils from 'emoji-utils';
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
@@ -90,6 +91,7 @@ class ActivityChat extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <OfflineNotice />
         <GiftedChat
           messages={this.state.messages}
           renderMessage={this.renderMessage}

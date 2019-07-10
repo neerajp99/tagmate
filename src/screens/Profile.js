@@ -9,6 +9,7 @@ import AddDetails from './auth/AddDetails';
 import {getCoins, getBio, listenForChange} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from './style/AdourStyle';
+import OfflineNotice from './OfflineNotice';
 
 const { width: WIDTH } = Dimensions.get('window')
 const PLACEHOLDER_AVATAR = "https://firebasestorage.googleapis.com/v0/b/chillmate-241a3.appspot.com/o/general%2Favatar.jpg?alt=media&token=4dcdfa81-fea1-4106-9306-26d67f55d62c";
@@ -174,6 +175,8 @@ class ProfileScreen extends Component{
 
   render(){
     return(
+      <View>
+      <OfflineNotice />
       <ScrollView>
       <View style={styles.backgroundContainer}>
             <Card>
@@ -280,6 +283,7 @@ class ProfileScreen extends Component{
         <View style={{marginTop: 25}} />
       </View>
       </ScrollView>
+      </View>
     )
   }
 }

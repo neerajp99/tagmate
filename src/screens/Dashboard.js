@@ -9,6 +9,7 @@ import { Button, ButtonGroup, ListItem, Badge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
+import OfflineNotice from './OfflineNotice';
 
 let uid;
 
@@ -314,6 +315,7 @@ class DashboardScreen extends Component {
                 />
                 {attendingBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
             </View>
+              <OfflineNotice />
               {!fetching && this.userGuideContainer(active)}
 
               {

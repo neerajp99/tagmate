@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import {getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
+import OfflineNotice from './OfflineNotice';
 
 const CUSTOM_IMG = "http://instajude.com/assets/item_img/custom.jpg";
 let uid;
@@ -346,6 +347,7 @@ class DashboardDetails extends Component {
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
+      <OfflineNotice />
       <Card featuredTitle={item.customTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: item.bgImage}}>
           <ListItem
               title={host}

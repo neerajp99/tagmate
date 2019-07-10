@@ -45,6 +45,23 @@ class ChatLib {
     return this.avatar;
   }
 
+  networkCheck = (userId, bio) => new Promise((resolve, reject) => {
+      try {
+            setTimeout(() => {
+              return fetch('http://www.google.com')
+                .then((response) => {
+                  resolve(true)
+                })
+                .catch((err) => {
+                  resolve(false)
+                });
+            }, 200);
+      } catch (e) {
+          reject(false)
+      }
+  })
+
+
   // retrieve the messages from the Backend
   loadMessages(callback) {
     console.log(this.taskId);
@@ -67,14 +84,21 @@ class ChatLib {
   }
   // send the message to the Backend
   sendMessage(message, userList) {
-    for (let i = 0; i < message.length; i++) {
-      this.messagesRef.push({
-        text: message[i].text,
-        user: message[i].user,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      });
-    }
-    this.incrementUnread(userList);
+    this.networkCheck().then(online =>{
+      if(online){
+        for (let i = 0; i < message.length; i++) {
+          this.messagesRef.push({
+            text: message[i].text,
+            user: message[i].user,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+          });
+        }
+        this.incrementUnread(userList);
+      }else{
+        alert('Please check your internet connection and try again')
+      }
+    })
+
   }
 
   //Reset unread msg count for this user
