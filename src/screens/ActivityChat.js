@@ -95,6 +95,8 @@ class ActivityChat extends React.Component {
         <GiftedChat
           messages={this.state.messages}
           renderMessage={this.renderMessage}
+          renderAvatarOnTop={true}
+          onPressAvatar={(user) => this.props.navigation.navigate('ViewProfile',{profileUid: user._id})}
           onSend={message => {
             ChatLib.sendMessage(message, this.state.userList);
           }}

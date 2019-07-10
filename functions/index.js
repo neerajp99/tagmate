@@ -284,24 +284,29 @@ exports.sendUnreadPushNotification = functions.database
     if (!pushId || !userId) {
         return console.log('missing mandatory params for sending push.')
     }
-    let deviceTokens = []
-    const userDevicePromise = admin.database().ref(`/users/${userId}`).once('value')
-    return Promise.all([userDevicePromise]).then(results => {
-      // Terminate here if the client does not have any device IDs.
-      let userItem = results[0].val();
-      if(!userItem.hasOwnProperty('deviceTokens') || !userItem.deviceTokens.length) return console.log('User does not have device ID.')
-      const payload = {
-          notification: {
-              title: 'You have new messages!',
-              body: `Tap to respond`
-          },
-          data: {
-              taskId: pushId,
-              notifType: 'OPEN_CHAT', // To tell the app what kind of notification this is.
-          }
-      };
-      return admin.messaging().sendToDevice(userItem.deviceTokens, payload);
-    })
+    if( change.after.val() > change.before.val() ){
+      let deviceTokens = []
+      const userDevicePromise = admin.database().ref(`/users/${userId}`).once('value')
+      return Promise.all([userDevicePromise]).then(results => {
+        // Terminate here if the client does not have any device IDs.
+        let userItem = results[0].val();
+        if(!userItem.hasOwnProperty('deviceTokens') || !userItem.deviceTokens.length) return console.log('User does not have device ID.')
+        const payload = {
+            notification: {
+                title: 'You have new messages!',
+                body: `Tap to respond`
+            },
+            data: {
+                taskId: pushId,
+                notifType: 'OPEN_CHAT', // To tell the app what kind of notification this is.
+            }
+        };
+        return admin.messaging().sendToDevice(userItem.deviceTokens, payload);
+      })
+    }else{
+      console.log('change.after.val() is not greater than change.before.val(). Exiting')
+      return
+    }
 
 });
 

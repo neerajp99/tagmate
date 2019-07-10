@@ -189,6 +189,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-start',
   },
+  slackAvatar: {
+    // The bottom should roughly line up with the first line of message text.
+    height: 40,
+    width: 40,
+    borderRadius: 3,
+  },
   wrapper: {
     marginRight: 60,
     minHeight: 20,

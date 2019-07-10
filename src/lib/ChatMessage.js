@@ -47,7 +47,7 @@ export default class Message extends React.Component {
   renderAvatar() {
     let extraStyle;
     if (
-      isSameUser(this.props.currentMessage, this.props.previousMessage)
+      (this.props.currentMessage.user == this.props.previousMessage.user)
       && isSameDay(this.props.currentMessage, this.props.previousMessage)
     ) {
       // Set the invisible avatar height to 0, but keep the width, padding, etc.

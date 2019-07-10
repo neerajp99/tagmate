@@ -140,7 +140,7 @@ export const setInitialThumbnail = (currentUser) => new Promise((resolve, reject
       }).then(result => {
         console.log('thumbnailExists: ', thumbnailExists);
         if(!thumbnailExists){
-          firebase.database().ref(`/users/${currentUser.user.uid}/thumbnail`).update({
+          firebase.database().ref(`/users/${currentUser.user.uid}`).update({
             thumbnail: currentUser.user.photoURL
           }).then(res => resolve(true))
         }

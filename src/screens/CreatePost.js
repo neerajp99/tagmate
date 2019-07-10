@@ -3,7 +3,7 @@ import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, Alert, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
-import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getFullName} from "../lib/firebaseUtils";
+import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getThumbURL, getFullName} from "../lib/firebaseUtils";
 import {connect} from "react-redux";
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from "react-native-modal-datetime-picker";

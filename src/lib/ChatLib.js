@@ -55,7 +55,7 @@ class ChatLib {
                 .catch((err) => {
                   resolve(false)
                 });
-            }, 200);
+            }, 150);
       } catch (e) {
           reject(false)
       }

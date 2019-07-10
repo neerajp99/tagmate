@@ -19,7 +19,7 @@ class DashboardDetails extends Component {
     this.state = {
       disabledDone:false, // "Mark as Done" is not disabled
       fetching:true,
-      item:{id:this.props.navigation.state.params.taskId, 'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
+      item:{id:this.props.navigation.state.params.taskId, when: 'Loading...' ,'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
       nameAvailable:false,
       confirmedGuestList: [],
