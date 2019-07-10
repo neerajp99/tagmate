@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, ScrollView} from 'react-native';
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, Alert, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
 import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getFullName} from "../lib/firebaseUtils";
@@ -113,7 +113,7 @@ class CreatePost extends Component{
             if(selectedServiceId === 'custom'){
               if(customTitle == '')
                 {
-                  this.erred('You must put a post title');
+                  this.erred('You forgot to write the title of your post');
                   this.setState({disabledBtn:false});
                   return
                 }else{
@@ -121,6 +121,14 @@ class CreatePost extends Component{
                 }
             } else {
               //Its not a custom post
+                if(selectedServiceId === null){
+                  this.erred('Please select an item from the dropdown menu. Use custom if not sure.');
+                  return
+                }
+                if(details == ''){
+                  this.erred(`You forgot to specify details about your ${this.state.selectedServiceItem.title}`);
+                  return
+                }
                 postTitle = serviceTitle;
             }
 
@@ -202,7 +210,13 @@ class CreatePost extends Component{
     // and returns an alert box with the message that was sent as parameter.
     erred = (msg) => {
         this.setState({disabledBtn:false});
-        return alert(msg);
+        return Alert.alert(
+        '😵 Yikes!',
+        msg,
+        [
+          {text: 'Got it'},
+        ]
+      );
     }
 
   render(){
@@ -303,7 +317,7 @@ class CreatePost extends Component{
               <TextInput
                 style={adourStyle.textInputCenter}
                 autoCapitalize="none"
-                placeholder="Additional Details"
+                placeholder="Details"
                 placeholderStyle={adourStyle.placeholderStyle}
                 placeholderTextColor={'rgba(255, 255, 255, 1)'}
                 underlineColorAndroid='transparent'
