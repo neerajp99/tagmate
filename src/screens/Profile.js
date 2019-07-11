@@ -7,7 +7,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import ImagePicker from 'react-native-image-crop-picker';
 import uuid from 'react-native-uuid';
 import AddDetails from './auth/AddDetails';
-import {getCoins, getBio, listenForChange} from '../lib/firebaseUtils.js';
+import {getCoins, getBio, listenForChange, getNetworkId, updateAvatar} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from './style/AdourStyle';
 import OfflineNotice from './OfflineNotice';
@@ -22,6 +22,7 @@ class ProfileScreen extends Component{
       loading: true,
       coins: 'Loading...',
       displayName: '_____ _____',
+      networkId: '',
       bio: '_____ _____ _____ ___ ______',
       photoURL: PLACEHOLDER_AVATAR
     }; // Message to show while Adour coins are being loaded
@@ -42,9 +43,13 @@ class ProfileScreen extends Component{
     let user = firebase.auth().currentUser;
     if (user != null) {
       displayName = user.displayName;
-      getBio(user.uid).then(bio => {
-        this.setState({displayName, bio, loading: false});
+
+      getNetworkId(user.uid).then(networkId => {
+        getBio(user.uid).then(bio => {
+          this.setState({displayName, bio, networkId, loading: false});
+        })
       })
+
     } else {
       this.props.navigation.navigate('Login')
     }
@@ -105,7 +110,7 @@ class ProfileScreen extends Component{
       this.setState({
         loading: true
       })
-      console.log('selected image.path: ', image.path)
+      //console.log('selected image.path: ', image.path)
       this.uploadImage(image);
     }).catch(e => {
       console.log(e);
@@ -115,7 +120,7 @@ class ProfileScreen extends Component{
 
   //For Image picking
   uploadImage(image) {
-    console.log("FirebaseStorageService :: image.path ", image.path );
+    //console.log("FirebaseStorageService :: image.path ", image.path );
     const imageId = uuid.v4();
 
     var firebaseStorageRef = firebase.storage().ref(`${this.state.networkId}/imgs`);
@@ -124,7 +129,7 @@ class ProfileScreen extends Component{
     //A thumbnail is created for any image created with thumb_NAME.jpeg. This is done on the cloud.
     const thumbRef = firebaseStorageRef.child("thumb_" + imageId + ".jpeg");
 
-    console.log("FirebaseStorageService :: imageRef ", imageRef);
+    //console.log("FirebaseStorageService :: imageRef ", imageRef);
 
 
     imageRef.putFile(image.path, {contentType: 'image/jpeg'}).then(function(){

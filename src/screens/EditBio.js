@@ -104,7 +104,7 @@ class EditBio extends Component{
       this.setState({
         loading: true
       })
-      console.log('selected image.path: ', image.path)
+      //console.log('selected image.path: ', image.path)
       this.uploadImage(image);
     }).catch(e => {
       console.log(e);
@@ -114,7 +114,7 @@ class EditBio extends Component{
 
 
   uploadImage(image) {
-    console.log("FirebaseStorageService :: image.path ", image.path );
+    //console.log("FirebaseStorageService :: image.path ", image.path );
     const imageId = uuid.v4();
 
     var firebaseStorageRef = firebase.storage().ref(`${this.state.networkId}/imgs`);
@@ -123,15 +123,15 @@ class EditBio extends Component{
     //A thumbnail is created for any image created with thumb_NAME.jpeg. This is done on the cloud.
     const thumbRef = firebaseStorageRef.child("thumb_" + imageId + ".jpeg");
 
-    console.log("FirebaseStorageService :: imageRef ", imageRef);
+    //console.log("FirebaseStorageService :: imageRef ", imageRef);
 
 
     imageRef.putFile(image.path, {contentType: 'image/jpeg'}).then(function(){
         return imageRef.getDownloadURL();
     }).then(function(url){
-        console.log("Image url", url);
+        //console.log("Image url", url);
         thumbRef.getDownloadURL().then(thumbURL => {
-          console.log("thumbURL: ", thumbURL);
+          console.log("done");
           updateAvatar(uid, url, thumbURL)
         })
     }).catch(function(error){
