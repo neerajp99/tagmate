@@ -732,6 +732,16 @@ export const getAvatar = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+
+export const getUserThumbnail = (userId) => new Promise((resolve, reject) => {
+    try {
+        var avatarRef = firebase.database().ref(`/users/${userId}/thumbnail`);
+        avatarRef.once("value", function(thumbnail){resolve(thumbnail.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
+
 export const getBio = (userId) => new Promise((resolve, reject) => {
     try {
         var nameRef = firebase.database().ref(`/users/${userId}/bio`);

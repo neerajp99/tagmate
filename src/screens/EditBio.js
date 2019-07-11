@@ -141,7 +141,9 @@ class EditBio extends Component{
   }
 
   onButtonPress() {
-      setUserBio(this.uid, this.state.bio)
+      setUserBio(this.uid, this.state.bio).then(res => {
+        this.props.navigation.goBack()
+      })
   }
 
   render(){

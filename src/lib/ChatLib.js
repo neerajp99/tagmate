@@ -1,5 +1,5 @@
 import firebase from "react-native-firebase";
-import {getAvatar, getFullName} from './firebaseUtils'
+import {getUserThumbnail, getFullName} from './firebaseUtils'
 
 class ChatLib {
   uid = "";
@@ -11,7 +11,7 @@ class ChatLib {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         this.setUid(user.uid);
-        getAvatar(user.uid).then(avatarURL => {
+        getUserThumbnail(user.uid).then(avatarURL => {
           this.avatar = avatarURL;
           console.log('got avatar: ', avatarURL)
         })

@@ -129,7 +129,13 @@ class GuestList extends Component {
       if(!incomplete){
         finalizeGuestList(this.state.item.id, this.state.item.hostId).then(result => {
           if(result){
-            alert('Guest List Finalised');
+            Alert.alert(
+                'Yay! 😍',
+                'Guest List Finalized. You can now start chatting with your guests.',
+                [
+                  {text: 'Cool'},
+                ]
+              );
             this.props.navigation.navigate('DashboardDetails',{taskId: this.state.item.id});
           }else {
             alert('Please accept atleast one guest before finalizing the list');
@@ -171,7 +177,7 @@ class GuestList extends Component {
                   <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
                 </TouchableOpacity>
               </View>
-              
+
             </View>}
 
             { guestStatus == 1 && <Text>CONFIRMED</Text>}
@@ -212,12 +218,12 @@ class GuestList extends Component {
                 title="Finalize List"
             />
 
-            <Button
+            {/* <Button
                 onPress={()=>this.props.navigation.goBack()}
                 buttonStyle={adourStyle.btnGeneralT}
                 titleStyle={adourStyle.btnText}
                 title="Wait for More People to Join"
-            />
+            /> */}
             </View>
 
             </View>

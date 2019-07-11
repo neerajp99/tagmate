@@ -192,7 +192,13 @@ class CreatePost extends Component{
                   createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
                   .then(({ data }) => {
                     console.log('[Client] Server successfully posted')
-                    alert('Posted Successfully. You can find it on your Dashboard.')
+                    Alert.alert(
+                        'Yay! 😄',
+                        'Posted Successfully. You can find it on your Dashboard.',
+                        [
+                          {text: 'Cool'},
+                        ]
+                      );
                     this.setState({disabledBtn:false}); // Enable the button again
                     this.props.navigation.goBack();
                   })
@@ -296,6 +302,7 @@ class CreatePost extends Component{
             onValueChange={value => {
               this.setState({
                 selectedServiceId: value,
+                anonymous: false
               });
             }}
             style={pickerSelectStyles}

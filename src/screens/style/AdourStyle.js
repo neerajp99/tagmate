@@ -42,6 +42,11 @@ export const adourStyle = StyleSheet.create({
     fontFamily:'OpenSans-Semibold',
     fontWeight:'200'
   },
+  listItemTextBoldB: {
+    fontFamily:'OpenSans-Semibold',
+    fontWeight:'400',
+    fontSize: 16
+  },
   fadedText: {
     fontFamily:'OpenSans',
     fontWeight:'200',

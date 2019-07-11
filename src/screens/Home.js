@@ -282,7 +282,7 @@ class HomeScreen extends Component {
               />
           </View>
 
-          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-132 , top: -35, position: 'absolute'}} >
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-124 , top: -35, position: 'absolute'}} >
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
           </View>
 
@@ -393,8 +393,8 @@ class HomeScreen extends Component {
             <Card>
               <ListItem
                 title="Create A Post"
-                titleStyle={adourStyle.listItemText}
-                leftIcon={{ name: 'edit' }}
+                titleStyle={adourStyle.listItemTextBoldB}
+                leftIcon={{ name: 'edit', size:28 }}
                 onPress={() => this.props.navigation.navigate('CreatePost')}
                 containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
               />
