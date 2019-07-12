@@ -242,6 +242,9 @@ exports.notifyHostOnNewGuest = functions.database
           return console.log('missing mandatory params for sending push.')
       }
       let interestedCount = change.after.val();
+      
+      //Hotfix
+      if(change.after.val() === 0) return;
 
       if( (interestedCount % 3) != 0 ){
         return console.log('interestedCount is updated but is not a multiple of 3')

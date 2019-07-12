@@ -168,6 +168,7 @@ class HomeScreen extends Component {
     decideOnPost = (id) =>
     {
         //this.hideTask(id);
+        this.setState({myTasks: this.state.myTasks.filter(item => item.id !== id)});
         if(uid) appendHiddenPosts(uid, id);
     }
 
@@ -186,6 +187,7 @@ class HomeScreen extends Component {
                     addAcceptor(uid, item.id, item.hostId).then(o =>
                     {
                       console.log('added as acceptor')
+                      this.decideOnPost(item.id)
                         //this.hideTask(item.id);
                     });
                 }
@@ -229,10 +231,14 @@ class HomeScreen extends Component {
         }
       }
 
-    swipableRender(myTasks) {
+    swipableRender() {
+      const {myTasks} = this.state;
+
+      console.log('swipableRender: myTasks is ', myTasks)
 
       return myTasks.map((item) => {
         const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, hostThumb, hostId, interestedCount} = item;
+        console.log('swipableRender return: item.customTitle is ', item.customTitle)
         var detailsAvailable = true;
 
         if(details == "" || typeof details == "undefined") detailsAvailable = false
@@ -254,7 +260,7 @@ class HomeScreen extends Component {
         return (
           <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTask(item)}>
           <View>
-
+          {console.log('swipableRender return return: customTitle is ', customTitle)}
 
 
           <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
@@ -282,7 +288,7 @@ class HomeScreen extends Component {
               />
           </View>
 
-          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-124 , top: -35, position: 'absolute'}} >
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-155 , top: -35, position: 'absolute'}} >
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
           </View>
 
@@ -334,6 +340,7 @@ class HomeScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
+        console.log('renderItem item.customTitle: ', item.customTitle);
         const {id, when, details, customTitle, bgImage, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
         if(details == "" || typeof details == "undefined") detailsAvailable = false
@@ -387,6 +394,7 @@ class HomeScreen extends Component {
 
     render() {
         const {fetching, myTasks} = this.state
+        console.log('*** RENDERING *** MyTasks: ', myTasks)
         return (
             <View style={styles.mainContainer}>
             <OfflineNotice />
@@ -402,15 +410,29 @@ class HomeScreen extends Component {
             <CardStack
                 renderNoMoreCards={() => <View style={{marginTop: 50}}>
                                                   {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}
-                                                  {!fetching && <Text style={adourStyle.cardOverText}>Check back later</Text>}
+                                                  {!fetching &&
+                                                    <View style={adourStyle.cardOverText}>
+                                                    <Text style={{marginBottom: 8}}>Check back later</Text>
+                                                    <IconElements
+                                                      name="refresh"
+                                                      type="material-community"
+                                                      color={'rgba(41, 89, 165, 0.75)'}
+                                                      containerStyle={{marginLeft:10}}
+                                                      raised
+                                                      />
+                                                    </View>
+
+                                                  }
                                                   </View>}
                 disableBottomSwipe={true}
                 disableTopSwipe={true}
+                loop={false}
+                key={myTasks.length}
                 ref={swiper => {
                   this.swiper = swiper
                 }}
               >
-              {this.swipableRender(myTasks)}
+              {this.swipableRender()}
               </CardStack>
 
 
