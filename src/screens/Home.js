@@ -16,7 +16,7 @@ import OfflineNotice from './OfflineNotice';
 
 const CUSTOM_IMG = "http://instajude.com/assets/item_img/custom.jpg";
 
-//Test commit
+//Test commit: Google Play Release
 
 const { width: WIDTH } = Dimensions.get('window')
 let uid;
