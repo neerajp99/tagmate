@@ -187,7 +187,6 @@ class HomeScreen extends Component {
                     addAcceptor(uid, item.id, item.hostId).then(o =>
                     {
                       console.log('added as acceptor')
-                      this.decideOnPost(item.id)
                         //this.hideTask(item.id);
                     });
                 }
@@ -410,24 +409,10 @@ class HomeScreen extends Component {
             <CardStack
                 renderNoMoreCards={() => <View style={{marginTop: 50}}>
                                                   {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}
-                                                  {!fetching &&
-                                                    <View style={adourStyle.cardOverText}>
-                                                    <Text style={{marginBottom: 8}}>Check back later</Text>
-                                                    <IconElements
-                                                      name="refresh"
-                                                      type="material-community"
-                                                      color={'rgba(41, 89, 165, 0.75)'}
-                                                      containerStyle={{marginLeft:10}}
-                                                      raised
-                                                      />
-                                                    </View>
-
-                                                  }
+                                                  {!fetching && <Text style={adourStyle.cardOverText}>Check back later</Text>}
                                                   </View>}
                 disableBottomSwipe={true}
                 disableTopSwipe={true}
-                loop={false}
-                key={myTasks.length}
                 ref={swiper => {
                   this.swiper = swiper
                 }}

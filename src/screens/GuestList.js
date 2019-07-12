@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button, Avatar} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput, Linking, FlatList, ScrollView, Dimensions, TouchableOpacity} from 'react-native'
+import {View, ActivityIndicator, Alert, StyleSheet, Text, TextInput, Linking, FlatList, ScrollView, Dimensions, TouchableOpacity} from 'react-native'
 import {getName, getLastName, finalizeGuestList, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase'
 import {connect} from "react-redux";

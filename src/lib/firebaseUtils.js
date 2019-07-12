@@ -619,7 +619,7 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
             });
           });
 
-          //appendHiddenPosts(userId, serviceId);
+          appendHiddenPosts(userId, serviceId);
 
           //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
           //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
