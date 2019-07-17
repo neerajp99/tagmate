@@ -604,7 +604,9 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
         const {currentUser} = firebase.auth();
         getNetworkId(userId).then(networkId => {
           var ref = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/acceptorIds/${userId}`);
-          ref.update({id: userId, guestStatus:0});
+          ref.update({id: userId, guestStatus:0}).then(updRes => {
+
+          })
           //Get first name of this particular acceptor
           getName(userId).then(firstName=>
           {
@@ -629,6 +631,7 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
             return (interestedCount || 0) + 1;
           });
           console.log('pushed user to acceptor list')
+          resolve(true)
 
         })
 

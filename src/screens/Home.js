@@ -168,9 +168,42 @@ class HomeScreen extends Component {
     decideOnPost = (id) =>
     {
         //this.hideTask(id);
-        this.setState({myTasks: this.state.myTasks.filter(item => item.id !== id)});
+        this.setState({myTasks: this.state.myTasks.filter(taskItem => taskItem.id !== id)});
         if(uid) appendHiddenPosts(uid, id);
     }
+
+    acceptTaskNew = (item) => new Promise((resolve, reject) => {
+      try {
+        console.log('acceptTaskNew try')
+        if(uid)
+        {
+            alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
+            {
+              console.log('Inside acceptTaskNew alreadyAccepted')
+                //this.hideTask(item.id);
+                if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
+                {
+                  console.log('Inside acceptTaskNew right before addAcceptor')
+                    //the addAcceptor function basically writes to the firebase database
+                    // try adding appendHiddenPosts here and removing everything else below, check if the function is run
+                    addAcceptor(uid, item.id, item.hostId).then(o =>
+                    {
+                      console.log('Inside acceptTaskNew addAcceptor then')
+                      this.setState({myTasks: this.state.myTasks.filter(taskItem => taskItem.id !== item.id)});
+                      //appendHiddenPosts(userId, serviceId);
+                      console.log('done with: ', item.customTitle)
+                      resolve(true)
+                      //this will remove this item from state.myTasks
+                        //this.hideTask(item.id);
+                    });
+                }
+            });
+        }
+
+      } catch(e) {
+        reject(e)
+      }
+    })
 
     // This function takes service request ID as parameter.
     // It first checks whether the service request is still up to be accepted.
@@ -184,9 +217,15 @@ class HomeScreen extends Component {
                 //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
+                    //the addAcceptor function basically writes to the firebase database
+                    // try adding appendHiddenPosts here and removing everything else below, check if the function is run
                     addAcceptor(uid, item.id, item.hostId).then(o =>
                     {
-                      console.log('added as acceptor')
+                      this.setState({myTasks: this.state.myTasks.filter(item => item.id !== item.id)});
+                      //appendHiddenPosts(userId, serviceId);
+                      console.log('added as acceptor item : ', item.customTitle)
+                      return;
+                      //this will remove this item from state.myTasks
                         //this.hideTask(item.id);
                     });
                 }
@@ -257,7 +296,7 @@ class HomeScreen extends Component {
         }
 
         return (
-          <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTask(item)}>
+          <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTaskNew(item)}>
           <View>
           {console.log('swipableRender return return: customTitle is ', customTitle)}
 
@@ -412,6 +451,7 @@ class HomeScreen extends Component {
                                                   {!fetching && <Text style={adourStyle.cardOverText}>Check back later</Text>}
                                                   </View>}
                 disableBottomSwipe={true}
+                key={myTasks.length}
                 disableTopSwipe={true}
                 ref={swiper => {
                   this.swiper = swiper
