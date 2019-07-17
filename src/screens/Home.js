@@ -326,7 +326,7 @@ class HomeScreen extends Component {
               />
           </View>
 
-          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-155 , top: -35, position: 'absolute'}} >
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
           </View>
 

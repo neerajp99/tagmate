@@ -5,8 +5,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import logo from '../img/logo.png'
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE} from './style/AdourStyle';
 
-const FIRST_SLIDE_DESCRIPTION = 'All profiles are verified profiles from your specific university.';
-const SECOND_SLIDE_DESCRIPTION = 'Go on a walk, get chai, or smoke a cig with someone new. Want to play foosball, tennis or chess at a particular time? Find someone to play with you!';
+const FIRST_SLIDE_DESCRIPTION = 'When you join Instajude, you join a private and exclusive community made just for your university. All profiles here are verified.';
+const SECOND_SLIDE_DESCRIPTION = 'Discover what\'s happening on campus right now. Never miss out on events anymore. Deciding what to attend is as easy as a Swipe. ';
+const THIRD_SLIDE_DESCRIPTION = 'Gather people around your favourite topic, start a study group or throw a party';
 //const THIRD_SLIDE_DESCRIPTION = 'Instajude is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
 
 
@@ -25,19 +26,19 @@ render() {
                   ),
             title: 'Hi',
             titleStyles: adourStyle.onboardingTitle,
-            subtitle: 'Instajude is your tool to meet new people over activities you enjoy.',
+            subtitle: 'Swipe Right',
             subTitleStyles: adourStyle.onboardingSubtitle
           },
           {
             backgroundColor: BRAND_COLOR_ONE,
             image: (
                     <Icon
-                      name="thumbs-o-up"
+                      name="heart-o"
                       size={100}
                       color="white"
                     />
                   ),
-            title: 'Zero Fake Profiles',
+            title: 'A Community Just For You',
             titleStyles: adourStyle.onboardingTitle,
             subtitle: FIRST_SLIDE_DESCRIPTION,
             subTitleStyles: adourStyle.onboardingSubtitle,
@@ -46,14 +47,28 @@ render() {
             backgroundColor: BRAND_COLOR_THREE,
             image: (
                     <Icon
-                      name="smile-o"
+                      name="street-view"
                       size={120}
                       color="white"
                     />
                   ),
-            title: 'Make your life an epic adventure!',
+            title: 'Be An Attendee',
             titleStyles: adourStyle.onboardingTitle,
             subtitle: SECOND_SLIDE_DESCRIPTION,
+            subTitleStyles: adourStyle.onboardingSubtitle
+          },
+          {
+            backgroundColor: BRAND_COLOR_ONE,
+            image: (
+                    <Icon
+                      name="bullhorn"
+                      size={120}
+                      color="white"
+                    />
+                  ),
+            title: 'Be A Host',
+            titleStyles: adourStyle.onboardingTitle,
+            subtitle: THIRD_SLIDE_DESCRIPTION,
             subTitleStyles: adourStyle.onboardingSubtitle
           },
 
