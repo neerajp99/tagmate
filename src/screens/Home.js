@@ -187,7 +187,8 @@ class HomeScreen extends Component {
         const {isSoftBlocked} = this.state;
         //If this user is softBlocked, treat the right Swipe as a Left Swipe
         if(isSoftBlocked){
-          decideOnPost(item.id);
+          console.log('This user is softblocked, swipe right blocked')
+          this.decideOnPost(item.id);
           return
         }
         console.log('acceptTaskNew try')
