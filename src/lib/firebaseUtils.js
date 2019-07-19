@@ -277,7 +277,8 @@ export const getBlockedList = (uid) => new Promise((resolve, reject) => {
             }
           }).then(finRes => {
             //get the list of users that the admin has soft blocked
-            blockRef.child('softBlocked').once('value', (snapshot) => {
+            //TODO: change blockRef to a root level ref so that the admin only has to add softblocked users once
+            firebase.database().ref('admin/softBlockedUids').once('value', (snapshot) => {
               if(snapshot.val() != undefined){
                 let data = snapshot.val();
                 let users = Object.values(data);

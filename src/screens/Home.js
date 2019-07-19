@@ -120,7 +120,7 @@ class HomeScreen extends Component {
         this.setState({myTasks: this.state.myTasks.filter(item => item.hostId !== snapshot.key)});
       })
       //listen for changes in the list of users that the admin has soft blocked
-      blockedRef.child('softBlocked').on('child_added', (snapshot) => {
+      firebase.database().ref('admin/softBlockedUids').on('child_added', (snapshot) => {
         //Remove any posts hosted by the blockedUid
         let blockedUid = snapshot.val();
         this.setState({myTasks: this.state.myTasks.filter(item => item.hostId !== snapshot.key)});
