@@ -29,6 +29,7 @@ class HomeScreen extends Component {
             hiddenPosts: [],
             blockedList: [],
             networkId: '',
+            isSoftBlocked: false,
             fetching: false,
         };
         this.getMyTasks = this.getMyTasks.bind(this);
@@ -126,6 +127,15 @@ class HomeScreen extends Component {
         this.setState({myTasks: this.state.myTasks.filter(item => item.hostId !== snapshot.key)});
       })
 
+      //Check if the current user is softBlocked
+      firebase.database().ref(`users/${uid}/isSoftBlocked`).on('value', (snapshot) => {
+        if(snapshot.val() != undefined){
+          if(snapshot.val() === true){
+            this.setState({isSoftBlocked: true});
+          }
+        }
+      })
+
     }
     /*
     * get all the task requests that this user can perform
@@ -174,6 +184,12 @@ class HomeScreen extends Component {
 
     acceptTaskNew = (item) => new Promise((resolve, reject) => {
       try {
+        const {isSoftBlocked} = this.state;
+        //If this user is softBlocked, treat the right Swipe as a Left Swipe
+        if(isSoftBlocked){
+          decideOnPost(item.id);
+          return
+        }
         console.log('acceptTaskNew try')
         if(uid)
         {
