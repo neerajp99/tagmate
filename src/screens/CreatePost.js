@@ -3,7 +3,7 @@ import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, Alert, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
-import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getThumbURL, getFullName} from "../lib/firebaseUtils";
+import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getThumbURL, isVerified, getFullName} from "../lib/firebaseUtils";
 import {connect} from "react-redux";
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from "react-native-modal-datetime-picker";
@@ -180,30 +180,32 @@ class CreatePost extends Component{
 
             getFullName(uid).then(fullName=>
             {
-              getThumbURL(uid).then(thumbRes=> {
-                //If its an anonymous post then use a dummy thumbnail instead of the user's thumbnail
-                let thumbnail = '';
-                if(anonymous){
-                  thumbnail = "https://firebasestorage.googleapis.com/v0/b/chillmate-241a3.appspot.com/o/general%2Favatar.jpg?alt=media&token=4dcdfa81-fea1-4106-9306-26d67f55d62c";
-                }else{
-                  thumbnail = thumbRes;
-                }
-                getNetworkId(uid).then(networkId => {
-                  createNewPost({when:when,details:details, anonymous: anonymous, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
-                  .then(({ data }) => {
-                    console.log('[Client] Server successfully posted')
-                    Alert.alert(
-                        'Yay! 😄',
-                        'Posted Successfully. You can find it on your Dashboard.',
-                        [
-                          {text: 'Cool'},
-                        ]
-                      );
-                    this.setState({disabledBtn:false}); // Enable the button again
-                    this.props.navigation.goBack();
-                  })
-                  .catch(HttpsError => {
-                      console.log(HttpsError.code); // invalid-argument
+              isVerified(uid).then(verified => {
+                getThumbURL(uid).then(thumbRes=> {
+                  //If its an anonymous post then use a dummy thumbnail instead of the user's thumbnail
+                  let thumbnail = '';
+                  if(anonymous){
+                    thumbnail = "https://firebasestorage.googleapis.com/v0/b/chillmate-241a3.appspot.com/o/general%2Favatar.jpg?alt=media&token=4dcdfa81-fea1-4106-9306-26d67f55d62c";
+                  }else{
+                    thumbnail = thumbRes;
+                  }
+                  getNetworkId(uid).then(networkId => {
+                    createNewPost({when:when,details:details, anonymous: anonymous, verified: verified, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
+                    .then(({ data }) => {
+                      console.log('[Client] Server successfully posted')
+                      Alert.alert(
+                          'Yay! 😄',
+                          'Posted Successfully. You can find it on your Dashboard.',
+                          [
+                            {text: 'Cool'},
+                          ]
+                        );
+                      this.setState({disabledBtn:false}); // Enable the button again
+                      this.props.navigation.goBack();
+                    })
+                    .catch(HttpsError => {
+                        console.log(HttpsError.code); // invalid-argument
+                    })
                   })
                 })
               })

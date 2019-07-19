@@ -156,6 +156,7 @@ exports.createNewPost = functions.https.onCall((data, context) => {
       interestedCount: 0,
       created_at:admin.database.ServerValue.TIMESTAMP,
       hostName: data.fullName,
+      verified: data.verified,
       hostThumb: data.hostThumb,
     }
     admin.database().ref(`networks/${data.networkId}/allPosts/${id_gen}`).update(post).then(res => {
@@ -242,7 +243,7 @@ exports.notifyHostOnNewGuest = functions.database
           return console.log('missing mandatory params for sending push.')
       }
       let interestedCount = change.after.val();
-      
+
       //Hotfix
       if(change.after.val() === 0) return;
 

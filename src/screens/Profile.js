@@ -4,10 +4,11 @@ import { ListItem, Card, Divider, Avatar, Icon as IconElements } from 'react-nat
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import uuid from 'react-native-uuid';
 import AddDetails from './auth/AddDetails';
-import {getCoins, getBio, listenForChange, getNetworkId, updateAvatar} from '../lib/firebaseUtils.js';
+import {getCoins, getBio, listenForChange, getNetworkId, isVerified, getFullName, updateAvatar} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from './style/AdourStyle';
 import OfflineNotice from './OfflineNotice';
@@ -23,6 +24,7 @@ class ProfileScreen extends Component{
       coins: 'Loading...',
       displayName: '_____ _____',
       networkId: '',
+      isVerified: false,
       bio: '_____ _____ _____ ___ ______',
       photoURL: PLACEHOLDER_AVATAR
     }; // Message to show while Adour coins are being loaded
@@ -42,11 +44,14 @@ class ProfileScreen extends Component{
     //Fetching name and photo URL
     let user = firebase.auth().currentUser;
     if (user != null) {
-      displayName = user.displayName;
 
       getNetworkId(user.uid).then(networkId => {
-        getBio(user.uid).then(bio => {
-          this.setState({displayName, bio, networkId, loading: false});
+        getFullName(user.uid).then(displayName => {
+          getBio(user.uid).then(bio => {
+            isVerified(user.uid).then(isVerified => {
+              this.setState({displayName, bio, networkId, isVerified, loading: false});
+            })
+          })
         })
       })
 
@@ -197,7 +202,7 @@ class ProfileScreen extends Component{
                 activeOpacity={0.7}
                 />
                 </View>
-              <Text style={adourStyle.titleTextCenter}>{this.state.displayName}</Text>
+              <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}><Text style={adourStyle.titleTextCenter}>{this.state.displayName}</Text>{this.state.isVerified ? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} style={{marginLeft: 3}} /> : null}</View>
               <View style={{flex:2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
               <IconElements name="star-border" type="material" color='grey' />
               <Text style={adourStyle.reputationText}> {this.state.coins}</Text>

@@ -112,7 +112,7 @@ export const HomeStack = createStackNavigator(
       screen: CreatePost,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Create A Post',
+          headerTitle: 'Host A Gathering',
           headerTitleStyle: routerStyle.headerText
         }
       }

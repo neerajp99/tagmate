@@ -3,6 +3,7 @@ import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollVie
 import {markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Button, Card, ListItem, Text, Divider, Badge, withBadge } from 'react-native-elements';
 import * as _ from 'lodash';
 import {getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '../lib/firebaseUtils.js';
@@ -354,8 +355,7 @@ class DashboardDetails extends Component {
               titleStyle={adourStyle.listItemText}
               subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
-              rightTitle={statusStr}
-              rightTitleStyle={adourStyle.listItemText}
+              rightIcon={item.verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
               leftAvatar={{ source: { uri: item.hostThumb } }}
               onPress={() => this.openProfile(item.hostId)}
               chevron={false}

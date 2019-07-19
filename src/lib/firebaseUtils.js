@@ -737,6 +737,15 @@ export const getAvatar = (userId) => new Promise((resolve, reject) => {
     }
 })
 
+// Expects user ID in parameters
+// Returns the avatar of the user
+export const isVerified = (userId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${userId}/verified`).once("value", function(verified){resolve(verified.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
 
 export const getUserThumbnail = (userId) => new Promise((resolve, reject) => {
     try {

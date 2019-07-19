@@ -156,7 +156,7 @@ class HomeScreen extends Component {
         if(this._isMounted) this.setState({fetching:false});
 
         livePostsRef.on('child_removed', (snapshot) => {
-          console.log('child_removed, snapshot key is ', snapshot.key)
+          //console.log('child_removed, snapshot key is ', snapshot.key)
           this.setState({myTasks: this.state.myTasks.filter(item => item.id !== snapshot.key)});
         })
 
@@ -187,25 +187,25 @@ class HomeScreen extends Component {
         const {isSoftBlocked} = this.state;
         //If this user is softBlocked, treat the right Swipe as a Left Swipe
         if(isSoftBlocked){
-          console.log('This user is softblocked, swipe right blocked')
+          //console.log('This user is softblocked, swipe right blocked')
           this.decideOnPost(item.id);
           return
         }
-        console.log('acceptTaskNew try')
+        //console.log('acceptTaskNew try')
         if(uid)
         {
             alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
             {
-              console.log('Inside acceptTaskNew alreadyAccepted')
+              //console.log('Inside acceptTaskNew alreadyAccepted')
                 //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                  console.log('Inside acceptTaskNew right before addAcceptor')
+                  //console.log('Inside acceptTaskNew right before addAcceptor')
                     //the addAcceptor function basically writes to the firebase database
                     // try adding appendHiddenPosts here and removing everything else below, check if the function is run
                     addAcceptor(uid, item.id, item.hostId).then(o =>
                     {
-                      console.log('Inside acceptTaskNew addAcceptor then')
+                      //console.log('Inside acceptTaskNew addAcceptor then')
                       this.setState({myTasks: this.state.myTasks.filter(taskItem => taskItem.id !== item.id)});
                       //appendHiddenPosts(userId, serviceId);
                       console.log('done with: ', item.customTitle)
@@ -289,11 +289,11 @@ class HomeScreen extends Component {
     swipableRender() {
       const {myTasks} = this.state;
 
-      console.log('swipableRender: myTasks is ', myTasks)
+      //console.log('swipableRender: myTasks is ', myTasks)
 
       return myTasks.map((item) => {
-        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, hostThumb, hostId, interestedCount} = item;
-        console.log('swipableRender return: item.customTitle is ', item.customTitle)
+        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, verified, hostThumb, hostId, interestedCount} = item;
+        //console.log('swipableRender return: item.customTitle is ', item.customTitle)
         var detailsAvailable = true;
 
         if(details == "" || typeof details == "undefined") detailsAvailable = false
@@ -315,7 +315,7 @@ class HomeScreen extends Component {
         return (
           <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTaskNew(item)}>
           <View>
-          {console.log('swipableRender return return: customTitle is ', customTitle)}
+          {/*console.log('swipableRender return return: customTitle is ', customTitle)*/}
 
 
           <Card image={{uri: bgImage}} featuredTitle={customTitle} featuredTitleStyle={adourStyle.listItemText} >
@@ -354,6 +354,7 @@ class HomeScreen extends Component {
               subtitle="Host"
               subtitleStyle={adourStyle.listItemText}
               leftAvatar={{ source: { uri: hostThumb } }}
+              rightIcon={verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
               chevron={false}
               onPress={() => this.openProfile(hostId)}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
@@ -395,7 +396,7 @@ class HomeScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        console.log('renderItem item.customTitle: ', item.customTitle);
+        //console.log('renderItem item.customTitle: ', item.customTitle);
         const {id, when, details, customTitle, bgImage, anonymous, created_at, hostName, interestedCount} = item;
         var detailsAvailable = true;
         if(details == "" || typeof details == "undefined") detailsAvailable = false
@@ -449,13 +450,13 @@ class HomeScreen extends Component {
 
     render() {
         const {fetching, myTasks} = this.state
-        console.log('*** RENDERING *** MyTasks: ', myTasks)
+        //console.log('*** RENDERING *** MyTasks: ', myTasks)
         return (
             <View style={styles.mainContainer}>
             <OfflineNotice />
             <Card>
               <ListItem
-                title="Create A Post"
+                title="Host A Gathering"
                 titleStyle={adourStyle.listItemTextBoldB}
                 leftIcon={{ name: 'edit', size:28 }}
                 onPress={() => this.props.navigation.navigate('CreatePost')}
