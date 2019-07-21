@@ -31,7 +31,7 @@ class OfflineNotice extends PureComponent {
   setTimeout(() => {
     this.poll();
 
-    return fetch('http://www.google.com')
+    return fetch('https://www.google.com')
       .then((response) => {
         if(this._isMounted) this.setState({ isConnected: true });
       })
