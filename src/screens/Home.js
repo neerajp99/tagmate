@@ -454,15 +454,9 @@ class HomeScreen extends Component {
         return (
             <View style={styles.mainContainer}>
             <OfflineNotice />
-            <Card>
-              <ListItem
-                title="Host A Gathering"
-                titleStyle={adourStyle.listItemTextBoldB}
-                leftIcon={{ name: 'edit', size:28 }}
-                onPress={() => this.props.navigation.navigate('CreatePost')}
-                containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-              />
-            </Card>
+            <View style={{marginLeft: 20, marginRight: 20}}>
+              <Button title="Host A Gathering" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
+            </View>
             <CardStack
                 renderNoMoreCards={() => <View style={{marginTop: 50}}>
                                                   {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}

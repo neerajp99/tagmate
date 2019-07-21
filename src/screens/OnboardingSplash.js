@@ -22,16 +22,6 @@ render() {
           {
             backgroundColor: BRAND_COLOR_ONE,
             image: (
-                    <Image source={logo} style={{height: 61, width: 250}} />
-                  ),
-            title: 'Hi',
-            titleStyles: adourStyle.onboardingTitle,
-            subtitle: 'Swipe Right',
-            subTitleStyles: adourStyle.onboardingSubtitle
-          },
-          {
-            backgroundColor: BRAND_COLOR_ONE,
-            image: (
                     <Icon
                       name="heart-o"
                       size={100}

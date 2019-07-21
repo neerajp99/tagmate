@@ -45,6 +45,7 @@ class DashboardScreen extends Component {
       //this.sendPushNotificationToHosts(hard code network Id here); //THIS IS A MANUAL CLOUD FUNCTION FOR ADMINS ONLY
       //massJobs();
 
+
       this.runFirebaseListeners();
     }
 
@@ -326,8 +327,8 @@ class DashboardScreen extends Component {
                     keyExtractor={(item, index) => item.id}
                 />
               }
-              <View style={{marginBottom:30, marginLeft: 20, marginRight: 20}}>
-              <Button title="Host A Gathering" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnGeneral} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
+              <View style={{marginBottom:15, marginLeft: 20, marginRight: 20}}>
+              <Button title="Host A Gathering" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
               </View>
 
               {
