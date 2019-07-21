@@ -11,7 +11,7 @@ import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 import OfflineNotice from './OfflineNotice';
 
-const CUSTOM_IMG = "http://instajude.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "https://instajude.com/assets/item_img/custom.jpg";
 let uid;
 
 class DashboardDetails extends Component {

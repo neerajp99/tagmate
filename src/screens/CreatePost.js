@@ -11,7 +11,7 @@ import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window');
 
-const CUSTOM_IMG = "http://instajude.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "https://instajude.com/assets/item_img/custom.jpg";
 
 let uid;
 
@@ -26,7 +26,7 @@ class CreatePost extends Component{
             selfName:'',
             customTitle: '',
             serviceTitle: '',
-            bgImage:'http://instajude.com/assets/item_img/custom.jpg',
+            bgImage:'https://instajude.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',

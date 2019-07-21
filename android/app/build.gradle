@@ -105,8 +105,8 @@ android {
         applicationId "com.chillmate"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 17
-        versionName "1.52"
+        versionCode 18
+        versionName "1.53"
         vectorDrawables.useSupportLibrary = true
     }
     signingConfigs {
