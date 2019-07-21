@@ -357,7 +357,7 @@ class DashboardDetails extends Component {
               subtitleStyle={adourStyle.listItemText}
               rightIcon={item.verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
               leftAvatar={{ source: { uri: item.hostThumb } }}
-              onPress={() => this.openProfile(item.hostId)}
+              onPress={item.anonymous? () =>  alert('The host is anonymous. Can\'t open profile.') : () => this.openProfile(item.hostId)}
               chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />

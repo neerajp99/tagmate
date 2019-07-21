@@ -374,7 +374,7 @@ class HomeScreen extends Component {
               leftAvatar={{ source: { uri: hostThumb } }}
               rightIcon={verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
               chevron={false}
-              onPress={() => this.openProfile(hostId)}
+              onPress={anonymous? () => alert('The host is anonymous. Can\'t open profile.') : () => this.openProfile(hostId)}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />
 
