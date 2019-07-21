@@ -17,11 +17,13 @@ class OfflineNotice extends PureComponent {
   };
 
   componentDidMount() {
+    this._isMounted = true;
     this.poll()
     //NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
     //NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
   }
 
@@ -31,10 +33,10 @@ class OfflineNotice extends PureComponent {
 
     return fetch('http://www.google.com')
       .then((response) => {
-        this.setState({ isConnected: true });
+        if(this._isMounted) this.setState({ isConnected: true });
       })
       .catch((err) => {
-        this.setState({ isConnected: false });
+        if(this._isMounted) this.setState({ isConnected: false });
       });
   }, 3000);
 }

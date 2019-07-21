@@ -3,6 +3,7 @@ import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpa
 import {serverExists, getNetworkId, getBlockedList, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
+import AsyncStorage from '@react-native-community/async-storage';
 import { Button, ListItem, Card, Icon as IconElements } from 'react-native-elements';
 import ActionSheet from 'react-native-actionsheet'
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -44,6 +45,23 @@ class HomeScreen extends Component {
         } else {
           this.props.navigation.navigate('Login')
         }
+
+        //We only need to check if it's user's first time if user is not signed in
+        AsyncStorage.getItem("alreadyLaunchedHome").then(value => {
+              if(user != null && value == null){
+                   AsyncStorage.setItem('alreadyLaunchedHome', "true"); // No need to wait for `setItem` to finish, although you might want to handle errors
+                   Alert.alert(
+                   'How It Works',
+                   'Swipe right to attend. Swipe left to decline.',
+                   [
+                     {text: 'COOL'}
+                   ]
+                 );
+              }
+              else{
+                   console.log('Not showing directions alert since this is not the first launch')
+              }}) // Add some error handling, also you can simply do this.setState({fistLaunch: value == null})
+
 
         // TEMPORARY
         //getAcceptors("testServiceRequest").then(response => {
