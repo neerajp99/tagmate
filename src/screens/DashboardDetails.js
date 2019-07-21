@@ -333,7 +333,7 @@ class DashboardDetails extends Component {
     console.log('DashboardScreen is displaying the item with ID: ', item.id);
     var statusStr = 'Not available';
     let host = 'Anonymous';
-    if(!item.anonymous) host = item.hostName;
+    if(!item.anonymous || item.status === 1) host = item.hostName;
     if(typeof item.status != 'undefined')
     {
       switch(item.status)
@@ -357,7 +357,7 @@ class DashboardDetails extends Component {
               subtitleStyle={adourStyle.listItemText}
               rightIcon={item.verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
               leftAvatar={{ source: { uri: item.hostThumb } }}
-              onPress={item.anonymous? () =>  alert('The host is anonymous. Can\'t open profile.') : () => this.openProfile(item.hostId)}
+              onPress={() => this.openProfile(item.hostId)}
               chevron={false}
               containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
             />

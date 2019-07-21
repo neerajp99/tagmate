@@ -118,31 +118,47 @@ class GuestList extends Component {
 
     confirmGuestList = () => {
       let incomplete = false;
+      const {anonymous} = this.state.item
       let undecidedGuests = this.state.guestList.filter(guest => guest.guestStatus == 0);
       if(undecidedGuests.length > 0){
         incomplete = true;
       }
       if(incomplete){
-        alert('Please make allow/disallow all potential guests');
+        alert('Please allow/disallow all potential guests');
         return;
       }
-      if(!incomplete){
-        finalizeGuestList(this.state.item.id, this.state.item.hostId).then(result => {
-          if(result){
-            Alert.alert(
-                'Yay! 😍',
-                'Guest List Finalized. You can now start chatting with your guests.',
-                [
-                  {text: 'Cool'},
-                ]
-              );
-            this.props.navigation.navigate('DashboardDetails',{taskId: this.state.item.id});
-          }else {
-            alert('Please accept atleast one guest before finalizing the list');
-          }
-        })
 
+      if(!incomplete){
+        if(anonymous){
+          Alert.alert(
+              'Note',
+              'Your identity will be revealed to confirmed guests once you finalize the list.',
+              [
+                {text: 'Cancel', onPress: () => {return} },
+                {text: 'Finalize List', onPress: () => this.executeFinalizeList()}
+              ]
+            );
+        }else{
+          this.executeFinalizeList()
+        }
       }
+    }
+
+    executeFinalizeList = () => {
+      finalizeGuestList(this.state.item.id, this.state.item.hostId).then(result => {
+        if(result){
+          Alert.alert(
+              'Yay! 😍',
+              'Guest List Finalized. You can now start chatting with your guests.',
+              [
+                {text: 'Cool'},
+              ]
+            );
+          this.props.navigation.navigate('DashboardDetails',{taskId: this.state.item.id});
+        }else {
+          alert('Please accept atleast one guest before finalizing the list');
+        }
+      })
     }
 
 
@@ -190,6 +206,7 @@ class GuestList extends Component {
 
     render() {
       const {fetching, guestList} = this.state
+
         return (
           <View style={{flex: 2, marginBottom: 8}}>
           <ScrollView>
