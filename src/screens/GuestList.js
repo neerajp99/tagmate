@@ -131,7 +131,7 @@ class GuestList extends Component {
       if(!incomplete){
         if(anonymous){
           Alert.alert(
-              'Note',
+              'Heads Up',
               'Your identity will be revealed to confirmed guests once you finalize the list.',
               [
                 {text: 'Cancel', onPress: () => {return} },
