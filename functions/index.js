@@ -316,6 +316,7 @@ exports.sendUnreadPushNotification = functions.database
 
 // TODO : Debug. Function is throwing errors
 //This function sends push notifications when there are new unread chat messages for this user. This function is not working as of now
+// NEW NOTE : only sending to the first user. probably a problem with an extra return. Check history.
   exports.sendFinalizedListNotification = functions.database
   .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests')
   .onCreate((snapshot, context) => {
@@ -351,7 +352,6 @@ exports.sendUnreadPushNotification = functions.database
                 return userData[key];
             });
             userItem.map(item => allDeviceTokens.push(item))
-            return true
           })
           promises.push(promise);
         }
