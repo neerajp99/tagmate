@@ -48,7 +48,7 @@ class ChatLib {
   networkCheck = (userId, bio) => new Promise((resolve, reject) => {
       try {
             setTimeout(() => {
-              return fetch('http://www.google.com')
+              return fetch('https://www.google.com')
                 .then((response) => {
                   resolve(true)
                 })

@@ -27,7 +27,7 @@ class ActivityChat extends React.Component {
   };
 
   componentWillMount() {
-    ChatLib.resetUnread(this.state.taskId);
+    //ChatLib.resetUnread(this.state.taskId);
   }
 
   componentDidMount() {
