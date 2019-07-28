@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Dimensions} from 'react-native';
+import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Share, ScrollView, Dimensions} from 'react-native';
 import {serverExists, getNetworkId, getBlockedList, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import AsyncStorage from '@react-native-community/async-storage';
-import { Button, ListItem, Card, Icon as IconElements } from 'react-native-elements';
+import { Button, Badge, ListItem, Card, Icon as IconElements } from 'react-native-elements';
 import ActionSheet from 'react-native-actionsheet'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -102,6 +102,17 @@ class HomeScreen extends Component {
           Notification.onTokenRefresh(token)
           saveDeviceToken(uid, token)
       })
+    }
+
+    onShare = (postTitle) => {
+    Share.share({
+      message: `Hey, I think you\'ll be interested in attending this gathering: ${postTitle}. RSVP Here: https://instajude.com`,
+      url: 'https://instajude.com',
+      title: `${postTitle}`
+    }, {
+      // Android only:
+      dialogTitle: 'Share this gathering',
+    })
     }
 
     openProfile = (uid) =>
@@ -364,7 +375,9 @@ class HomeScreen extends Component {
           <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
           </View>
-
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-380 , top: -35, position: 'absolute'}} >
+          {interestAvailable && <Badge value={interestNumText} status="primary" textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />}
+          </View>
 
               <ListItem
               title={anonymous? "Anonymous": hostName}
@@ -385,7 +398,17 @@ class HomeScreen extends Component {
             }
 
             { (scheduledFor != "null") && <Text style={adourStyle.cardText}>{scheduledFor}</Text> }
-            {interestAvailable && <Text style={adourStyle.cardText}>{interestNumText}</Text>}
+
+            <Button
+            icon={{
+                    name: "share",
+                    size: 15,
+                    color: "white"
+                  }}
+            onPress={() => this.onShare(customTitle)}
+            buttonStyle={adourStyle.btnShare}
+            titleStyle={adourStyle.btnTextSmall}
+            title="Recommend A Friend" />
 
               <View>
               </View>
@@ -401,7 +424,6 @@ class HomeScreen extends Component {
                   </TouchableOpacity>
                 </View>
               </View>
-
               </Card>
               </View>
             </SwipableCard>
@@ -524,13 +546,17 @@ const styles = StyleSheet.create({
     },btnAccept:{
         width: ((WIDTH/2) - 35) ,
         height: 45,
+        borderBottomRightRadius: 5,
+        borderTopRightRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: BRAND_COLOR_ONE
+        backgroundColor: BRAND_COLOR_TWO
     },
     btnReject:{
         width: ((WIDTH/2) - 35),
         height: 45,
+        borderBottomLeftRadius: 5,
+        borderTopLeftRadius: 5,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: BRAND_COLOR_FOUR

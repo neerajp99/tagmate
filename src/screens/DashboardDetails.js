@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, ScrollView} from 'react-native';
+import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, Share, ScrollView} from 'react-native';
 import {markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -49,6 +49,17 @@ class DashboardDetails extends Component {
   {
     this._isMounted = false;
   }
+
+  onShare = (postTitle) => {
+  Share.share({
+    message: `Check out this gathering on campus: ${postTitle}. I think you\'ll be interested in it. https://instajude.com`,
+    url: 'https://instajude.com',
+    title: `${postTitle}`
+  }, {
+    // Android only:
+    dialogTitle: 'Share this gathering',
+  })
+}
 
   //WIP
   getTaskItem = () => {
@@ -397,6 +408,17 @@ class DashboardDetails extends Component {
                   </View>
 
                    */ }
+
+                   { item.status === 0 && <Button
+                   icon={{
+                           name: "share",
+                           size: 15,
+                           color: "white"
+                         }}
+                   onPress={() => this.onShare(item.customTitle)}
+                   buttonStyle={adourStyle.btnShare}
+                   titleStyle={adourStyle.btnTextSmall}
+                   title="Share" />}
 
       </Card>
 

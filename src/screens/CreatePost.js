@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
-import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, Alert, ScrollView} from 'react-native';
+import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, Alert, Share, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
 import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getThumbURL, isVerified, getFullName} from "../lib/firebaseUtils";
@@ -95,6 +95,17 @@ class CreatePost extends Component{
        this.setState({anonymous: !this.state.anonymous})
      }
    }
+
+   onShare = (postTitle) => {
+   Share.share({
+     message: `Check out this gathering on campus: ${postTitle}. I think you\'ll be interested in it. https://instajude.com`,
+     url: 'https://instajude.com',
+     title: `${postTitle}`
+    }, {
+     // Android only:
+     dialogTitle: 'Share this gathering',
+    })
+  }
 
   	sendRequest = () =>
     {
@@ -198,6 +209,7 @@ class CreatePost extends Component{
                           'Posted Successfully. You can find it on your Dashboard.',
                           [
                             {text: 'Cool'},
+                            {text: 'Share', onPress: () => this.onShare(postTitle)},
                           ]
                         );
                       this.setState({disabledBtn:false}); // Enable the button again

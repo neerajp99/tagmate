@@ -17,6 +17,9 @@ export const BRAND_COLOR_FOUR = '#215596';
 //Cyan
 export const BRAND_COLOR_FIVE = '#73FBD3'
 
+//Light version
+export const BRAND_COLOR_SIX = '#98b9e3';
+
 const { width: WIDTH } = Dimensions.get('window');
 
 export const adourStyle = StyleSheet.create({
@@ -37,6 +40,12 @@ export const adourStyle = StyleSheet.create({
     marginBottom: 10,
     marginRight: 12,
     color: '#bfbfbf'
+  },
+  interestedText: {
+    fontFamily:'OpenSans',
+    fontWeight:'200',
+    alignSelf:'flex-end',
+    color: '#ffffff'
   },
   listItemTextBold: {
     fontFamily:'OpenSans-Semibold',
@@ -83,8 +92,8 @@ export const adourStyle = StyleSheet.create({
   cardText: {
     fontFamily:'OpenSans',
     marginLeft: 74,
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 5,
+    marginTop: 5,
     fontWeight:'200'
   },
   reputationText: {
@@ -230,6 +239,13 @@ export const adourStyle = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
+  btnShare: {
+    borderRadius: 5,
+    height: 35,
+    backgroundColor: BRAND_COLOR_SIX,
+    justifyContent: 'center',
+    marginTop: 20
+  },
   btnHomeHost: {
     borderRadius: 5,
     height: 45,
@@ -279,6 +295,13 @@ export const adourStyle = StyleSheet.create({
     fontWeight:'200',
     color: 'rgba(255, 255, 255, 1)',
     fontSize: 16,
+    textAlign: 'center'
+  },
+  btnTextSmall: {
+    fontFamily:'OpenSans-Semibold',
+    fontWeight:'200',
+    color: 'rgba(255, 255, 255, 1)',
+    fontSize: 14,
     textAlign: 'center'
   }
 

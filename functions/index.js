@@ -318,15 +318,20 @@ exports.sendUnreadPushNotification = functions.database
 //This function sends push notifications when there are new unread chat messages for this user. This function is not working as of now
 // NEW NOTE : only sending to the first user. probably a problem with an extra return. Check history.
   exports.sendFinalizedListNotification = functions.database
-  .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests')
+  .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests/{userId}')
   .onCreate((snapshot, context) => {
-      const {pushId, networkId} = context.params;
-      if (!pushId || !networkId) {
+      const {pushId, networkId, userId} = context.params;
+      if (!pushId || !networkId || !userId) {
           return console.log('missing mandatory params for sending push.')
       }
-      let allDeviceTokens = []
-      let guestIds = []
-      const payload = {
+
+      let deviceTokens = []
+      const userDevicePromise = admin.database().ref(`/users/${userId}`).once('value')
+      return Promise.all([userDevicePromise]).then(results => {
+        // Terminate here if the client does not have any device IDs.
+        let userItem = results[0].val();
+        if(!userItem.hasOwnProperty('deviceTokens') || !userItem.deviceTokens.length) return console.log('User does not have device ID.')
+        const payload = {
           notification: {
               title: 'You have been accepted!',
               body: `Tap to chat`
@@ -335,30 +340,10 @@ exports.sendUnreadPushNotification = functions.database
               taskId: pushId,
               notifType: 'OPEN_DASHBOARD_DETAILS', // To tell the app what kind of notification this is.
           }
-      };
-        let confGuestsData = snapshot.val();
-        let confGuestItems = Object.keys(confGuestsData).map(function(key) {
-            return confGuestsData[key];
-        });
-        confGuestItems.map(guest => {
-          guestIds.push(guest.id)
-        })
-        let promises = []
-        for(let i=0; i<guestIds.length; i++){
-          let userId = guestIds[i];
-          let promise = admin.database().ref(`/users/${userId}/deviceTokens`).once('value', (tokenSnapshot) => {
-            let userData = tokenSnapshot.val();
-            let userItem = Object.keys(userData).map(function(key) {
-                return userData[key];
-            });
-            userItem.map(item => allDeviceTokens.push(item))
-          })
-          promises.push(promise);
-        }
-        return Promise.all(promises).then(() => {
-          console.log('allDeviceTokens: ', allDeviceTokens)
-          return admin.messaging().sendToDevice(allDeviceTokens, payload);
-        })
+        };
+        console.log('Sending Finalize List notification to ', userItem.deviceTokens);
+        return admin.messaging().sendToDevice(userItem.deviceTokens, payload);
+      })
   });
 
   exports.finalizeGuestListOps = functions.database
@@ -410,17 +395,27 @@ exports.sendUnreadPushNotification = functions.database
       }
       console.log('change.before.val().status :', change.before.val().status);
       console.log('change.after.val().status :', change.after.val().status);
-
+      /*
       //if the post is no longer live, remove it from the livePosts reference object
       if(change.before.val().status == 0 && change.after.val().status != 0){
         console.log('Post no longer live. Removing it from livePosts.')
         return admin.database().ref(`networks/${networkId}/livePosts/${postId}`).remove();
       }
 
+      if(change.after.val().status > 0){
+        console.log('Post status 1. Removing it from livePosts.')
+        return admin.database().ref(`networks/${networkId}/livePosts/${postId}`).remove();
+      }
+      */
+
       let post = change.after.val();
 
       if(post.status > 0){
-        //Since the post's guest list is finalized, it is no longer in livePosts, so we don't need to update livePosts
+        //Since the post's guest list is finalized, it is no longer in livePosts, so we don't need to update livePosts.
+        //we remove it from livePosts
+        console.log('post status > 0. Removing from livePosts')
+        admin.database().ref(`networks/${networkId}/livePosts/${postId}`).remove();
+
         console.log('Post change detected.')
         //Update the duplicate post for the host
         return admin.database().ref(`/users/${post.hostId}/posts/host/${postId}`).update(post).then(res => {
