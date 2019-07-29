@@ -220,7 +220,7 @@ class Login extends Component {
 
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Light} onPress={this._signIn}/>
         {/* <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
-          What is Instajude?
+          What is Tagmate?
         </Text> */}
       </View>
       </View>

@@ -5,10 +5,10 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import logo from '../img/logo.png'
 import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE} from './style/AdourStyle';
 
-const FIRST_SLIDE_DESCRIPTION = 'When you join Instajude, you join a private and exclusive community made just for your university. All profiles here are verified.';
+const FIRST_SLIDE_DESCRIPTION = 'When you join Tagmate, you join a private and exclusive community made just for your university. All profiles here are verified.';
 const SECOND_SLIDE_DESCRIPTION = 'Discover what\'s happening on campus right now. Never miss out on events anymore. Deciding what to attend is as easy as a Swipe. ';
 const THIRD_SLIDE_DESCRIPTION = 'Gather people around your favourite topic, start a study group or throw a party';
-//const THIRD_SLIDE_DESCRIPTION = 'Instajude is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
+//const THIRD_SLIDE_DESCRIPTION = 'Tagmate is an inclusive and positive space. If you face any inapproperiate behavior, you can report the person.';
 
 
 class OnboardingSplash extends Component {
