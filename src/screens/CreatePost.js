@@ -11,7 +11,7 @@ import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window');
 
-const CUSTOM_IMG = "https://instajude.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "https://tagmateapp.com/assets/item_img/custom.jpg";
 
 let uid;
 
@@ -26,7 +26,7 @@ class CreatePost extends Component{
             selfName:'',
             customTitle: '',
             serviceTitle: '',
-            bgImage:'https://instajude.com/assets/item_img/custom.jpg',
+            bgImage:'https://tagmateapp.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
             dtPlaceholder: 'Date & Time (Optional)',
@@ -98,8 +98,8 @@ class CreatePost extends Component{
 
    onShare = (postTitle) => {
    Share.share({
-     message: `Check out this gathering on campus: ${postTitle}. I think you\'ll be interested in it. https://instajude.com`,
-     url: 'https://instajude.com',
+     message: `Check out this gathering on campus: ${postTitle}. I think you\'ll be interested in it. https://tagmateapp.com`,
+     url: 'https://tagmateapp.com',
      title: `${postTitle}`
     }, {
      // Android only:

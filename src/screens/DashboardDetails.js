@@ -11,7 +11,7 @@ import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 import OfflineNotice from './OfflineNotice';
 
-const CUSTOM_IMG = "https://instajude.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "https://tagmateapp.com/assets/item_img/custom.jpg";
 let uid;
 
 class DashboardDetails extends Component {
@@ -52,8 +52,8 @@ class DashboardDetails extends Component {
 
   onShare = (postTitle) => {
   Share.share({
-    message: `Check out this gathering on campus: ${postTitle}. I think you\'ll be interested in it. https://instajude.com`,
-    url: 'https://instajude.com',
+    message: `Check out this gathering on campus: ${postTitle}. I think you\'ll be interested in it. https://tagmateapp.com`,
+    url: 'https://tagmateapp.com',
     title: `${postTitle}`
   }, {
     // Android only:

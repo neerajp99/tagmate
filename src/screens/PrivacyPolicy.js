@@ -26,7 +26,7 @@ class PrivacyPolicyScreen extends Component{
           <WebView
             onLoad={() => this.hideSpinner()}
             style={{ flex: 1 }}
-            source={{ uri: 'https://instajude.com/legal/privacypolicy.html' }}
+            source={{ uri: 'https://tagmateapp.com/legal/privacypolicy.html' }}
           />
         </View>
       )

@@ -15,7 +15,7 @@ import {adourStyle, BRAND_COLOR_ONE, BRAND_COLOR_THREE, BRAND_COLOR_TWO, BRAND_C
 import CardStack, { Card as SwipableCard } from 'react-native-card-stack-swiper';
 import OfflineNotice from './OfflineNotice';
 
-const CUSTOM_IMG = "https://instajude.com/assets/item_img/custom.jpg";
+const CUSTOM_IMG = "https://tagmateapp.com/assets/item_img/custom.jpg";
 
 //Test commit: Google Play Release
 
@@ -106,8 +106,8 @@ class HomeScreen extends Component {
 
     onShare = (postTitle) => {
     Share.share({
-      message: `Hey, I think you\'ll be interested in attending this gathering: ${postTitle}. RSVP Here: https://instajude.com`,
-      url: 'https://instajude.com',
+      message: `Hey, I think you\'ll be interested in attending this gathering: ${postTitle}. RSVP Here: https://tagmateapp.com`,
+      url: 'https://tagmateapp.com',
       title: `${postTitle}`
     }, {
       // Android only:

@@ -34,7 +34,7 @@ class RequestScreen extends Component {
     addCustomService = () =>
     {
          // Trigger default email app to open "Compose email" box preloaded with an Adour rep's email and a subject line.
-        Linking.openURL('mailto:support@instajude.com?subject=New Activity Suggestion&body=Please add this activity: ')
+        Linking.openURL('mailto:support@tagmateapp.com?subject=New Activity Suggestion&body=Please add this activity: ')
     }
 
     render() {

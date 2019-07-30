@@ -64,7 +64,7 @@ export const createCustomService = (customTitle) => new Promise((resolve, reject
             description: customTitle,
             title: customTitle,
             id: newServiceId,
-            img: 'https://instajude.com/assets/item_img/custom.jpg',
+            img: 'https://tagmateapp.com/assets/item_img/custom.jpg',
             icon: 'av-timer'
           })
           resolve(newServiceId);
