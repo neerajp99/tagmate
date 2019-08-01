@@ -5,7 +5,7 @@ import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-goog
 import {connect} from 'react-redux';
 import {loginUser, loginGoogleUser,addNewGoogleUser} from '../../actions';
 import {populateUserServices, addNetworkDetails, setInitialThumbnail} from '../../lib/firebaseUtils';
-import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, Platform, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Video from 'react-native-video'
@@ -219,9 +219,11 @@ class Login extends Component {
 
 
         <GoogleSigninButton style={styles.btnGoogleLogin} disabled={this.state.loading}  size ={GoogleSigninButton.Size.Wide} color={GoogleSigninButton.Color.Light} onPress={this._signIn}/>
-        {/* <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('OnboardingSplash')} >
-          What is Tagmate?
-        </Text> */}
+
+        {Platform.OS === 'ios' && <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('EmailLogin', {navigation: this.props.navigation })} >
+          Sign-In Using Email and Password
+        </Text>}
+
       </View>
       </View>
     )

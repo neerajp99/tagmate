@@ -3,20 +3,54 @@ import React, {Component} from 'react';
 import firebase from 'react-native-firebase';
 import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, ActivityIndicator  } from 'react-native';
 import {connect} from 'react-redux';
-import {signupUser} from '../../actions';
+import {loginUser} from '../../actions';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import bgImage from '../../img/background.jpg'
 import logo from '../../img/logo.png'
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
+//Note: this has a lot of unused garbage code. Please clean it.
+
 const { width: WIDTH } = Dimensions.get('window')
+const { height: HEIGHT } = Dimensions.get('window')
 
-class SignUp extends Component {
-  state = { email: '', password: '', showPass: true }
+class EmailLogin extends Component {
 
-  handleSignUp = () => {
-      console.log('inside handleSignUp')
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      success: false,
+      showPass: true
+    };
+  }
+
+  componentDidMount(){
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in.
+        () => this.props.navigation.navigate('MainStack')
+
+      } else {
+        // User is signed out.
+        // ...
+      }
+    });
+  }
+
+  loginUser = () => {
+    const {email, password} = this.state;
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(user => this.props.navigation.navigate('MainStack'))
+      .catch( (err) => {
+        alert(err.message)})
+
+  }
+
+  handleSignIn = () => {
+      console.log('inside handleSignIn')
       const { email, password } = this.state
 
       // Ensuring no fields are empty.
@@ -25,15 +59,15 @@ class SignUp extends Component {
         alert('Please fill all the fields.');
         return;
       }
-      alert('New email based signups are temporarily disabled because we are facing issues verifying the authenticity of students. Please use Google SignIn using your University email ID. Contact support for help.')
-      //DISABLED this.props.signupUser({email, password})
+      this.props.loginUser({email, password})
+      this.props.navigation.navigate('MainStack')
     }
 
     handleLoading = () => {
       if(this.props.loading){
         return <ActivityIndicator />;
       } else {
-        return <Text style={styles.text}> Signup </Text>;
+        return <Text style={styles.text}> Login </Text>;
       }
     }
 
@@ -53,7 +87,7 @@ render() {
       <View>
         <View style={styles.logoContainer}>
           <Image source={logo} style={styles.logo} />
-          <Text style={styles.logoText}> Join the community </Text>
+          <Text style={styles.logoText}> Know what's happening on campus </Text>
         </View>
           <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
             {this.props.error}
@@ -90,15 +124,17 @@ render() {
 
           </View>
 
-        <TouchableOpacity style={styles.btnLogin} onPress={this.handleSignUp}>
+        <TouchableOpacity style={styles.btnLogin} onPress={this.loginUser}>
           {this.handleLoading()}
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnLogin} onPress={() => this.props.navigation.navigate('Login')}>
           <Text style={styles.text}> Back to Home</Text>
         </TouchableOpacity>
-        <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('EmailLogin')} >
-          Already a user? Login
+
+        <Text style={styles.clickableText} onPress={() => this.props.navigation.navigate('SignUp')} >
+          New user? Signup
         </Text>
+
 
       </View>
       </ImageBackground>
@@ -163,10 +199,16 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   clickableText: {
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: 'rgba(255, 255, 255, 0.7)',
     fontSize: 15,
     textAlign: 'center',
     marginTop: 8
+  },
+  backHomeText: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 15,
+    textAlign: 'center',
+    marginTop: 16
   }
 })
 
@@ -175,8 +217,9 @@ const mapStateToProps = state => {
   /* only return the property that we care about */
   return{
     error: state.auth.error,
+    success: state.auth.success,
     loading: state.auth.loading
   };
 };
 
-export default connect(mapStateToProps, {signupUser}) (SignUp);
+export default connect(mapStateToProps, {loginUser}) (EmailLogin);

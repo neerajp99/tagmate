@@ -283,7 +283,9 @@ class ProfileScreen extends Component{
                   await GoogleSignin.signOut();
                   this.props.navigation.navigate('Login')
                 }
-                firebase.auth().signOut();
+                firebase.auth().signOut().then(res => {
+                  this.props.navigation.navigate('Login')
+                });
               }
               catch (error) {
                 console.log(error);

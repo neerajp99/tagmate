@@ -8,6 +8,7 @@ import IconWithBadge from "./screens/IconWithBadge";
 import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, SupportScreen, ViewImage, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
+import EmailLogin from './screens/auth/EmailLogin';
 import ActivityChat from './screens/ActivityChat';
 import {routerStyle, BRAND_COLOR_TWO} from './screens/style/RouterStyle';
 
@@ -250,6 +251,7 @@ export const RootNav = createSwitchNavigator(
     Onboarding,
     OnboardingSplash,
     MainStack,
+    EmailLogin,
   },
   {
     initialRouteName: 'Loading'
