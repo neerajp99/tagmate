@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   btnGoogleLogin: {
     width: 312,
     height: 48,
-    marginBottom: 50
+    marginBottom: 35
   },
   btnEye: {
     position: 'absolute',
@@ -287,11 +287,11 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   clickableText: {
-    color: 'rgba(255, 255, 255, 0.35)',
+    color: 'rgba(255, 255, 255, 0.75)',
     fontSize: 12,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 8
+    marginBottom: 28
   }
 })
 

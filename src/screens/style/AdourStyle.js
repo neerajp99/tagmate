@@ -145,9 +145,9 @@ export const adourStyle = StyleSheet.create({
     color: 'white',
     fontFamily:'OpenSans-Semibold',
     fontSize: 16,
-    fontWeight: '200',
+    fontWeight: '500',
     marginTop: 2,
-    opacity: 0.8
+    opacity: 0.9
   },
   placeholderStyle: {
     fontFamily:'OpenSans-Semibold',
