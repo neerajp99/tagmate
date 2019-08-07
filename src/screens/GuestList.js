@@ -169,7 +169,7 @@ class GuestList extends Component {
         const {id, guestStatus, fullName, thumbnail} = item;
 
         return (
-          <View>
+          <View key={id}>
           <Card>
             <View style={styles.guestContainer}>
             <View style={{marginRight: 12, marginTop: 4}}>
