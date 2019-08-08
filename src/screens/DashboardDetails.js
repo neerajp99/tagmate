@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, Share, ScrollView} from 'react-native';
+import {FlatList, View, ActivityIndicator, StyleSheet, Linking, Alert, Share, ScrollView, Dimensions} from 'react-native';
 import {markRequestCancelled} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -10,6 +10,8 @@ import {getNetworkId, getWhatsapp, getName, getCoins, hasOptedOutAsGuest} from '
 import TimeAgo from 'react-native-timeago';
 import {adourStyle, BRAND_COLOR_TWO} from './style/AdourStyle'
 import OfflineNotice from './OfflineNotice';
+
+const { width: WIDTH } = Dimensions.get('window')
 
 const CUSTOM_IMG = "https://tagmateapp.com/assets/item_img/custom.jpg";
 let uid;
@@ -22,6 +24,7 @@ class DashboardDetails extends Component {
       fetching:true,
       item:{id:this.props.navigation.state.params.taskId, when: 'Loading...' ,'whatsapp':'Loading...'}, // Loading service request's ID which was passed on
       hide:false,
+      showChat: false,
       nameAvailable:false,
       confirmedGuestList: [],
       optedOut: false,
@@ -69,7 +72,14 @@ class DashboardDetails extends Component {
       let data = snapshot.val();
       if(this._isMounted) this.setState({ item: data});
 
-      if(this.state.item.status != 0 && this.state.item.status != 3){
+      //Old conditions: this.state.item.status != 0 && this.state.item.status != 3
+      console.log(' *********** INSIDE GET TASK ITEM')
+
+      const {item} = this.state;
+
+      if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) ){
+        console.log(' *********** INSIDE IF CONDITION')
+        if(this._isMounted) this.setState({ showChat: true});
         this.getConfirmedGuests();
         this.getUnreadChatCount();
       }
@@ -83,7 +93,6 @@ class DashboardDetails extends Component {
       if(this._isMounted) this.setState({optedOut: result})
       }
     })
-
 
   }
 
@@ -125,12 +134,16 @@ class DashboardDetails extends Component {
         if(this._isMounted) this.setState({fetching:false});
         if(item.hostId == uid) item.isClient = true; // The user is requester
         else if(item.serverId == uid) item.isClient = false; // The user is acceptor
-        else
-        {
-          // The user is neither requester nor acceptor
-          if(this._isMounted) this.setState({hide:true});
-          return;
+        else return
+
+        //Manage show chat variable
+        console.log('this.state.showChat: ', this.state.showChat)
+        console.log('this.state.item.publicPost: ', item.publicPost)
+
+        if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) ){
+          if(this._isMounted) this.setState({ showChat: true});
         }
+
 
         if(this._isMounted) this.setState({item:item});
 
@@ -356,11 +369,20 @@ class DashboardDetails extends Component {
         case 4: statusStr = (item.isClient)?'Cancelled by your attendee':'Cancelled by you';break; //case 4 is useless now
       }
     }
+
+    let eventTypeText = 'Public';
+    if(item.publicPost === false) eventTypeText = 'Private'
+
     return (
       <ScrollView>
       <View style={styles.mainContainer}>
       <OfflineNotice />
       <Card featuredTitle={item.customTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: item.bgImage}}>
+
+      <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-380 , top: -35, position: 'absolute'}} >
+      <Badge value={eventTypeText} status="primary" textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />
+      </View>
+
           <ListItem
               title={host}
               titleStyle={adourStyle.listItemText}
@@ -423,7 +445,7 @@ class DashboardDetails extends Component {
       </Card>
 
 
-      {item.status == 1 && <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
+      {this.state.showChat && <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
         <FlatList
             data={confirmedGuestList}
             extraData={confirmedGuestList}
@@ -431,7 +453,7 @@ class DashboardDetails extends Component {
             keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
         />
         {
-          item.status == 1 && !optedOut &&
+          this.state.showChat &&
           <View>
           <Button
           icon={{name: 'chat'}}
@@ -447,7 +469,7 @@ class DashboardDetails extends Component {
       {!optedOut && <Card>
 
            {
-             item.isClient && item.status == 0 &&
+             item.isClient && item.status == 0 && item.publicPost === false &&
                   <View>
                    <Button onPress={()=>this.openGuestList(item.id, item.hostId)}
                        buttonStyle={adourStyle.btnGeneral}

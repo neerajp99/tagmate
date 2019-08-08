@@ -232,7 +232,7 @@ class HomeScreen extends Component {
                   //console.log('Inside acceptTaskNew right before addAcceptor')
                     //the addAcceptor function basically writes to the firebase database
                     // try adding appendHiddenPosts here and removing everything else below, check if the function is run
-                    addAcceptor(uid, item.id, item.hostId).then(o =>
+                    addAcceptor(uid, item.id, item.hostId, item.publicPost).then(o =>
                     {
                       //console.log('Inside acceptTaskNew addAcceptor then')
                       this.setState({myTasks: this.state.myTasks.filter(taskItem => taskItem.id !== item.id)});

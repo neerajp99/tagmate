@@ -600,13 +600,17 @@ export const finalizeGuestList = (taskId, hostId) => new Promise((resolve, rejec
 })
 
 // Push this user to the list of acceptors
-export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, reject) => {
+export const addAcceptor = (userId, serviceId, hostId, publicPost) => new Promise((resolve, reject) => {
     try {
         const {currentUser} = firebase.auth();
         getNetworkId(userId).then(networkId => {
           var ref = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/acceptorIds/${userId}`);
           ref.update({id: userId, guestStatus:0}).then(updRes => {
-
+            if(publicPost){
+              //Since this is a public event, automatically add this userId to confirmedList
+              confRef = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/confirmedGuests/${userId}`);
+              confRef.update({id: userId, guestStatus:1});
+            }
           })
           //Get first name of this particular acceptor
           getName(userId).then(firstName=>
@@ -618,6 +622,7 @@ export const addAcceptor = (userId, serviceId, hostId) => new Promise((resolve, 
               getThumbURL(userId).then(thumbnail => {
                 const fullName = `${firstName} ${lastName}`;
                 ref.update({fullName: fullName, thumbnail: thumbnail})
+                if(publicPost) confRef.update({fullName: fullName, thumbnail: thumbnail})
               })
             });
           });
