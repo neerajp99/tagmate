@@ -24,6 +24,7 @@ class CreatePost extends Component{
             details:'',
             anonymous: false,
             selfName:'',
+            public: 0,
             customTitle: '',
             serviceTitle: '',
             bgImage:'https://tagmateapp.com/assets/item_img/custom.jpg',
@@ -113,7 +114,7 @@ class CreatePost extends Component{
         else
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
-            const {when, details, anonymous, selectedServiceId, selectedServiceItem, serviceTitle, bgImage, customTitle} = this.state;
+            const {when, public, details, anonymous, selectedServiceId, selectedServiceItem, serviceTitle, bgImage, customTitle} = this.state;
             let postTitle = '';
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
@@ -201,7 +202,7 @@ class CreatePost extends Component{
                     thumbnail = thumbRes;
                   }
                   getNetworkId(uid).then(networkId => {
-                    createNewPost({when:when,details:details, anonymous: anonymous, verified: verified, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
+                    createNewPost({when:when,details:details, public: public, anonymous: anonymous, verified: verified, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
                     .then(({ data }) => {
                       console.log('[Client] Server successfully posted')
                       Alert.alert(
@@ -354,6 +355,12 @@ class CreatePost extends Component{
                 is24Hour={false}
                 onConfirm={this._handleDatePicked}
                 onCancel={this._hideDateTimePicker}
+              />
+
+              <CheckBox
+                title='Private'
+                checked={this.state.public}
+                onPress={() => this.setState({ public: !this.state.public })}
               />
 
               <CheckBox
