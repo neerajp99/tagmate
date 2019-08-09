@@ -77,7 +77,7 @@ class DashboardDetails extends Component {
 
       const {item} = this.state;
 
-      if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) ){
+      if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) || (item.publicPost === false && item.status === 0 && item.confirmedCount > 0 && !this.state.optedOut) ){
         console.log(' *********** INSIDE IF CONDITION')
         if(this._isMounted) this.setState({ showChat: true});
         this.getConfirmedGuests();
@@ -140,7 +140,7 @@ class DashboardDetails extends Component {
         console.log('this.state.showChat: ', this.state.showChat)
         console.log('this.state.item.publicPost: ', item.publicPost)
 
-        if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) ){
+        if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) || (item.publicPost === false && item.status === 0 && item.confirmedCount > 0 && !this.state.optedOut) ){
           if(this._isMounted) this.setState({ showChat: true});
         }
 
@@ -229,6 +229,23 @@ class DashboardDetails extends Component {
   openGuestList = (itemId, hostId) =>
   {
     this.props.navigation.navigate('GuestList',{taskId: itemId, hostId: hostId})
+  }
+
+  closeGuestList = (id) => {
+    let networkId = this.state.networkId;
+    ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}`);
+    ref.update({status: 1})
+  }
+
+  closeGuestListAlert = (id) => {
+    Alert.alert(
+        'Heads Up',
+        'Are you sure you want to close down the guest list? New users won\'t be able to join this group.',
+        [
+          {text: 'Cancel', onPress: () => {return} },
+          {text: 'Confirm', onPress: () => this.closeGuestList(id)}
+        ]
+      );
   }
 
   openChat = (item) =>
@@ -481,6 +498,16 @@ class DashboardDetails extends Component {
                    {(item.interestedCount != 0) && <Badge value={item.interestedCount} status="primary" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
                    </View>
 
+           }
+
+           {
+             item.isClient && item.status === 0 &&
+                   <Button onPress={()=>this.closeGuestListAlert(item.id)}
+                       buttonStyle={adourStyle.btnGeneral}
+                       titleStyle={adourStyle.btnText}
+                       disabled={this.state.disabledDone}
+                       title="Close Guest List"
+                   />
            }
 
           {

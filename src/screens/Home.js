@@ -321,7 +321,7 @@ class HomeScreen extends Component {
       //console.log('swipableRender: myTasks is ', myTasks)
 
       return myTasks.map((item) => {
-        const {id, when, details, anonymous, customTitle, bgImage, created_at, hostName, verified, hostThumb, hostId, interestedCount} = item;
+        const {id, when, details, anonymous, customTitle, publicPost, bgImage, created_at, hostName, verified, hostThumb, hostId, interestedCount} = item;
         //console.log('swipableRender return: item.customTitle is ', item.customTitle)
         var detailsAvailable = true;
 
@@ -340,6 +340,9 @@ class HomeScreen extends Component {
         if(when != ""){
           scheduledFor = ("Scheduled for " + when);
         }
+
+        let eventTypeText = 'Public';
+        if(publicPost === false) eventTypeText = 'Private'
 
         return (
           <SwipableCard key={id} onSwipedLeft={() => this.decideOnPost(id)} onSwipedRight={() => this.acceptTaskNew(item)}>
@@ -372,9 +375,14 @@ class HomeScreen extends Component {
               />
           </View>
 
-          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
+          {/* <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
+          </View> */}
+
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
+            <Badge value={eventTypeText} status="primary" textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />
           </View>
+
           <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-380 , top: -35, position: 'absolute'}} >
           {interestAvailable && <Badge value={interestNumText} status="primary" textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />}
           </View>

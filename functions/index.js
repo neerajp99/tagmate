@@ -155,6 +155,7 @@ exports.createNewPost = functions.https.onCall((data, context) => {
       bgImage: data.bgImage,
       status: 0,
       interestedCount: 0,
+      confirmedCount: 0,
       created_at:admin.database.ServerValue.TIMESTAMP,
       hostName: data.fullName,
       verified: data.verified,

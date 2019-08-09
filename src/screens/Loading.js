@@ -8,7 +8,7 @@ import connect from "react-redux/es/connect/connect";
 import {fetchAllServices, submitUserServices} from "../actions";
 import bgImage from '../img/background.jpg'
 import logo from '../img/logo.png'
-import {adourStyle} from './style/AdourStyle'
+import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle'
 import * as _ from 'lodash'
 
 class Loading extends Component {
@@ -36,19 +36,25 @@ class Loading extends Component {
         //const {setDeviceToken} = this.props
         let {currentUser} = await firebase.auth();
         // If the user exists and does not have to go to OnboardingSplash:
-        //SEND THE USER DIRECTLY WITHOUT CHECKING EMAIL AGAIN
+        //SEND THE USER DIRECTLY WITHOUT CHECKING EMAIL AGAIN. WE ARE JUST CHECKING FIRSTNAME INSTEAD
+        if(currentUser === null){
+          this.props.navigation.navigate('Login');
+        }
 
         //If firstName is null that means the user tried to sign in using non university ID and Google could not derive firstName
         //Therefore, redirect the user to the Login screen
-        let uid = currentUser.uid;
-        firebase.database().ref(`/users/${uid}/firstName`).once('value', (snapshot) => {
-            let firstName = snapshot.val();
-            if(firstName == null){
-              this.props.navigation.navigate('Login');
-            } else {
-              this.props.navigation.navigate('MainStack');
-          }
-        });
+        if(currentUser != null)
+        {
+          let uid = currentUser.uid;
+          firebase.database().ref(`/users/${uid}/firstName`).once('value', (snapshot) => {
+              let firstName = snapshot.val();
+              if(firstName == null){
+                this.props.navigation.navigate('Login');
+              } else {
+                this.props.navigation.navigate('MainStack');
+            }
+          });
+        }
 
         //IF you want to check the user's email again and verify its university affiliation then uncomment the below code
         /*
@@ -175,15 +181,15 @@ class Loading extends Component {
 
     render() {
         return (
-          <ImageBackground source={bgImage} style={styles.backgroundContainer}>
+          <View style={{backgroundColor: BRAND_COLOR_ONE, flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <View style={styles.logoContainer}>
               <Image source={logo} style={styles.logo} />
-              {/* <Text style={adourStyle.logoSubtitle}> Do more for others. Get more done. </Text> */}
+              <Text style={adourStyle.logoSubtitle}> Please wait... </Text>
             </View>
             <View style={{marginTop: 10, marginBottom: 10}}>
                 <ActivityIndicator size="large" color="white"/>
             </View>
-          </ImageBackground>
+          </View>
         )
     }
 }
@@ -214,8 +220,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   logo: {
-    height: 61,
-    width: 250,
+    height: 45,
+    width: 150,
     marginBottom: 8
   },
 })

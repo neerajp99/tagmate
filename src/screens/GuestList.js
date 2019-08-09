@@ -104,16 +104,36 @@ class GuestList extends Component {
 
     }
 
-    acceptGuest = (id) => {
+    acceptGuest = (id, guestStatus, fullName, thumbnail) => {
       let networkId = this.state.networkId;
+
       ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 1})
+      confRef = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/confirmedGuests/${id}`);
+      confRef.update({id: id, guestStatus: 1, fullName: fullName, thumbnail: thumbnail})
+
+      //Increment confirmed count
+      firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/confirmedCount`).transaction(function(confirmedCount){
+        return (confirmedCount || 0) + 1;
+      });
+      
     }
 
     rejectGuest = (id) => {
       let networkId = this.state.networkId;
       ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/acceptorIds/${id}`);
       ref.update({guestStatus: 2})
+    }
+
+    rejectGuestAlert = (id) => {
+      Alert.alert(
+          'Heads Up',
+          'Are you sure you want to reject this guest? You cannot undo this action',
+          [
+            {text: 'Cancel', onPress: () => {return} },
+            {text: 'Confirm', onPress: () => this.rejectGuest(id)}
+          ]
+        );
     }
 
     confirmGuestList = () => {
@@ -184,12 +204,12 @@ class GuestList extends Component {
 
             { guestStatus == 0 && <View style={styles.buttonsContainer}>
               <View>
-                <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectGuest(id) }} >
+                <TouchableOpacity style={styles.btnReject} onPress={() => { this.rejectGuestAlert(id) }} >
                   <Icon name={'close'} size={25} color={'rgba(255, 255, 255, 1)'} />
                 </TouchableOpacity>
               </View>
               <View>
-                <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptGuest(id) }}>
+                <TouchableOpacity style={styles.btnAccept} onPress={() => { this.acceptGuest(id, guestStatus, fullName, thumbnail) }}>
                   <Icon name={'check'} size={25} color={'rgba(255, 255, 255, 1)'} />
                 </TouchableOpacity>
               </View>
@@ -226,6 +246,7 @@ class GuestList extends Component {
             </View>
             </ScrollView>
 
+            {/* Finalize List button Disabled. Logic changed to allow guests on rolling basis
             <View style={{marginLeft: 15, marginRight: 15, marginBottom: 8}} >
             <Button
                 onPress={()=>this.confirmGuestList()}
@@ -235,13 +256,15 @@ class GuestList extends Component {
                 title="Finalize List"
             />
 
-            {/* <Button
+             <Button
                 onPress={()=>this.props.navigation.goBack()}
                 buttonStyle={adourStyle.btnGeneralT}
                 titleStyle={adourStyle.btnText}
                 title="Wait for More People to Join"
-            /> */}
+            />
             </View>
+            */}
+
 
             </View>
         )
