@@ -41,6 +41,7 @@ class ProfileScreen extends Component{
 
   componentDidMount(){
     this._isMounted = true;
+    firebase.analytics().setCurrentScreen('Profile');
     //Fetching name and photo URL
     let user = firebase.auth().currentUser;
     if (user != null) {

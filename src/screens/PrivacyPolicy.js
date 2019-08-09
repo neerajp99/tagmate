@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {View, WebView, ActivityIndicator} from 'react-native';
+import firebase from 'react-native-firebase';
 import {BRAND_COLOR_ONE} from './style/AdourStyle';
 
 class PrivacyPolicyScreen extends Component{
@@ -11,6 +12,10 @@ class PrivacyPolicyScreen extends Component{
 
     hideSpinner() {
       this.setState({ visible: false });
+    }
+
+    componentDidMount(){
+      firebase.analytics().setCurrentScreen('PrivacyPolicy');
     }
 
     render() {

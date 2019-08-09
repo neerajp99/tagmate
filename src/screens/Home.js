@@ -46,6 +46,8 @@ class HomeScreen extends Component {
           this.props.navigation.navigate('Login')
         }
 
+        firebase.analytics().setCurrentScreen('Home');
+
         //We only need to check if it's user's first time if user is not signed in
         AsyncStorage.getItem("alreadyLaunchedHome").then(value => {
               if(user != null && value == null){

@@ -35,6 +35,7 @@ class ActivityChat extends React.Component {
     ChatLib.resetUnread(this.state.taskId);
     this.props.chatScreenMounted();
 
+    firebase.analytics().setCurrentScreen('ActivityChat');
     /*
     firebase.auth().onAuthStateChanged(user => {
       if (user) {

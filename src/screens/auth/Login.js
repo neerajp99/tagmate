@@ -49,6 +49,9 @@ class Login extends Component {
       loginHint: '', // [iOS] The user's ID, or email address, to be prefilled in the authentication UI if possible. [See docs here](https://developers.google.com/identity/sign-in/ios/api/interface_g_i_d_sign_in.html#a0a68c7504c31ab0b728432565f6e33fd)
       forceConsentPrompt: true, // [Android] if you want to show the authorization prompt at each login. Test
     });
+
+    firebase.analytics().setCurrentScreen('Login');
+
   }
 
   componentWillUnmount()

@@ -35,6 +35,7 @@ class ViewProfile extends Component{
 
   componentDidMount(){
     this._isMounted = true;
+    firebase.analytics().setCurrentScreen('ViewProfile');
     //Fetching name and photo URL
     const {profileUid} = this.state;
     console.log('profileUid: ', profileUid)

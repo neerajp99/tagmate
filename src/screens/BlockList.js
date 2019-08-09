@@ -25,6 +25,7 @@ class BlockList extends Component {
 
   componentDidMount(){
       this._isMounted = true;
+      firebase.analytics().setCurrentScreen('BlockedList');
       this.setState({fetching:true});
       let user = firebase.auth().currentUser;
       if (user != null) {

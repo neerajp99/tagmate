@@ -1,7 +1,12 @@
 import React, {Component} from 'react';
 import {View, WebView} from 'react-native';
+import firebase from 'react-native-firebase';
 
 class ToS extends Component{
+
+  componentDidMount(){
+    firebase.analytics().setCurrentScreen('ToS');
+  }
 
     render() {
       return (

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {View, Image, Dimensions} from 'react-native';
+import firebase from 'react-native-firebase';
 import {BRAND_COLOR_ONE} from './style/AdourStyle';
 
 const { width: WIDTH } = Dimensions.get('window')
@@ -13,6 +14,7 @@ class ViewImage extends Component{
 
     componentDidMount(){
       console.log('props: ', this.state.imgURL)
+      firebase.analytics().setCurrentScreen('ViewImage');
     }
 
     render() {

@@ -46,6 +46,8 @@ class DashboardDetails extends Component {
       this.getTaskItem();
       this.liveUpdates(); // Get live updates for the service request {this.state.item.id}
     })
+
+    firebase.analytics().setCurrentScreen('DashboardDetails');
   }
 
   componentWillUnmount()

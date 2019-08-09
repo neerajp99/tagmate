@@ -27,6 +27,7 @@ class CreatePost extends Component{
             publicPost: true,
             customTitle: '',
             serviceTitle: '',
+            loading: false,
             bgImage:'https://tagmateapp.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
@@ -53,6 +54,8 @@ class CreatePost extends Component{
       if (user != null) {
         uid = user.uid;
       }
+
+      firebase.analytics().setCurrentScreen('CreatePost');
 
       // Get name of the user
       getFullName(uid).then(selfName=>
@@ -368,7 +371,7 @@ class CreatePost extends Component{
                 checked={this.state.anonymous}
                 onPress={() => this.postAsAnonymous()}
               />
-	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} titleStyle={adourStyle.btnText} disabled={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
+	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} titleStyle={adourStyle.btnText} disabled={this.state.disabledBtn} loading={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
       </ScrollView>

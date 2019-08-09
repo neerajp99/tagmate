@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking} from 'react-native';
+import firebase from 'react-native-firebase';
 import Onboarding from 'react-native-onboarding-swiper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import logo from '../img/logo.png'
@@ -12,6 +13,10 @@ const THIRD_SLIDE_DESCRIPTION = 'Gather people around your favourite topic, star
 
 
 class OnboardingSplash extends Component {
+
+componentDidMount() {
+  firebase.analytics().setCurrentScreen('OnboardingSplash');
+}
 
 render() {
     return(

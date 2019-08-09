@@ -10,7 +10,7 @@ import com.brentvatne.react.ReactVideoPackage;
 import co.apptailor.googlesignin.RNGoogleSigninPackage;
 import io.invertase.firebase.RNFirebasePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
-import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
 import io.invertase.firebase.auth.RNFirebaseAuthPackage;
 import io.invertase.firebase.database.RNFirebaseDatabasePackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
@@ -45,6 +45,7 @@ public class MainApplication extends Application implements ReactApplication {
             new RNGestureHandlerPackage(),
             new RNFirebasePackage(),
             new RNFirebaseAuthPackage(),
+            new RNFirebaseAnalyticsPackage(),
             new RNFirebaseDatabasePackage(),
               new RNFirebaseMessagingPackage(),
               new RNFirebaseNotificationsPackage(),

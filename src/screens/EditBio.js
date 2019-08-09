@@ -40,6 +40,7 @@ class EditBio extends Component{
 
   componentDidMount(){
     this._isMounted = true;
+    firebase.analytics().setCurrentScreen('EditBio');
     //Fetching name and photo URL
     let user = firebase.auth().currentUser;
     if (user != null) {

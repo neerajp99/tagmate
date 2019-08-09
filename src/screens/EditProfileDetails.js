@@ -9,6 +9,10 @@ let uid;
 
 class EditProfileDetails extends Component{
 
+  componentDidMount(){
+    firebase.analytics().setCurrentScreen('EditProfileDetails');
+  }
+
   handleSignout = () => {
       firebase
         .auth()

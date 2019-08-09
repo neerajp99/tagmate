@@ -38,6 +38,7 @@ class EmailLogin extends Component {
         // ...
       }
     });
+    firebase.analytics().setCurrentScreen('EmailLogin');
   }
 
   loginUser = () => {

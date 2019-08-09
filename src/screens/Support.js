@@ -1,11 +1,16 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking} from 'react-native';
+import firebase from 'react-native-firebase';
 import {Card, Button} from 'react-native-elements';
 import {adourStyle} from './style/AdourStyle'
 
 const { width: WIDTH } = Dimensions.get('window')
 
 class SupportScreen extends Component{
+
+  componentDidMount(){
+    firebase.analytics().setCurrentScreen('Support');
+  }
 
   launchEmail = () =>
   {

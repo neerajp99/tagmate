@@ -48,6 +48,7 @@ class DashboardScreen extends Component {
 
 
       this.runFirebaseListeners();
+      firebase.analytics().setCurrentScreen('DashboardScreen');
     }
 
     componentWillUnmount(){
