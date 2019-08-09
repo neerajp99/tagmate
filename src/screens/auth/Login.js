@@ -167,7 +167,7 @@ class Login extends Component {
           </Text>
           {
             this.state.invalid_email &&
-            <Text style={{ color: 'red', textAlign: 'center', marginTop: 5 }}>
+            <Text style={{ color: '#ff7e75', textAlign: 'center', marginTop: 5 }}>
               Please use your university email to login.
             </Text>
           }

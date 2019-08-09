@@ -20,6 +20,7 @@ class DashboardScreen extends Component {
         active:0, // Determines active tab: hosting Tasks or attending Tasks. Default: attending.
         fetching:false,
         attendingBadge: false,
+        hostingBadge: false,
         hosting:[], // Array of hosting services
         attending:[], // Array of attending tasks
       }
@@ -65,17 +66,20 @@ class DashboardScreen extends Component {
       //Get all the posts that this user is a host of
       userPostRef.child('host').on('child_added', (snapshot) => {
         let post = snapshot.val()
-        //Check for unread msg count START
-        if(post.status != 0)
+
+        //Check for unread msg count for host START
+        let unreadAv = false;
+        firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
         {
-          firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
-          {
-            if(unreadSnapshot.val() != null){
-              post.unreadMsgs = unreadSnapshot.val();
-            }
-          });
-        }
-        //Check for unread msg count END
+          if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
+            post.unreadMsgs = unreadSnapshot.val();
+            unreadAv = true;
+          }
+        }).then(result => {
+            if(unreadAv) this.setState({hostingBadge: true})
+          })
+        //Check for unread msg count for host END
+
         this.setState({hosting:[post].concat(this.state.hosting)});
         if(this._isMounted) this.setState({fetching:false});
       });
@@ -92,6 +96,20 @@ class DashboardScreen extends Component {
       userPostRef.child('host').on('child_changed', (snapshot) => {
         var post = snapshot.val(); //this is the post object that changed
         let hosting_arr = []; // creating a new array for this.state.hosting;
+
+        //Check for unread msg count for host START
+        let unreadAv = false;
+        firebase.database().ref(`/users/${uid}/messages/${post.id}/unreadCount`).once("value", function(unreadSnapshot)
+        {
+          if(unreadSnapshot.val() != null && unreadSnapshot.val() != 0){
+            post.unreadMsgs = unreadSnapshot.val();
+            unreadAv = true;
+          }
+        }).then(result => {
+            if(unreadAv) this.setState({hostingBadge: true})
+          })
+        //Check for unread msg count for host END
+
         console.log('host changed. mounted? ', this._isMounted)
         if(this._isMounted)
         {
@@ -207,6 +225,13 @@ class DashboardScreen extends Component {
           if(unreadMsgTasks.length == 0) this.setState({attendingBadge: false})
           if(unreadMsgTasks.length != 0) this.setState({attendingBadge: true})
 
+          //If no unread msgs are left in hosting, disable the mini badge
+          let unreadMsgTasksHosting = [];
+          unreadMsgTasksHosting = this.state.hosting.filter(item => item.unreadMsgs != 0 && item.unreadMsgs != undefined)
+          console.log('unreadMsgTasksHosting', unreadMsgTasksHosting);
+          if(unreadMsgTasksHosting.length == 0) this.setState({hostingBadge: false})
+          if(unreadMsgTasksHosting.length != 0) this.setState({hostingBadge: true})
+
           this.setState({hosting:hosting_arr});
           this.setState({attending:attending_arr});
         }
@@ -301,8 +326,8 @@ class DashboardScreen extends Component {
     }
 
     render() {
-        const {fetching, attending, hosting, active, attendingBadge} = this.state
-        const buttons = ['Hosting', 'Attending']
+        const {fetching, attending, hosting, active, attendingBadge, hostingBadge} = this.state
+        const buttons = ['Attending', 'Hosting']
 
         return (
           <View style={styles.mainContainer}>
@@ -314,15 +339,15 @@ class DashboardScreen extends Component {
                   textStyle={adourStyle.buttonText}
                   containerStyle={{height: 45}}
                 />
-                {attendingBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
+                {hostingBadge && <Badge status="success" containerStyle={{ position: 'absolute', top: 4, right: 8 }} />}
             </View>
               <OfflineNotice />
               {!fetching && this.userGuideContainer(active)}
 
               {
                 !fetching &&  <FlatList
-                    data={(active == 0)?hosting:attending}
-                    extraData={(active == 0)?hosting:attending}
+                    data={(active == 0)?attending:hosting}
+                    extraData={(active == 0)?attending:hosting}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
                 />
