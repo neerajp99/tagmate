@@ -306,9 +306,10 @@ class DashboardDetails extends Component {
         console.log('cancelled');
         if(!item.isClient){
           if(this._isMounted) this.setState({optedOut: true});
+        }else{
+          //It is the client and s/he is trying to remove the event
+          this.props.navigation.goBack();
         }
-        //Do nothing
-        //this.props.navigation.navigate('DashboardScreen')
       });
 
 
