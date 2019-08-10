@@ -31,6 +31,7 @@ export const adourStyle = StyleSheet.create({
     fontFamily:'OpenSans',
     fontWeight:'200',
     alignSelf: 'center',
+    marginBottom: 6,
     justifyContent: 'center'
   },
   timeAgoText: {

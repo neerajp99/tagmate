@@ -237,6 +237,33 @@ export const addNetworkDetails = (currentUser) => new Promise((resolve, reject) 
 // get the list of all the task IDs that this user has rejected or accepted
 export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
     try {
+      let accHiddenPosts = [];
+      let rejHiddenPosts = [];
+      let hiddenPosts = [];
+
+      firebase.database().ref(`users/${uid}/hiddenPosts/accepted`).once('value', (snapshot) => {
+        if(snapshot.val() != undefined){
+          let data = snapshot.val();
+          accHiddenPosts = Object.values(data);
+        }
+      }).then(res => {
+        firebase.database().ref(`users/${uid}/hiddenPosts/rejected`).once('value', (snapshot) => {
+          if(snapshot.val() != undefined){
+            let data = snapshot.val();
+            rejHiddenPosts = Object.values(data);
+          }
+        }).then(finRes => {
+          hiddenPosts = accHiddenPosts.concat(rejHiddenPosts);
+          console.log('accHiddenPosts: ', accHiddenPosts);
+          console.log('rejHiddenPosts: ', rejHiddenPosts);
+          console.log('hiddenPosts: ', hiddenPosts);
+          resolve(hiddenPosts)
+        })
+      })
+
+      //resolve(hiddenPosts)
+
+      /*
         firebase.database().ref(`users/${uid}/hiddenPosts`).once('value', (snapshot) => {
           if(snapshot.val() != undefined){
             let data = snapshot.val();
@@ -246,6 +273,7 @@ export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
             resolve([])
           }
         });
+        */
     } catch (e) {
         reject(e)
     }
@@ -626,8 +654,8 @@ export const addAcceptor = (userId, serviceId, hostId, publicPost) => new Promis
               })
             });
           });
-
-          appendHiddenPosts(userId, serviceId);
+          console.log('inside add acceptor')
+          appendHiddenPosts(userId, serviceId, true);
 
           //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
           //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
@@ -714,6 +742,14 @@ export const deletePostFromUser = (uid, taskId, deletedBy) => new Promise((resol
         firebase.database().ref(`/users/${uid}/posts/guest/${taskId}`).remove().then( res => {resolve(true)})
       }
 
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const undoRejects = (uid) => new Promise((resolve, reject) => {
+    try {
+      firebase.database().ref(`/users/${uid}/hiddenPosts/rejected`).remove().then( res => {resolve(true)})
     } catch (e) {
         reject(e)
     }
@@ -826,9 +862,14 @@ export const getFullName = (userId) => new Promise((resolve, reject) => {
 })
 
 // To note in database that user {userId} has rejected or accepted a post{serviceId} . The app wont show these tasks to this user again
-export const appendHiddenPosts = (userId, serviceId) => new Promise((resolve, reject) => {
+export const appendHiddenPosts = (userId, serviceId, swipeRight) => new Promise((resolve, reject) => {
     try {
-        resolve(firebase.database().ref(`/users/${userId}/hiddenPosts`).push(serviceId));
+      if(swipeRight){
+        resolve(firebase.database().ref(`/users/${userId}/hiddenPosts/accepted`).push(serviceId));
+      }else{
+        resolve(firebase.database().ref(`/users/${userId}/hiddenPosts/rejected`).push(serviceId));
+      }
+        //resolve(firebase.database().ref(`/users/${userId}/hiddenPosts`).push(serviceId));
     } catch (e) {
         reject(e)
     }

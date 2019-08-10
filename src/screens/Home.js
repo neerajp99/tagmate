@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Share, ScrollView, Dimensions} from 'react-native';
-import {serverExists, getNetworkId, getBlockedList, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
+import {serverExists, getNetworkId, getBlockedList, undoRejects, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -81,6 +81,7 @@ class HomeScreen extends Component {
               this.setState({networkId, blockedList, hiddenPosts});
               this.getMyTasks();
               this.blockedListListener();
+              //this.rewindListener();
             })
           })
         })
@@ -115,6 +116,27 @@ class HomeScreen extends Component {
       // Android only:
       dialogTitle: 'Share this gathering',
     })
+    }
+
+    showScopeInfo = (publicPost) => {
+        if(publicPost){
+            Alert.alert(
+            'Info',
+            'This is a public event. If you swipe right, you will be immediately added to the guest list.',
+            [
+              {text: 'Cool'}
+            ]
+          );
+        }else{
+          Alert.alert(
+          'Info',
+          'This is a private event. When you swipe right, the host will have to first approve you before you can join the guest list.',
+          [
+            {text: 'Cool'}
+          ]
+        );
+        }
+
     }
 
     openProfile = (uid) =>
@@ -168,6 +190,36 @@ class HomeScreen extends Component {
       })
 
     }
+
+    rewindListener = () => {
+      //Currently only taking care of when the user blocks someone new. Does not work when user unblocks. S/he must reload the app in that case.
+      let ref = firebase.database().ref(`users/${uid}/hiddenPosts/`);
+      //When the user blocks someone new
+      let postId;
+      ref.child('rejected').on('child_removed', (snapshot) => {
+        //If there is a change, use the function getBlockedList to create the updated combined blockedList
+          //Remove any posts hosted by the blockedUid
+          postId = snapshot.val();
+      }).then(res=> {
+          let networkId = this.state.networkId;
+          let livePostsRef = firebase.database().ref(`networks/${networkId}/livePosts/${postId}`)
+          livePostsRef.once('value', (snapshot) => {
+            let postIsLive = snapshot.exists();
+            if(postIsLive){
+              let request = snapshot.val()
+              // Check if this request is not made by same user, it is not by a host who has blocked this user or vice versa and it is not already decided upon by this user
+              if(request.hostId != uid && !_.includes(this.state.blockedList, request.hostId) && !_.includes(this.state.hiddenPosts, request.id))
+              {
+                this.setState({myTasks:[request].concat(this.state.myTasks) , fetching: false});
+              }
+              if(this.state.fetching) this.setState({fetching:false});
+            }
+          })
+          if(this._isMounted) this.setState({fetching:false});
+      })
+
+    }
+
     /*
     * get all the task requests that this user can perform
     * */
@@ -177,6 +229,7 @@ class HomeScreen extends Component {
         livePostsRef.on('child_added', (snapshot) => {
 
           let request  = snapshot.val()
+          console.log('this.state.hiddenPosts: ', this.state.hiddenPosts);
           // Check if this request is not made by same user, it is not by a host who has blocked this user or vice versa and it is not already decided upon by this user
           if(request.hostId != uid && !_.includes(this.state.blockedList, request.hostId) && !_.includes(this.state.hiddenPosts, request.id))
           {
@@ -210,7 +263,7 @@ class HomeScreen extends Component {
     {
         //this.hideTask(id);
         this.setState({myTasks: this.state.myTasks.filter(taskItem => taskItem.id !== id)});
-        if(uid) appendHiddenPosts(uid, id);
+        if(uid) appendHiddenPosts(uid, id, false);
     }
 
     acceptTaskNew = (item) => new Promise((resolve, reject) => {
@@ -222,16 +275,17 @@ class HomeScreen extends Component {
           this.decideOnPost(item.id);
           return
         }
-        //console.log('acceptTaskNew try')
+        console.log('acceptTaskNew try')
         if(uid)
         {
             alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
             {
-              //console.log('Inside acceptTaskNew alreadyAccepted')
+              console.log('Inside acceptTaskNew alreadyAccepted')
+              console.log('**** alreadyAcc value is: ', alreadyAcc)
                 //this.hideTask(item.id);
                 if(!alreadyAcc) // If the task is still not accepted by this user, add this user to the uid
                 {
-                  //console.log('Inside acceptTaskNew right before addAcceptor')
+                  console.log('Inside acceptTaskNew right before addAcceptor')
                     //the addAcceptor function basically writes to the firebase database
                     // try adding appendHiddenPosts here and removing everything else below, check if the function is run
                     addAcceptor(uid, item.id, item.hostId, item.publicPost).then(o =>
@@ -279,6 +333,32 @@ class HomeScreen extends Component {
                 }
             });
         }
+    }
+
+    rewindPrompt = () => {
+      Alert.alert(
+      'Confirmation',
+      'Are you sure you want to undo all your left swipes?',
+      [
+        {text: 'Cancel', onPress: () => console.log('Report Revoked')},
+        {text: 'Undo', onPress: () => undoRejects(uid).then(res=> {
+          this.setState({fetching:true});
+          //START
+          // Get the necessary lists to filter the posts
+          getHiddenPosts(uid).then(hiddenPosts => {
+            getBlockedList(uid).then(blockedList => {
+              getNetworkId(uid).then(networkId => {
+                this.setState({networkId, blockedList, hiddenPosts});
+                this.getMyTasks();
+                this.blockedListListener();
+                //this.rewindListener();
+              })
+            })
+          })
+          //END
+        })}
+      ]
+    );
     }
 
     showActionSheet = () => {
@@ -382,7 +462,7 @@ class HomeScreen extends Component {
           </View> */}
 
           <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
-            <Badge value={eventTypeText} status="primary" textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />
+            <Badge value={eventTypeText} status="primary" onPress={() => this.showScopeInfo(publicPost)} textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />
           </View>
 
           <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-380 , top: -35, position: 'absolute'}} >
@@ -510,7 +590,16 @@ class HomeScreen extends Component {
             <CardStack
                 renderNoMoreCards={() => <View style={{marginTop: 50}}>
                                                   {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}
-                                                  {!fetching && <Text style={adourStyle.cardOverText}>Check back later</Text>}
+                                                  {!fetching && <View style={{alignItems: 'center'}}>
+                                                    <Text style={adourStyle.cardOverText}>Check back later</Text>
+                                                    <IconElements
+                                                      name='fast-rewind'
+                                                      raised
+                                                      type='material'
+                                                      onPress={() => this.rewindPrompt()}
+                                                      color={BRAND_COLOR_ONE} />
+
+                                                    </View>}
                                                   </View>}
                 disableBottomSwipe={true}
                 key={myTasks.length}
