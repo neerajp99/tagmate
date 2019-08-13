@@ -189,6 +189,9 @@ class Loading extends Component {
             <View style={{marginTop: 10, marginBottom: 10}}>
                 <ActivityIndicator size="large" color="white"/>
             </View>
+            <View style={{marginTop: 80}}>
+              <Text style={adourStyle.thinText}> Taking too long to load? Restart the app </Text>
+            </View>
           </View>
         )
     }

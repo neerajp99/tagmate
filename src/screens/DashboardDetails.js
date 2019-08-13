@@ -206,6 +206,23 @@ class DashboardDetails extends Component {
 
   }
 
+  addToGoogleCalendar = (item) =>
+  {
+    //Build the link
+    let dates = '';
+    let location = '';
+
+    //Base
+    let calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${item.customTitle}&details=${item.details}&sf=true&output=xml`
+    //Variables
+    if(item.dtStart != '' && item.dtEnd != '') calendarLink.concat(`&dates=${item.dtStart}/${item.dtEnd}`);
+    if(item.venue != '') calendarLink.concat(`&location=${item.venue}`);
+    console.log('final url: ', calendarLink)
+
+    Linking.openURL(calendarLink)
+
+
+  }
 
   // Expects {id} parameter to be a valid service request ID
   // Changes service request's status to 2 (Complete) in Firebase realtime database
@@ -468,6 +485,17 @@ class DashboardDetails extends Component {
                    buttonStyle={adourStyle.btnShare}
                    titleStyle={adourStyle.btnTextSmall}
                    title="Share" />}
+
+                   <Button
+                   icon={{
+                           name: "link",
+                           size: 15,
+                           color: "white"
+                         }}
+                   onPress={() => this.addToGoogleCalendar(item)}
+                   buttonStyle={adourStyle.btnShare}
+                   titleStyle={adourStyle.btnTextSmall}
+                   title="Add to My Google Calendar" />
 
       </Card>
 

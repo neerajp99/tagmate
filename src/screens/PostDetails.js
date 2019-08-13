@@ -26,6 +26,7 @@ class PostDetails extends Component {
       hide:false,
       showChat: false,
       nameAvailable:false,
+      loadingBtn: false,
       confirmedGuestList: [],
       optedOut: false,
       unreadChatCount: 0,
@@ -233,6 +234,39 @@ class PostDetails extends Component {
     this.props.navigation.navigate('GuestList',{taskId: itemId, hostId: hostId})
   }
 
+  // Open Guest List Page: this page has the list of everyone who is interested in this activity
+  openURL = (urlAddress) =>
+  {
+    this.props.navigation.navigate('ViewURLHome',{urlAddress: urlAddress});
+  }
+
+  addToGoogleCalendar = (item) =>
+  {
+    //Build the link
+    let venue = item.venue.replace(/ /g, '+');
+    let title = item.customTitle.replace(/ /g, '+');
+    let details = item.details.replace(/ /g, '+');
+    let calLinkB, calLinkC;
+
+    //Base
+    let calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}`
+    //Variables
+    if(item.dtStart != '' && item.dtEnd != '') {
+      calLinkB = calendarLink.concat(`&dates=${item.dtStart}/${item.dtEnd}`);
+    }
+    if(item.venue != '') {
+      calLinkC = calLinkB.concat(`&location=${venue}`);
+    }
+
+    let finalCalLink = calLinkC.concat('&sf=true&output=xml')
+
+    console.log('final url: ', finalCalLink)
+
+    Linking.openURL(finalCalLink)
+
+
+  }
+
   closeGuestList = (id) => {
     let networkId = this.state.networkId;
     ref = firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}`);
@@ -429,13 +463,7 @@ class PostDetails extends Component {
 
                   {
                     item.details != "" &&
-                        <ListItem
-                            title={item.details}
-                            titleStyle={adourStyle.listItemText}
-                            chevron={false}
-                            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-                            leftIcon={{ name: 'info-outline'}}
-                          />
+                        <Text style={adourStyle.defaultText}>{item.details}</Text>
                   }
 
                   {
@@ -455,10 +483,22 @@ class PostDetails extends Component {
                           size: 15,
                           color: "white"
                         }}
-                  onPress={() => this.onShare(item.customTitle)}
+                  onPress={() => this.openURL(item.link)}
+                  buttonStyle={adourStyle.btnShare}
+                  loading={this.state.loadingBtn}
+                  titleStyle={adourStyle.btnTextSmall}
+                  title="More Info" />}
+
+                  <Button
+                  icon={{
+                          name: "link",
+                          size: 15,
+                          color: "white"
+                        }}
+                  onPress={() => this.addToGoogleCalendar(item)}
                   buttonStyle={adourStyle.btnShare}
                   titleStyle={adourStyle.btnTextSmall}
-                  title="Website" />}
+                  title="Add to My Google Calendar" />
 
                   {/* Timestamp DISABLED - throwing error
                   <View style={styles.subContent} key={item.id}>

@@ -150,6 +150,14 @@ export const adourStyle = StyleSheet.create({
     marginTop: 2,
     opacity: 0.9
   },
+  thinText: {
+    color: 'white',
+    fontFamily:'OpenSans',
+    fontSize: 12,
+    fontWeight: '200',
+    marginTop: 2,
+    opacity: 0.7
+  },
   placeholderStyle: {
     fontFamily:'OpenSans-Semibold',
     fontSize: 16,

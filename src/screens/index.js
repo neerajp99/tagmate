@@ -7,6 +7,8 @@ export * from './Support';
 export * from './PrivacyPolicy'
 export * from './ViewImage'
 export * from './ToS'
+export * from './ViewURLHome'
+export * from './PostDetails'
 export RequestScreen from './Request';
 export CreatePost from './CreatePost';
 export HomeScreen from './Home';

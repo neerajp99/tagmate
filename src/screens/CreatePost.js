@@ -5,6 +5,7 @@ import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
 import {postServiceRequest, getNetworkId, canRequestMore, getServiceItem, getThumbURL, isVerified, getFullName} from "../lib/firebaseUtils";
 import {connect} from "react-redux";
+import moment from 'moment'
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
@@ -26,12 +27,16 @@ class CreatePost extends Component{
             selfName:'',
             publicPost: true,
             customTitle: '',
+            venue: '',
+            dtStart: '',
+            dtEnd: '',
             serviceTitle: '',
             loading: false,
             bgImage:'https://tagmateapp.com/assets/item_img/custom.jpg',
             selectedServiceId: 'custom',
             selectedServiceItem: [],
-            dtPlaceholder: 'Date & Time (Optional)',
+            dtStartPlaceholder: 'Start Date & Time',
+            dtEndPlaceholder: 'End Date & Time',
             isDateTimePickerVisible: false,
         }
 
@@ -71,12 +76,29 @@ class CreatePost extends Component{
         this._isMounted = false;
     }
 
-    _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+    _showStartDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
 
-   _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+    _showEndDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
 
-   _handleDatePicked = date => {
-     this.setState({ when: this.formatDate(date), dtPlaceholder: this.formatDate(date) });
+   _hideStartDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+
+   _hideEndDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+
+   _handleStartDatePicked = date => {
+     const dateISO = moment(date).startOf("minute").toISOString();
+     let newDateA = dateISO.replace(/[-:]/g, "");
+     let newDateB = newDateA.split('.')[0]+"Z";
+     this.setState({ when: this.formatDate(date), dtStartPlaceholder: this.formatDate(date), dtStart: newDateB});
+     console.log('dtStart is ', newDateB);
+     this._hideDateTimePicker();
+   };
+
+   _handleEndDatePicked = date => {
+     const dateISO = moment(date).startOf("minute").toISOString();
+     let newDateA = dateISO.replace(/[-:]/g, "");
+     let newDateB = newDateA.split('.')[0]+"Z";
+     this.setState({ dtEndPlaceholder: this.formatDate(date), dtEnd: newDateB});
+     console.log('dtEnd is ', newDateB);
      this._hideDateTimePicker();
    };
 
@@ -117,7 +139,7 @@ class CreatePost extends Component{
         else
         {
             this.setState({disabledBtn:true}); // Disable button while function is running.
-            const {when, publicPost, details, anonymous, selectedServiceId, selectedServiceItem, serviceTitle, bgImage, customTitle} = this.state;
+            const {when, publicPost, dtStart, venue, details, anonymous, selectedServiceId, selectedServiceItem, serviceTitle, bgImage, customTitle} = this.state;
             let postTitle = '';
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
@@ -205,7 +227,7 @@ class CreatePost extends Component{
                     thumbnail = thumbRes;
                   }
                   getNetworkId(uid).then(networkId => {
-                    createNewPost({when:when,details:details, publicPost: publicPost, anonymous: anonymous, verified: verified, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
+                    createNewPost({when:when, dtStart: dtStart, venue: venue, details:details, publicPost: publicPost, anonymous: anonymous, verified: verified, customTitle: postTitle, fullName: fullName, networkId: networkId, bgImage: bgImage, hostThumb: thumbnail})
                     .then(({ data }) => {
                       console.log('[Client] Server successfully posted')
                       Alert.alert(
@@ -244,7 +266,7 @@ class CreatePost extends Component{
     }
 
   render(){
-    const { isDateTimePickerVisible, when, dtPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
+    const { isDateTimePickerVisible, when, dtStartPlaceholder, dtEndPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
     const {services = [], fetching} = this.props;
 
     let servicesArray = [];
@@ -349,15 +371,36 @@ class CreatePost extends Component{
                 onChangeText={details => this.setState({ details: details })}
               />
 
-              <Button title={dtPlaceholder} buttonStyle={styles.dateTimeStyle} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showDateTimePicker()}}/>
+              <TextInput
+              style={adourStyle.textInputCenter}
+              autoCapitalize="none"
+              placeholder="Venue (optional)"
+              placeholderStyle={adourStyle.placeholderStyle}
+              placeholderTextColor={'rgba(255, 255, 255, 1)'}
+              underlineColorAndroid='transparent'
+              onChangeText={venue => this.setState({ venue: venue })}
+              />
+
+              <Button title={dtStartPlaceholder} buttonStyle={styles.dateTimeStyle} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showStartDateTimePicker()}}/>
               <DateTimePicker
                 isVisible={isDateTimePickerVisible}
                 mode='datetime'
                 date={today}
                 minimumDate={today}
                 is24Hour={false}
-                onConfirm={this._handleDatePicked}
-                onCancel={this._hideDateTimePicker}
+                onConfirm={this._handleStartDatePicked}
+                onCancel={this._hideStartDateTimePicker}
+              />
+
+              <Button title={dtEndPlaceholder} buttonStyle={styles.dateTimeStyle} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showEndDateTimePicker()}}/>
+              <DateTimePicker
+                isVisible={isDateTimePickerVisible}
+                mode='datetime'
+                date={today}
+                minimumDate={today}
+                is24Hour={false}
+                onConfirm={this._handleEndDatePicked}
+                onCancel={this._hideEndDateTimePicker}
               />
 
               <CheckBox

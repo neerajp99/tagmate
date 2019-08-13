@@ -118,6 +118,12 @@ class HomeScreen extends Component {
     })
     }
 
+    // Open Post Details screen for the task the user has tapped.
+    openInfo = (item) =>
+    {
+      this.props.navigation.navigate('PostDetails',{taskId: item.id})
+    }
+
     showScopeInfo = (publicPost) => {
         if(publicPost){
             Alert.alert(
@@ -483,7 +489,7 @@ class HomeScreen extends Component {
 
 
             {
-                detailsAvailable && <Text style={adourStyle.cardText}>{details}</Text>
+                detailsAvailable && <Text style={adourStyle.cardText} onPress={() => this.openInfo(item)}>{details}</Text>
 
             }
 
@@ -567,6 +573,7 @@ class HomeScreen extends Component {
                   subtitle={ details }
                   subtitleStyle={adourStyle.listItemText}
                   chevron={false}
+                  onPress={() => this.openInfo(item)}
                   containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                   subtitleProps={{ numberOfLines: 2 }}
                 />
