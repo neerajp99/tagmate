@@ -11,6 +11,7 @@ export RequestScreen from './Request';
 export CreatePost from './CreatePost';
 export HomeScreen from './Home';
 export GuestList from './GuestList';
+export * from './ViewGuestList';
 export BlockList from './BlockList';
 export * from './Dashboard';
 export * from './DashboardDetails';

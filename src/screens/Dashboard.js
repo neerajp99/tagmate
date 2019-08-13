@@ -249,7 +249,7 @@ class DashboardScreen extends Component {
     userGuideContainer = (active) =>
     {
       if(active){
-          if(this.state.attending.length == 0) {
+          if(this.state.hosting.length == 0) {
             //Get Display Name
             let user = firebase.auth().currentUser;
             let displayName;
@@ -259,16 +259,15 @@ class DashboardScreen extends Component {
             return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                       <Text style={adourStyle.guideText}>
                       Hello {displayName} {"\n"} {"\n"}You do not have any upcoming gatherings. {"\n"} {"\n"}
-                      "Twenty years from now, you will be more disappointed by the things you didn't do than by the ones you did do." - Mark Twain
                       </Text>
                     </View>
           }
       } else {
 
-        if(this.state.hosting.length == 0) {
+        if(this.state.attending.length == 0) {
           return <View style={{marginLeft: 20, marginRight: 18, marginTop: 20}}>
                     <Text style={adourStyle.guideText}>
-                    It's pitch white in here! {"\n"} {"\n"} Magic lies outside your comfort zone. {"\n"}{"\n"}
+                    It's pitch white in here! {"\n"} {"\n"} Host meetups to meet new people and have new experiences. {"\n"}{"\n"}
                     </Text>
                   </View>
         }
@@ -279,7 +278,7 @@ class DashboardScreen extends Component {
     * render an item of the list
     * */
     renderItem = ({item}) => {
-        const{id, created_at, details, customTitle, interestedCount} = item;
+        const{id, created_at, details, publicPost, customTitle, interestedCount} = item;
         const uid = this.state.uid;
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
@@ -299,6 +298,12 @@ class DashboardScreen extends Component {
           case 2: statusStr = 'Completed'; break;
           case 3:
           case 4: statusStr = 'Cancelled'; break;
+        }
+
+        if(item.status === 0 && publicPost){
+          statusStr = `Open: ${interestedCount}+ guests`;
+        }else if (item.status === 0 && !publicPost){
+          statusStr = `Open: ${interestedCount}+ interested`;
         }
 
         /* Update: removed the following code

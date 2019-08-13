@@ -638,6 +638,10 @@ export const addAcceptor = (userId, serviceId, hostId, publicPost) => new Promis
               //Since this is a public event, automatically add this userId to confirmedList
               confRef = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/confirmedGuests/${userId}`);
               confRef.update({id: userId, guestStatus:1});
+              //Increment confirmed count
+              firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/confirmedCount`).transaction(function(interestedCount){
+                return (interestedCount || 0) + 1;
+              });
             }
           })
           //Get first name of this particular acceptor

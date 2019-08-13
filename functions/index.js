@@ -375,6 +375,22 @@ exports.sendUnreadPushNotification = functions.database
 
   });
 
+  exports.onConfirmGuest = functions.database
+  .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests/{userId}')
+  .onCreate((snapshot, context) => {
+      const pushId = context.params.pushId;
+      const userId = context.params.userId;
+      const networkId = context.params.networkId;
+      if (!pushId || !userId || !networkId) {
+          return console.log('missing mandatory param pushId for sending push.')
+      }
+      admin.database().ref(`networks/${networkId}/allPosts/${pushId}`).once('value', (postSnapshot) => {
+        let post = postSnapshot.val()
+        admin.database().ref(`/users/${userId}/posts/guest/${pushId}`).update(post)
+      })
+
+    });
+
   exports.addLivePosts = functions.database
   .ref('/networks/{networkId}/allPosts/{postId}/')
   .onCreate((snapshot, context) => {

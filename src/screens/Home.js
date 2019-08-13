@@ -461,7 +461,7 @@ class HomeScreen extends Component {
             <TimeAgo key={id} style={adourStyle.timeAgoText} time={created_at} />
           </View> */}
 
-          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-165 , top: -35, position: 'absolute'}} >
+          <View style={{alignItems: 'flex-end', justifyContent: 'flex-end', left: WIDTH-110 , top: -35, position: 'absolute'}} >
             <Badge value={eventTypeText} status="primary" onPress={() => this.showScopeInfo(publicPost)} textStyle={adourStyle.interestedText} badgeStyle={{marginTop: 5, marginBottom: 5}} />
           </View>
 

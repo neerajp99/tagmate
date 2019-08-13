@@ -16,7 +16,7 @@ const { width: WIDTH } = Dimensions.get('window')
 const CUSTOM_IMG = "https://tagmateapp.com/assets/item_img/custom.jpg";
 let uid;
 
-class DashboardDetails extends Component {
+class PostDetails extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -84,8 +84,6 @@ class DashboardDetails extends Component {
         if(this._isMounted) this.setState({ showChat: true});
         this.getConfirmedGuests();
         this.getUnreadChatCount();
-      } else if(item.status === 1 || item.status === 2){ //we need to also show the guest list if the events guest list is closed or it is marked as done
-        this.getConfirmedGuests();
       }
 
     })
@@ -270,11 +268,6 @@ class DashboardDetails extends Component {
     })
   }
 
-  openViewGuestList = (confGuestList) =>
-  {
-    this.props.navigation.navigate('ViewGuestList',{confirmedGuestList: confGuestList})
-  }
-
   openProfile = (uid) =>
   {
     this.props.navigation.navigate('ViewProfile',{profileUid: uid})
@@ -445,6 +438,28 @@ class DashboardDetails extends Component {
                           />
                   }
 
+                  {
+                    item.venue != "" &&
+                        <ListItem
+                            title={item.venue}
+                            titleStyle={adourStyle.listItemText}
+                            chevron={false}
+                            containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+                            leftIcon={{ name: 'info-outline'}}
+                          />
+                  }
+
+                  { item.link != "" && <Button
+                  icon={{
+                          name: "link",
+                          size: 15,
+                          color: "white"
+                        }}
+                  onPress={() => this.onShare(item.customTitle)}
+                  buttonStyle={adourStyle.btnShare}
+                  titleStyle={adourStyle.btnTextSmall}
+                  title="Website" />}
+
                   {/* Timestamp DISABLED - throwing error
                   <View style={styles.subContent} key={item.id}>
                   <ListItem
@@ -471,98 +486,6 @@ class DashboardDetails extends Component {
 
       </Card>
 
-
-      {(this.state.showChat || item.status === 1 || item.status === 2) && <Card title="Guest List" titleStyle={adourStyle.cardTitle}>
-        <View style={{maxHeight: 270}} >
-        <FlatList
-            data={confirmedGuestList}
-            extraData={confirmedGuestList}
-            renderItem={this.renderGuests}
-            keyExtractor={(confirmedGuestList, index) => confirmedGuestList.id}
-        />
-
-          { (item.confirmedCount > 3) && <View style={{alignItems: 'center', justifyContent: 'center'}}>
-          <Text style={adourStyle.defaultText}>and {item.confirmedCount-3} more are going</Text>
-          </View>}
-
-        </View>
-        { !(item.isClient && item.status == 0 && item.publicPost === false) && item.confirmedCount > 3 && <Button onPress={()=>this.openViewGuestList(confirmedGuestList)}
-            buttonStyle={adourStyle.btnGeneral}
-            titleStyle={adourStyle.btnText}
-            disabled={this.state.disabledDone}
-            title="View Guest List"
-            rightIcon={{name: 'code'}}
-        />}
-        {
-          this.state.showChat &&
-          <View>
-          <Button
-          icon={{name: 'chat'}}
-          onPress={() => this.openChat(item)}
-          buttonStyle={adourStyle.btnGeneral}
-          titleStyle={adourStyle.btnText}
-          title="Chat" />
-          {(unreadChatCount != 0) && <Badge value={unreadChatCount} status="success" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
-          </View>
-        }
-      </Card>}
-
-      {!optedOut && <Card>
-
-           {
-             item.isClient && item.status == 0 && item.publicPost === false &&
-                  <View>
-                   <Button onPress={()=>this.openGuestList(item.id, item.hostId)}
-                       buttonStyle={adourStyle.btnGeneral}
-                       titleStyle={adourStyle.btnText}
-                       disabled={this.state.disabledDone}
-                       title="Guest List"
-                       rightIcon={{name: 'code'}}
-                   />
-                   {(item.interestedCount != 0) && <Badge value={item.interestedCount} status="primary" containerStyle={{ position: 'absolute', top: 14, right: 0 }} />}
-                   </View>
-
-           }
-
-           {
-             item.isClient && item.status === 0 &&
-                   <Button onPress={()=>this.closeGuestListAlert(item.id)}
-                       buttonStyle={adourStyle.btnGeneral}
-                       titleStyle={adourStyle.btnText}
-                       disabled={this.state.disabledDone}
-                       title="Close Guest List"
-                   />
-           }
-
-          {
-            item.isClient && item.status == 1 &&
-                  <Button onPress={()=>this.markDone(item.id)}
-                      buttonStyle={adourStyle.btnGeneral}
-                      titleStyle={adourStyle.btnText}
-                      disabled={this.state.disabledDone}
-                      title="Mark as Done"
-                  />
-          }
-
-          {
-           item.status < 2 &&
-                <Button
-                    onPress={()=>this.confirmCancel(item)}
-                    buttonStyle={adourStyle.btnCancel}
-                    titleStyle={adourStyle.btnText}
-                    title={(item.isClient)?"Remove":"Opt Out"}
-                />
-          }
-          {
-           item.status == 3 &&
-                <Button
-                    onPress={()=>this.confirmCancel(item)}
-                    buttonStyle={adourStyle.btnCancel}
-                    titleStyle={adourStyle.btnText}
-                    title={"Remove"}
-                />
-          }
-        </Card>}
         {
             !item.isClient && !this.state.fetching && <View style={{alignItems: 'center', justifyContent: 'center'}}>
             <Text style={adourStyle.defaultText} onPress={() => this.onReportPress()}>Flag as inappropriate</Text>
@@ -574,7 +497,7 @@ class DashboardDetails extends Component {
   }
 }
 
-export {DashboardDetails};
+export {PostDetails};
 
 /*
 * Styles used in this screen
