@@ -95,7 +95,7 @@ export const adourStyle = StyleSheet.create({
     marginLeft: 14,
     fontSize: 11,
     alignSelf: 'center',
-    marginBottom: 10,
+    marginBottom: 2,
     marginTop: 5,
     color: '#545454',
     fontWeight:'200'
