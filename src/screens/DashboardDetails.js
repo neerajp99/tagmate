@@ -108,6 +108,12 @@ class DashboardDetails extends Component {
     }.bind(this));
   }
 
+  // Open Guest List Page: this page has the list of everyone who is interested in this activity
+  openURL = (urlAddress) =>
+  {
+    this.props.navigation.navigate('ViewURLHome',{urlAddress: urlAddress});
+  }
+
 
   //Returns the react native component list with names of confirmed guests
   getConfirmedGuests = () => {
@@ -209,19 +215,22 @@ class DashboardDetails extends Component {
   addToGoogleCalendar = (item) =>
   {
     //Build the link
-    let dates = '';
-    let location = '';
-
+    let venue = item.venue.replace(/ /g, '+');
+    let title = item.customTitle.replace(/ /g, '+');
+    let details = item.details.replace(/ /g, '+');
+    let calLinkB, calLinkC;
     //Base
-    let calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${item.customTitle}&details=${item.details}&sf=true&output=xml`
+    let calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}`
     //Variables
-    if(item.dtStart != '' && item.dtEnd != '') calendarLink.concat(`&dates=${item.dtStart}/${item.dtEnd}`);
-    if(item.venue != '') calendarLink.concat(`&location=${item.venue}`);
-    console.log('final url: ', calendarLink)
-
-    Linking.openURL(calendarLink)
-
-
+    if(item.dtStart != '' && item.dtEnd != '') {
+      calLinkB = calendarLink.concat(`&dates=${item.dtStart}/${item.dtEnd}`);
+    }
+    if(item.venue != '') {
+      calLinkC = calLinkB.concat(`&location=${venue}`);
+    }
+    let finalCalLink = calLinkC.concat('&sf=true&output=xml')
+    console.log('final url: ', finalCalLink)
+    Linking.openURL(finalCalLink)
   }
 
   // Expects {id} parameter to be a valid service request ID
@@ -453,14 +462,20 @@ class DashboardDetails extends Component {
 
                   {
                     item.details != "" &&
+                        <Text style={adourStyle.defaultText}>{item.details}</Text>
+                  }
+
+                  {
+                    item.venue != "" &&
                         <ListItem
-                            title={item.details}
+                            title={item.venue}
                             titleStyle={adourStyle.listItemText}
                             chevron={false}
                             containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
                             leftIcon={{ name: 'info-outline'}}
                           />
                   }
+                  
 
                   {/* Timestamp DISABLED - throwing error
                   <View style={styles.subContent} key={item.id}>
@@ -475,16 +490,17 @@ class DashboardDetails extends Component {
 
                    */ }
 
-                   { item.status === 0 && <Button
+                   { item.link != "" && <Button
                    icon={{
-                           name: "share",
+                           name: "link",
                            size: 15,
                            color: "white"
                          }}
-                   onPress={() => this.onShare(item.customTitle)}
+                   onPress={() => this.openURL(item.link)}
                    buttonStyle={adourStyle.btnShare}
+                   loading={this.state.loadingBtn}
                    titleStyle={adourStyle.btnTextSmall}
-                   title="Share" />}
+                   title="More Info" />}
 
                    <Button
                    icon={{
@@ -496,6 +512,19 @@ class DashboardDetails extends Component {
                    buttonStyle={adourStyle.btnShare}
                    titleStyle={adourStyle.btnTextSmall}
                    title="Add to My Google Calendar" />
+
+                   { item.status === 0 && <Button
+                   icon={{
+                           name: "share",
+                           size: 15,
+                           color: "white"
+                         }}
+                   onPress={() => this.onShare(item.customTitle)}
+                   buttonStyle={adourStyle.btnShare}
+                   titleStyle={adourStyle.btnTextSmall}
+                   title="Share" />}
+
+
 
       </Card>
 

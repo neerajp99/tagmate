@@ -412,8 +412,14 @@ class HomeScreen extends Component {
         const {id, when, details, anonymous, customTitle, publicPost, bgImage, created_at, hostName, verified, hostThumb, hostId, interestedCount} = item;
         //console.log('swipableRender return: item.customTitle is ', item.customTitle)
         var detailsAvailable = true;
+        let detailsTrimmed = details;
 
         if(details == "" || typeof details == "undefined") detailsAvailable = false
+
+        if(details.length > 140){
+          let detailsB = details.substring(0, 140);
+          detailsTrimmed = detailsB.concat('...');
+        }
 
         let interestAvailable = false;
         let interestNumText = '';
@@ -489,7 +495,7 @@ class HomeScreen extends Component {
 
 
             {
-                detailsAvailable && <Text style={adourStyle.cardText} onPress={() => this.openInfo(item)}>{details}</Text>
+                detailsAvailable && <Text style={adourStyle.cardText} onPress={() => this.openInfo(item)}>{detailsTrimmed}</Text>
 
             }
 

@@ -90,6 +90,16 @@ export const adourStyle = StyleSheet.create({
     marginTop: 10,
     fontWeight:'200'
   },
+  defaultTextSmall: {
+    fontFamily:'OpenSans',
+    marginLeft: 14,
+    fontSize: 11,
+    alignSelf: 'center',
+    marginBottom: 10,
+    marginTop: 5,
+    color: '#545454',
+    fontWeight:'200'
+  },
   cardText: {
     fontFamily:'OpenSans',
     marginLeft: 74,
@@ -159,8 +169,15 @@ export const adourStyle = StyleSheet.create({
     opacity: 0.7
   },
   placeholderStyle: {
-    fontFamily:'OpenSans-Semibold',
-    fontSize: 16,
+    fontFamily:'OpenSans',
+    fontSize: 14,
+    fontWeight: '200',
+    color: 'rgba(0, 0, 0, 0.35)'
+  },
+  placeholderStyleMultiline: {
+    fontFamily:'OpenSans',
+    alignItems: 'flex-start',
+    fontSize: 14,
     fontWeight: '200',
     color: 'rgba(0, 0, 0, 0.35)'
   },
@@ -186,6 +203,31 @@ export const adourStyle = StyleSheet.create({
     backgroundColor: 'rgba(54, 105, 169, 0.2)',
     color: 'rgba(0, 0, 0, 0.35)',
     textAlign: 'center'
+  },
+  textInputLeft: {
+    height: 45,
+    width: WIDTH -108,
+    marginLeft: 15,
+    marginBottom: 15,
+    fontSize: 14,
+    fontFamily:'OpenSans',
+    paddingLeft: 25,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    color: 'rgba(0, 0, 0, 0.75)',
+  },
+  textInputLeftMultiline: {
+    height: 200,
+    width: WIDTH -108,
+    marginLeft: 15,
+    marginBottom: 15,
+    fontSize: 14,
+    textAlignVertical: "top",
+    fontFamily:'OpenSans',
+    paddingLeft: 25,
+    paddingTop: 10,
+    paddingRight: 15,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    color: 'rgba(0, 0, 0, 0.75)',
   },
   bioInputCenter: {
     height: 100,

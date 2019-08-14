@@ -247,7 +247,6 @@ class PostDetails extends Component {
     let title = item.customTitle.replace(/ /g, '+');
     let details = item.details.replace(/ /g, '+');
     let calLinkB, calLinkC;
-
     //Base
     let calendarLink = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}`
     //Variables
@@ -257,14 +256,9 @@ class PostDetails extends Component {
     if(item.venue != '') {
       calLinkC = calLinkB.concat(`&location=${venue}`);
     }
-
     let finalCalLink = calLinkC.concat('&sf=true&output=xml')
-
     console.log('final url: ', finalCalLink)
-
     Linking.openURL(finalCalLink)
-
-
   }
 
   closeGuestList = (id) => {

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, ListItem, Button, CheckBox} from 'react-native-elements';
+import {Card, ListItem, Button, CheckBox, Icon as IconElements} from 'react-native-elements';
 import {View, ActivityIndicator, StyleSheet, Text, TextInput, Picker, Dimensions, Alert, Share, ScrollView} from 'react-native';
 import firebase from 'react-native-firebase'
 import {fetchAllServices} from "../actions";
@@ -37,7 +37,8 @@ class CreatePost extends Component{
             selectedServiceItem: [],
             dtStartPlaceholder: 'Start Date & Time',
             dtEndPlaceholder: 'End Date & Time',
-            isDateTimePickerVisible: false,
+            isDateTimeStartPickerVisible: false,
+            isDateTimeEndPickerVisible: false,
         }
 
         this.inputRefs = {
@@ -76,13 +77,13 @@ class CreatePost extends Component{
         this._isMounted = false;
     }
 
-    _showStartDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+    _showStartDateTimePicker = () => this.setState({ isDateTimeStartPickerVisible: true });
 
-    _showEndDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+    _showEndDateTimePicker = () => this.setState({ isDateTimeEndPickerVisible: true });
 
-   _hideStartDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+   _hideStartDateTimePicker = () => this.setState({ isDateTimeStartPickerVisible: false });
 
-   _hideEndDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+   _hideEndDateTimePicker = () => this.setState({ isDateTimeEndPickerVisible: false });
 
    _handleStartDatePicked = date => {
      const dateISO = moment(date).startOf("minute").toISOString();
@@ -90,7 +91,7 @@ class CreatePost extends Component{
      let newDateB = newDateA.split('.')[0]+"Z";
      this.setState({ when: this.formatDate(date), dtStartPlaceholder: this.formatDate(date), dtStart: newDateB});
      console.log('dtStart is ', newDateB);
-     this._hideDateTimePicker();
+     this._hideStartDateTimePicker();
    };
 
    _handleEndDatePicked = date => {
@@ -99,7 +100,7 @@ class CreatePost extends Component{
      let newDateB = newDateA.split('.')[0]+"Z";
      this.setState({ dtEndPlaceholder: this.formatDate(date), dtEnd: newDateB});
      console.log('dtEnd is ', newDateB);
-     this._hideDateTimePicker();
+     this._hideEndDateTimePicker();
    };
 
    formatDate = (d) => {
@@ -133,6 +134,16 @@ class CreatePost extends Component{
     })
   }
 
+  publicInfo(){
+    Alert.alert(
+        'What are public events?',
+        'Public events: Anyone can join your event immediately. \nNon-public events: guests have to wait for your approval to join.',
+        [
+          {text: 'Got It'}
+        ]
+      );
+  }
+
   	sendRequest = () =>
     {
         if(this.state.disabledBtn == true) return;
@@ -143,7 +154,7 @@ class CreatePost extends Component{
             let postTitle = '';
             //if(when == 'Time & Date') return this.erred('Please select time & date');
             //if(when.length > 20) return this.erred('When should not exceed 20 characters.');
-            if(details.length > 142) return this.erred('Details should not exceed 142 characters.');
+            if(details.length > 1500) return this.erred('Details should not exceed 1500 characters.');
             if(customTitle.length > 24) return this.erred('Title should not exceed 24 characters. Use description to specify more details.');
             //Check if title is not blank if custom
             //Set postTitle to customTitle if its a custom post else set postTitle to serviceTitle
@@ -266,7 +277,7 @@ class CreatePost extends Component{
     }
 
   render(){
-    const { isDateTimePickerVisible, when, dtStartPlaceholder, dtEndPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
+    const { isDateTimeStartPickerVisible, isDateTimeEndPickerVisible, when, dtStartPlaceholder, dtEndPlaceholder, selectedServiceItem, selectedServiceId, customTitle, bgImage, selfName, customService } = this.state;
     const {services = [], fetching} = this.props;
 
     let servicesArray = [];
@@ -352,38 +363,40 @@ class CreatePost extends Component{
 
           { selectedServiceId === "custom" &&
             <TextInput
-            style={adourStyle.textInputCenter}
+            style={adourStyle.textInputLeft}
             autoCapitalize="none"
-            placeholder="Post Title"
+            placeholder="Title"
             placeholderStyle={adourStyle.placeholderStyle}
-            placeholderTextColor={'rgba(255, 255, 255, 1)'}
+            placeholderTextColor={'rgba(0, 0, 0, 0.65)'}
             underlineColorAndroid='transparent'
             onChangeText={customTitle => this.setState({ customTitle: customTitle })}
             />}
 
               <TextInput
-                style={adourStyle.textInputCenter}
+                style={adourStyle.textInputLeftMultiline}
                 autoCapitalize="none"
                 placeholder="Details"
-                placeholderStyle={adourStyle.placeholderStyle}
-                placeholderTextColor={'rgba(255, 255, 255, 1)'}
+                multiline={true}
+                autoCorrect={true}
+                placeholderStyle={adourStyle.placeholderStyleMultiline}
+                placeholderTextColor={'rgba(0, 0, 0, 0.65)'}
                 underlineColorAndroid='transparent'
                 onChangeText={details => this.setState({ details: details })}
               />
 
               <TextInput
-              style={adourStyle.textInputCenter}
+              style={adourStyle.textInputLeft}
               autoCapitalize="none"
-              placeholder="Venue (optional)"
+              placeholder="Venue"
               placeholderStyle={adourStyle.placeholderStyle}
-              placeholderTextColor={'rgba(255, 255, 255, 1)'}
+              placeholderTextColor={'rgba(0, 0, 0, 0.65)'}
               underlineColorAndroid='transparent'
               onChangeText={venue => this.setState({ venue: venue })}
               />
 
-              <Button title={dtStartPlaceholder} buttonStyle={styles.dateTimeStyle} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showStartDateTimePicker()}}/>
+              <Button title={dtStartPlaceholder} buttonStyle={styles.dateTimeStyleLeft} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showStartDateTimePicker()}}/>
               <DateTimePicker
-                isVisible={isDateTimePickerVisible}
+                isVisible={isDateTimeStartPickerVisible}
                 mode='datetime'
                 date={today}
                 minimumDate={today}
@@ -392,9 +405,9 @@ class CreatePost extends Component{
                 onCancel={this._hideStartDateTimePicker}
               />
 
-              <Button title={dtEndPlaceholder} buttonStyle={styles.dateTimeStyle} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showEndDateTimePicker()}}/>
+              <Button title={dtEndPlaceholder} buttonStyle={styles.dateTimeStyleLeft} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showEndDateTimePicker()}}/>
               <DateTimePicker
-                isVisible={isDateTimePickerVisible}
+                isVisible={isDateTimeEndPickerVisible}
                 mode='datetime'
                 date={today}
                 minimumDate={today}
@@ -409,11 +422,14 @@ class CreatePost extends Component{
                 onPress={() => this.setState({ publicPost: !this.state.publicPost})}
               />
 
+              <Text onPress={this.publicInfo} style={adourStyle.defaultTextSmall}>What are public events?</Text>
+              {/* DISABLED TEMPORARILY
               <CheckBox
                 title='Post As Anonymous'
                 checked={this.state.anonymous}
                 onPress={() => this.postAsAnonymous()}
               />
+              */}
 	            <Button title="Post" buttonStyle={adourStyle.btnGeneral} titleStyle={adourStyle.btnText} disabled={this.state.disabledBtn} loading={this.state.disabledBtn} onPress={() => {this.sendRequest()}}/>
 	        </Card>
 	    </View>
@@ -451,11 +467,20 @@ const styles = StyleSheet.create({
       marginBottom: 20,
       marginLeft: 15
     },
+    dateTimeStyleLeft: {
+      height: 45,
+      width: WIDTH - 110,
+      backgroundColor: 'rgba(54, 105, 169, 0.2)',
+      justifyContent: 'flex-start',
+      marginBottom: 20,
+      marginLeft: 15
+    },
     buttonTextStyle: {
-      fontFamily:'OpenSans-Semibold',
-      fontSize: 16,
-      fontWeight: '800',
-      color: 'rgba(255, 255, 255, 1)'
+      fontFamily:'OpenSans',
+      fontSize: 14,
+      fontWeight: '400',
+      marginLeft: 15,
+      color: 'rgba(0, 0, 0, 0.65)'
     },
     progressContainer: {
         left: '50%',
