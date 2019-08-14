@@ -100,6 +100,15 @@ export const adourStyle = StyleSheet.create({
     color: '#545454',
     fontWeight:'200'
   },
+  defaultTextSmallB: {
+    fontFamily:'OpenSans',
+    marginLeft: 2,
+    fontSize: 11,
+    alignSelf: 'center',
+    marginBottom: 2,
+    color: '#545454',
+    fontWeight:'200'
+  },
   cardText: {
     fontFamily:'OpenSans',
     marginLeft: 74,
@@ -297,6 +306,16 @@ export const adourStyle = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20
   },
+  btnRewind: {
+    borderRadius: 5,
+    marginTop: 4,
+    marginBottom: 4,
+    marginLeft: 4,
+    marginRight: 4,
+    height: 35,
+    backgroundColor: '#ebebeb',
+    justifyContent: 'center',
+  },
   btnHomeHost: {
     borderRadius: 5,
     height: 45,
@@ -346,6 +365,13 @@ export const adourStyle = StyleSheet.create({
     fontWeight:'200',
     color: 'rgba(255, 255, 255, 1)',
     fontSize: 16,
+    textAlign: 'center'
+  },
+  btnTextRewind: {
+    fontFamily:'OpenSans-Semibold',
+    fontWeight:'200',
+    color: BRAND_COLOR_ONE,
+    fontSize: 14,
     textAlign: 'center'
   },
   btnTextSmall: {

@@ -1,7 +1,7 @@
 // This screen shows tasks hosting and attending by the user.
 
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity} from 'react-native';
+import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, RefreshControl} from 'react-native';
 import {countallPosts, isConfirmedAcceptor, deleteForever, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -21,6 +21,7 @@ class DashboardScreen extends Component {
         fetching:false,
         attendingBadge: false,
         hostingBadge: false,
+        refreshing: false,
         hosting:[], // Array of hosting services
         attending:[], // Array of attending tasks
       }
@@ -45,14 +46,19 @@ class DashboardScreen extends Component {
       //countallPosts(networkId); //THIS IS TO GET STATISTICS. ENABLE WHEN REQUIRED
       //this.sendPushNotificationToHosts(hard code network Id here); //THIS IS A MANUAL CLOUD FUNCTION FOR ADMINS ONLY
       //massJobs();
-
-
       this.runFirebaseListeners();
       firebase.analytics().setCurrentScreen('DashboardScreen');
     }
 
     componentWillUnmount(){
       this._isMounted = false;
+    }
+
+    _onRefresh = () => {
+      this.setState({hosting: [], attending: []}, function () {
+             this.runFirebaseListeners();
+           }
+        )
     }
 
     runFirebaseListeners = () => {
@@ -159,6 +165,7 @@ class DashboardScreen extends Component {
             }
           }).then(result => {
               if(unreadAv) this.setState({attendingBadge: true})
+              if(this.state.refreshing) this.setState({refreshing:false});
             })
         }
         //Check for unread msg count END
@@ -248,6 +255,7 @@ class DashboardScreen extends Component {
 
     userGuideContainer = (active) =>
     {
+      /*
       if(active){
           if(this.state.hosting.length == 0) {
             //Get Display Name
@@ -272,6 +280,7 @@ class DashboardScreen extends Component {
                   </View>
         }
       }
+      */
     }
 
     /*
@@ -356,6 +365,12 @@ class DashboardScreen extends Component {
                     extraData={(active == 0)?attending:hosting}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
+                    refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
                 />
               }
               <View style={{marginBottom:15, marginLeft: 20, marginRight: 20}}>

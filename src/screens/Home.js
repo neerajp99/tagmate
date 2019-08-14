@@ -341,6 +341,25 @@ class HomeScreen extends Component {
         }
     }
 
+    _onRefresh = () => {
+      this.setState({myTasks: [], hiddenPosts: [], blockedList: [], fetching: true}, function () {
+              //START
+              // Get the necessary lists to filter the posts
+              getHiddenPosts(uid).then(hiddenPosts => {
+                getBlockedList(uid).then(blockedList => {
+                  getNetworkId(uid).then(networkId => {
+                    this.setState({networkId, blockedList, hiddenPosts});
+                    this.getMyTasks();
+                    this.blockedListListener();
+                    //this.rewindListener();
+                  })
+                })
+              })
+              //END
+           }
+        )
+    }
+
     rewindPrompt = () => {
       Alert.alert(
       'Confirmation',
@@ -605,12 +624,25 @@ class HomeScreen extends Component {
                                                   {fetching && <ActivityIndicator color={BRAND_COLOR_ONE} size={'large'}/>}
                                                   {!fetching && <View style={{alignItems: 'center'}}>
                                                     <Text style={adourStyle.cardOverText}>Check back later</Text>
+                                                    <View style={{marginTop: 45}}>
                                                     <IconElements
-                                                      name='fast-rewind'
+                                                      name='refresh'
                                                       raised
                                                       type='material'
-                                                      onPress={() => this.rewindPrompt()}
+                                                      onPress={() => this._onRefresh()}
                                                       color={BRAND_COLOR_ONE} />
+                                                      <Text style={adourStyle.defaultTextSmallB}>Refresh</Text>
+                                                      </View>
+
+                                                      <View style={{marginTop: 45}}>
+                                                      <IconElements
+                                                        name='fast-rewind'
+                                                        raised
+                                                        type='material'
+                                                        onPress={() => this.rewindPrompt()}
+                                                        color={BRAND_COLOR_ONE} />
+                                                        <Text style={adourStyle.defaultTextSmallB}>Rewind</Text>
+                                                      </View>
 
                                                     </View>}
                                                   </View>}
