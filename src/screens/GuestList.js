@@ -116,7 +116,7 @@ class GuestList extends Component {
       firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/confirmedCount`).transaction(function(confirmedCount){
         return (confirmedCount || 0) + 1;
       });
-      
+
     }
 
     rejectGuest = (id) => {
@@ -236,7 +236,7 @@ class GuestList extends Component {
                     data={guestList}
                     extraData={guestList}
                     renderItem={this.renderItem}
-                    keyExtractor={(guestList, index) => guestList.id}
+                    keyExtractor={(guestList, index) => index.toString() }
                 />}
                 {
                     fetching && <View style={styles.progressContainer}>

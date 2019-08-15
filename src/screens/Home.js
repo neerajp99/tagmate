@@ -48,7 +48,6 @@ class HomeScreen extends Component {
 
         firebase.analytics().setCurrentScreen('Home');
 
-        //We only need to check if it's user's first time if user is not signed in
         AsyncStorage.getItem("alreadyLaunchedHome").then(value => {
               if(user != null && value == null){
                    AsyncStorage.setItem('alreadyLaunchedHome', "true"); // No need to wait for `setItem` to finish, although you might want to handle errors
@@ -282,8 +281,39 @@ class HomeScreen extends Component {
           return
         }
         console.log('acceptTaskNew try')
+
         if(uid)
         {
+            //Info popups START
+            if(item.publicPost === true){
+              AsyncStorage.getItem("firstRightSwipePublic").then(value => {
+                if(value == null){
+                    AsyncStorage.setItem('firstRightSwipePublic', "true"); // No need to wait for `setItem` to finish, although you might want to handle errors
+                     Alert.alert(
+                     'Added to Dashboard',
+                     'You can find the event on your dashboard.',
+                     [
+                       {text: 'Dismiss'},
+                       {text: 'Go To Dashboard', onPress: () => this.props.navigation.navigate('DashboardScreen')}
+                     ]
+                   );
+                 }})
+            }else{
+              //its a private event
+              AsyncStorage.getItem("firstRightSwipePrivate").then(value => {
+                if(value == null){
+                         AsyncStorage.setItem('firstRightSwipePrivate', "true"); // No need to wait for `setItem` to finish, although you might want to handle errors
+                         Alert.alert(
+                         'Pending Approval',
+                         'This is a private event. Once the host approves your participation, we will notify you.',
+                         [
+                           {text: 'Cool'}
+                         ]
+                       );
+                    }})
+            }
+            //Info popups END
+
             alreadyAccepted(uid, item.id).then(alreadyAcc => // Check if someone has already accepted the task {id}.
             {
               console.log('Inside acceptTaskNew alreadyAccepted')
