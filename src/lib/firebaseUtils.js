@@ -970,21 +970,26 @@ export const hasOptedOutAsGuest = (uid, taskId) => new Promise((resolve, reject)
 
 /*
 export const massJobs = () => {
-  usersToSave = ["kHgG7F9IubPRXyeiBNl9adpsYoo1", "3jOLGdMgClejVrZH4FsaOyue3AS2", "I73ZXJEh7uXDzn7LLX6tSowmJUE3", "TdCg22Vcv8TpZdQPPiOL44v9g462", "aQuMUbYPU6gbXTdRCFpZgFJuoZ93", "yM36vYdtLFdh8rNk0ayJE6QEiJ32", "MQoEZERX8BcBofbNtkMf4KaUUFE3"];
+  //usersToSave = ["kHgG7F9IubPRXyeiBNl9adpsYoo1", "3jOLGdMgClejVrZH4FsaOyue3AS2", "I73ZXJEh7uXDzn7LLX6tSowmJUE3", "TdCg22Vcv8TpZdQPPiOL44v9g462", "aQuMUbYPU6gbXTdRCFpZgFJuoZ93", "yM36vYdtLFdh8rNk0ayJE6QEiJ32", "MQoEZERX8BcBofbNtkMf4KaUUFE3"];
 
   firebase.database().ref('users').once("value")
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
       const uid = childSnapshot.key;
+      firebase.database().ref(`users/${uid}/messages`).remove();
       //const profilePic = childSnapshot.val().profilePicture;
-      if(!usersToSave.includes(uid)){
-          firebase.database().ref(`users/${uid}`).remove();
-          console.log('done. Deleted: ', childSnapshot.firstName);
-      }
+      //firebase.database().ref(`users/${uid}/hiddenPosts`).remove();
+
+      //if(!usersToSave.includes(uid)){
+      //    firebase.database().ref(`users/${uid}`).remove();
+      //    console.log('done. Deleted: ', childSnapshot.firstName);
+      //}
+
     })
   })
 }
 */
+
 
 
 //Stats

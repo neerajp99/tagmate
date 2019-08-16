@@ -90,6 +90,14 @@ export const adourStyle = StyleSheet.create({
     marginTop: 10,
     fontWeight:'200'
   },
+  defaultTextCenter: {
+    fontFamily:'OpenSans',
+    marginLeft: 14,
+    marginBottom: 10,
+    alignSelf: 'center',
+    marginTop: 10,
+    fontWeight:'200'
+  },
   defaultTextSmall: {
     fontFamily:'OpenSans',
     marginLeft: 14,
@@ -228,6 +236,21 @@ export const adourStyle = StyleSheet.create({
     height: 200,
     width: WIDTH -108,
     marginLeft: 15,
+    marginBottom: 15,
+    fontSize: 14,
+    textAlignVertical: "top",
+    fontFamily:'OpenSans',
+    paddingLeft: 25,
+    paddingTop: 10,
+    paddingRight: 15,
+    backgroundColor: 'rgba(54, 105, 169, 0.2)',
+    color: 'rgba(0, 0, 0, 0.75)',
+  },
+  textInputMultilineSmall: {
+    height: 120,
+    width: WIDTH -108,
+    marginLeft: 15,
+    marginTop: 10,
     marginBottom: 15,
     fontSize: 14,
     textAlignVertical: "top",

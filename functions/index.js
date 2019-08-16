@@ -250,10 +250,11 @@ exports.notifyHostOnNewGuest = functions.database
       let interestedCount = change.after.val();
 
       //Hotfix
-      if(change.after.val() === 0) return;
+      if(change.after.val() === 0) return 0;
 
       if( (interestedCount % 3) != 0 ){
-        return console.log('interestedCount is updated but is not a multiple of 3')
+        console.log('interestedCount is updated but is not a multiple of 3')
+        return 0;
       }
       console.log('interestedCount is a multiple of 3. Sending Push.')
 
@@ -275,7 +276,8 @@ exports.notifyHostOnNewGuest = functions.database
           if(deviceTokens != null){
             return admin.messaging().sendToDevice(deviceTokens, payload);
           }else{
-            return console.log('deviceTokens is null')
+            console.log('deviceTokens is null');
+            return 0;
           }
         })
       })
@@ -291,7 +293,8 @@ exports.sendUnreadPushNotification = functions.database
     const pushId = context.params.pushId;
     const userId = context.params.userId;
     if (!pushId || !userId) {
-        return console.log('missing mandatory params for sending push.')
+        console.log('missing mandatory params for sending push.')
+        return;
     }
     if( change.after.val() > change.before.val() ){
       let deviceTokens = []
@@ -314,7 +317,7 @@ exports.sendUnreadPushNotification = functions.database
       })
     }else{
       console.log('change.after.val() is not greater than change.before.val(). Exiting')
-      return
+      return 0;
     }
 
 });
@@ -335,7 +338,10 @@ exports.sendUnreadPushNotification = functions.database
       return Promise.all([userDevicePromise]).then(results => {
         // Terminate here if the client does not have any device IDs.
         let userItem = results[0].val();
-        if(!userItem.hasOwnProperty('deviceTokens') || !userItem.deviceTokens.length) return console.log('User does not have device ID.')
+        if(!userItem.hasOwnProperty('deviceTokens') || !userItem.deviceTokens.length){
+          console.log('User does not have device ID.');
+          return;
+        }
         const payload = {
           notification: {
               title: 'You have been accepted!',
@@ -351,6 +357,7 @@ exports.sendUnreadPushNotification = functions.database
       })
   });
 
+/*
   exports.finalizeGuestListOps = functions.database
   .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests')
   .onCreate((snapshot, context) => {
@@ -378,6 +385,8 @@ exports.sendUnreadPushNotification = functions.database
 
   });
 
+  */
+
   exports.onConfirmGuest = functions.database
   .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests/{userId}')
   .onCreate((snapshot, context) => {
@@ -387,9 +396,9 @@ exports.sendUnreadPushNotification = functions.database
       if (!pushId || !userId || !networkId) {
           return console.log('missing mandatory param pushId for sending push.')
       }
-      admin.database().ref(`networks/${networkId}/allPosts/${pushId}`).once('value', (postSnapshot) => {
+      return admin.database().ref(`networks/${networkId}/allPosts/${pushId}`).once('value', (postSnapshot) => {
         let post = postSnapshot.val()
-        admin.database().ref(`/users/${userId}/posts/guest/${pushId}`).update(post)
+        return admin.database().ref(`/users/${userId}/posts/guest/${pushId}`).update(post)
       })
 
     });

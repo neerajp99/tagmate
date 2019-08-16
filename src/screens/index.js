@@ -3,6 +3,7 @@ export * from './Profile';
 export * from './ViewProfile';
 export * from './EditProfileDetails';
 export * from './EditBio';
+export * from './NewUserSetProfile';
 export * from './Support';
 export * from './PrivacyPolicy'
 export * from './ViewImage'

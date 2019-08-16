@@ -3,6 +3,7 @@ import React, {Component} from 'react'
 import firebase, { config } from 'react-native-firebase';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {connect} from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 import {loginUser, loginGoogleUser,addNewGoogleUser} from '../../actions';
 import {populateUserServices, addNetworkDetails, setInitialThumbnail} from '../../lib/firebaseUtils';
 import { StyleSheet, Text, TextInput, View, Button, Image, ImageBackground, Dimensions, TouchableOpacity, Platform, ActivityIndicator } from 'react-native'
@@ -113,7 +114,17 @@ class Login extends Component {
             addNetworkDetails(currentUser).then(secRes => {
               setInitialThumbnail(currentUser).then(lastRes => {
                 this.setState({loading:false});
-                this.props.navigation.navigate('MainStack');
+                AsyncStorage.getItem("alreadyLaunchedHome").then(value => {
+                      if(value == null){
+                          console.log('Taking the user to onboarding profile screen.')
+                           this.props.navigation.navigate('NewUserSetProfile');
+                           //We hope Home.js takes care of setting alreadyLaunchedHome to true
+                      }
+                      else{
+                           console.log('Taking the user straight to Home. Not the first launch.')
+                           this.props.navigation.navigate('MainStack');
+                      }})
+
               })
             })
           })

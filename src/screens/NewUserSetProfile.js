@@ -21,7 +21,7 @@ const options = {
   }
 };
 
-class EditBio extends Component{
+class NewUserSetProfile extends Component{
   uid = "";
 
   constructor(props) {
@@ -40,7 +40,7 @@ class EditBio extends Component{
 
   componentDidMount(){
     this._isMounted = true;
-    firebase.analytics().setCurrentScreen('EditBio');
+    firebase.analytics().setCurrentScreen('NewUserSetProfile');
     //Fetching name and photo URL
     let user = firebase.auth().currentUser;
     if (user != null) {
@@ -143,8 +143,12 @@ class EditBio extends Component{
 
   onButtonPress() {
       setUserBio(this.uid, this.state.bio).then(res => {
-        this.props.navigation.goBack()
+        this.props.navigation.navigate('MainStack');
       })
+  }
+
+  onSkip() {
+    this.props.navigation.navigate('MainStack');
   }
 
   render(){
@@ -152,8 +156,9 @@ class EditBio extends Component{
       <ScrollView>
       <View style={styles.backgroundContainer}>
 
-            <Card title="Update Profile Picture" titleStyle={adourStyle.cardTitleSmall} containerStyle={{alignItems: 'center', justifyContent: 'center'}}>
+            <Card title="Set A Profile Picture" containerStyle={{alignItems: 'center', justifyContent: 'center'}}>
               <View style={{alignItems: 'center', justifyContent: 'center', marginBottom: 8}} >
+              <Text style={adourStyle.defaultText}>You are 10x more likely to be accepted for selective events if you set a recent profile picture.</Text>
               <Avatar
                 size="large"
                 rounded
@@ -169,10 +174,10 @@ class EditBio extends Component{
             </Card>
 
 
-        <Card title="Edit Bio" titleStyle={adourStyle.cardTitleSmall} containerStyle={{alignItems: 'center', justifyContent: 'center'}}>
-        <View style={{alignItems: 'center', justifyContent: 'center', marginBottom: 8}} >
+        <Card title="Write A Bio">
+        <Text style={adourStyle.defaultText}>Writing a brief bio helps others get a glimpse of your personality.</Text>
           <TextInput
-            style={adourStyle.textInputLeftMultiline}
+            style={adourStyle.textInputMultilineSmall}
             autoCapitalize="none"
             placeholder="Please write about your background, hobbies and interests"
             multiline={true}
@@ -184,14 +189,14 @@ class EditBio extends Component{
             value={this.state.bio}
             onChangeText={bio => this.setState({ bio: bio })}
           />
-          </View>
 
           </Card>
 
           <Card>
             <TouchableOpacity style={adourStyle.btnGeneral} onPress={this.onButtonPress.bind(this)}>
-              <Text style={adourStyle.btnText}>Save</Text>
+              <Text style={adourStyle.btnText}>Done</Text>
             </TouchableOpacity>
+            <Text onPress={this.onSkip.bind(this)} style={adourStyle.defaultTextCenter}>Skip</Text>
         </Card>
         <View style={{marginTop: 25}} />
       </View>
@@ -243,4 +248,4 @@ const styles = StyleSheet.create({
 })
 
 
-export {EditBio};
+export {NewUserSetProfile};

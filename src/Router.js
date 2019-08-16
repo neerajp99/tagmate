@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
 import IconWithBadge from "./screens/IconWithBadge";
-import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, ViewURLHome, SupportScreen, PostDetails, ViewGuestList, ViewImage, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, NewUserSetProfile, ViewURLHome, SupportScreen, PostDetails, ViewGuestList, ViewImage, PrivacyPolicyScreen, ToS, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import EmailLogin from './screens/auth/EmailLogin';
@@ -277,6 +277,7 @@ export const RootNav = createSwitchNavigator(
     Login,
     Onboarding,
     OnboardingSplash,
+    NewUserSetProfile,
     MainStack,
     EmailLogin,
   },
