@@ -27,7 +27,6 @@
 		19B2E209B03641B8BDFC7A2B /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0B00D006835C4456966BCB08 /* SimpleLineIcons.ttf */; };
 		1BBBA32514B245EC9FB6CC07 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9592D814FCCE40A59AF257EE /* MaterialCommunityIcons.ttf */; };
 		298C9D1F0E34439D8E19B622 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AE673D6AB761464A831A9ED7 /* Ionicons.ttf */; };
-		2BB86294B54D1DB852700007 /* libPods-adourapp-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BAE18F846F78A393B2DCB8E /* libPods-adourapp-tvOSTests.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -46,8 +45,6 @@
 		397F3B768E2F14D299056DF8 /* libPods-chillmate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FCBB1219A849214A60025F7C /* libPods-chillmate.a */; };
 		4ECC556ACCF8463CA95B9C69 /* OpenSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60F7CFC9093B47AC8534078D /* OpenSans-BoldItalic.ttf */; };
 		5042BE96C8E342F687E30ADC /* libRNGoogleSignin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A978BD0995734269AE0DD116 /* libRNGoogleSignin.a */; };
-		50F050BC9A00857A0FBE722B /* libPods-adourapp-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C6A1D414F5AB93A52E4EB64 /* libPods-adourapp-tvOS.a */; };
-		54584430C9D40EAB91B2F56D /* libPods-adourappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5FD66A0E97785770840242FE /* libPods-adourappTests.a */; };
 		5AB82A15FBD84C98AC6B0790 /* OpenSans-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 13AFF060E4DC4BAEA659C612 /* OpenSans-ExtraBold.ttf */; };
 		60E354E7E5D04EFDAD42514F /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EF03816769A5402B852834ED /* FontAwesome5_Brands.ttf */; };
 		6C361A482F7145E68FF612B4 /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE27C0E905344F1E9C0891E4 /* libRNCAsyncStorage.a */; };
@@ -486,14 +483,12 @@
 		42439E803F7542D3A58FD8DD /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		463E9417B6AC4456838253BF /* OpenSans-SemiboldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-SemiboldItalic.ttf"; path = "../assets/fonts/OpenSans-SemiboldItalic.ttf"; sourceTree = "<group>"; };
 		4B7975A0DF95415DB363C983 /* OpenSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Light.ttf"; path = "../assets/fonts/OpenSans-Light.ttf"; sourceTree = "<group>"; };
-		4C6A1D414F5AB93A52E4EB64 /* libPods-adourapp-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-adourapp-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C7DEBF0E96A4253BA0919FB /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		4F29C81E0F454D82BC4FCE4B /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		529B553142A92AAA6D15B552 /* Pods-chillmateTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chillmateTests.release.xcconfig"; path = "Target Support Files/Pods-chillmateTests/Pods-chillmateTests.release.xcconfig"; sourceTree = "<group>"; };
 		572DF21612F34A5A8F9D6662 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		5EDB2250D0DF42ECB64C59E1 /* libRNFirebase.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNFirebase.a; sourceTree = "<group>"; };
-		5FD66A0E97785770840242FE /* libPods-adourappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-adourappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		607D3E904A5D501889D5FB8C /* libPods-adourapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-adourapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		60F7CFC9093B47AC8534078D /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-BoldItalic.ttf"; path = "../assets/fonts/OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		63CBDD2612BA43B7B3D36A57 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
@@ -530,7 +525,6 @@
 		79B98F9C22A4D72A00280586 /* libFirebaseInstanceID.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseInstanceID.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		79B98F9E22A4D72A00280586 /* libFirebaseMessaging.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFirebaseMessaging.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7ADFFAC46D72435689E75E6E /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNGestureHandler.xcodeproj; path = "../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; };
-		7BAE18F846F78A393B2DCB8E /* libPods-adourapp-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-adourapp-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		811DE5E7B6884AAD84E835BC /* OpenSans-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-LightItalic.ttf"; path = "../assets/fonts/OpenSans-LightItalic.ttf"; sourceTree = "<group>"; };
 		8308B6D0A816463694E88A7C /* RNGoogleSignin.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNGoogleSignin.xcodeproj; path = "../node_modules/react-native-google-signin/ios/RNGoogleSignin.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
@@ -574,7 +568,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */,
-				54584430C9D40EAB91B2F56D /* libPods-adourappTests.a in Frameworks */,
 				FAADA77099C8AB02EDC4F23F /* libPods-chillmateTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -628,7 +621,6 @@
 				2D02E4C71E0B4AEC006451C7 /* libRCTText-tvOS.a in Frameworks */,
 				2D02E4C81E0B4AEC006451C7 /* libRCTWebSocket-tvOS.a in Frameworks */,
 				ACDEE24BC05243BC95D513D0 /* libRNVectorIcons-tvOS.a in Frameworks */,
-				50F050BC9A00857A0FBE722B /* libPods-adourapp-tvOS.a in Frameworks */,
 				78D8B20369A8FA97682C8B4C /* libPods-chillmate-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -638,7 +630,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */,
-				2BB86294B54D1DB852700007 /* libPods-adourapp-tvOSTests.a in Frameworks */,
 				00CD73BDCA8E96366713B563 /* libPods-chillmate-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -784,9 +775,6 @@
 				79331F9522A40EDF003FC251 /* JavaScriptCore.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				607D3E904A5D501889D5FB8C /* libPods-adourapp.a */,
-				4C6A1D414F5AB93A52E4EB64 /* libPods-adourapp-tvOS.a */,
-				7BAE18F846F78A393B2DCB8E /* libPods-adourapp-tvOSTests.a */,
-				5FD66A0E97785770840242FE /* libPods-adourappTests.a */,
 				FCBB1219A849214A60025F7C /* libPods-chillmate.a */,
 				8C7F167125BA25BCC7034835 /* libPods-chillmate-tvOS.a */,
 				B6CDC70030F3A22EA1BD5DAA /* libPods-chillmate-tvOSTests.a */,
@@ -1755,8 +1743,6 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-chillmate/Pods-chillmate-resources.sh",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
@@ -1764,8 +1750,6 @@
 				"${PODS_ROOT}/RSKImageCropper/RSKImageCropper/RSKImageCropperStrings.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",

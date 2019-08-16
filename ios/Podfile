@@ -31,6 +31,8 @@ target 'chillmate' do
 
   pod 'Firebase/Functions', '~> 5.20.1'
 
+  Pod
+
   pod 'Firebase/Auth', '~> 5.20.1'
 
   pod 'Firebase/Messaging', '~> 5.20.1'
@@ -38,6 +40,8 @@ target 'chillmate' do
   pod 'Firebase/Database', '~> 5.20.1'
 
   pod 'Firebase/Storage', '~> 5.20.2'
+
+  pod 'GoogleIDFASupport', '~> 3.14.0'
 
   pod 'RNImageCropPicker', :path =>  '../node_modules/react-native-image-crop-picker'
 
