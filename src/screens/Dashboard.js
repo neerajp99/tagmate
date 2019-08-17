@@ -291,12 +291,19 @@ class DashboardScreen extends Component {
         const uid = this.state.uid;
         let notifications = 0;
         let badgeColor = 'success'; // this is to change the color of the badge according to whether its a chat notif or a interested people notif
+
+        if (item.unreadMsgs != undefined){
+          notifications = item.unreadMsgs;
+        }
+
+        /*
         if(interestedCount != null && interestedCount != undefined && item.status == 0){
           notifications = interestedCount;
           badgeColor = 'primary';
         } else if (item.status != 0 && item.unreadMsgs != undefined){
           notifications = item.unreadMsgs;
         }
+        */
 
         // Find appropriate status for current status code:
         var statusStr = 'Not available';

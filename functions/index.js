@@ -152,6 +152,7 @@ exports.createNewPost = functions.https.onCall((data, context) => {
       details: data.details,
       anonymous: data.anonymous,
       customTitle: data.customTitle,
+      link: data.link,
       venue: data.venue,
       dtStart: data.dtStart,
       dtEnd: data.dtEnd,
