@@ -32,7 +32,6 @@ class Loading extends Component {
                  console.log('Not showing onboarding since this is not the first launch')
             }}) // Add some error handling, also you can simply do this.setState({fistLaunch: value == null})
 
-
         //const {setDeviceToken} = this.props
         let {currentUser} = await firebase.auth();
         // If the user exists and does not have to go to OnboardingSplash:

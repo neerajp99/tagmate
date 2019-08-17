@@ -639,8 +639,8 @@ export const addAcceptor = (userId, serviceId, hostId, publicPost) => new Promis
               confRef = firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/confirmedGuests/${userId}`);
               confRef.update({id: userId, guestStatus:1});
               //Increment confirmed count
-              firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/confirmedCount`).transaction(function(interestedCount){
-                return (interestedCount || 0) + 1;
+              firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/confirmedCount`).transaction(function(confirmedCount){
+                return (confirmedCount || 0) + 1;
               });
             }
           })

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Share, ScrollView, Dimensions} from 'react-native';
+import {FlatList, View, Text, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Share, ScrollView, Linking, Platform, Dimensions} from 'react-native';
 import {serverExists, getNetworkId, getBlockedList, undoRejects, saveDeviceToken, addServer, appendHiddenPosts, alreadyAccepted, addAcceptor, removeSelfHostedPosts, getAcceptors, getHiddenPosts} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Notification from '../lib/Notification';
@@ -80,6 +80,7 @@ class HomeScreen extends Component {
               this.setState({networkId, blockedList, hiddenPosts});
               this.getMyTasks();
               this.blockedListListener();
+              this.checkAppVersion();
               //this.rewindListener();
             })
           })
@@ -161,6 +162,48 @@ class HomeScreen extends Component {
           }
     }
 
+    updateApp = () => {
+      if(Platform.OS === 'android'){
+        Linking.openURL('https://play.google.com/store/apps/details?id=com.chillmate')
+      }else if (Platform.OS === 'ios'){
+        Linking.openURL('https://apps.apple.com/ca/app/instajude/id1468743902')
+      }else{
+        console.log('error updating app')
+        Alert.alert(
+        'Error',
+        'Error updating. Please go to Google Play Store and update the app manually.',
+        [
+          {text: 'Exit', onPress: () => this.props.navigation.navigate('BlockAccess', {reason: 'You are using an outdated version of the app. Please update it by going to Google Play Store or Apple App Store.'})}
+        ]
+      );
+      }
+    }
+
+    //If there is a change in blocked list while the user is on this screen, update the blockedList state
+    checkAppVersion = () => {
+      let installedVersion = '1.59.1';
+      //Currently only taking care of when the user blocks someone new. Does not work when user unblocks. S/he must reload the app in that case.
+      let ref = firebase.database().ref(`specs/versionName`);
+      //When the user blocks someone new
+      ref.on('value', (snapshot) => {
+        //If there is a change, use the function getBlockedList to create the updated combined blockedList
+          //Remove any posts hosted by the blockedUid
+          let versionName = snapshot.val();
+          if(installedVersion != versionName){
+            Alert.alert(
+            'Outdated version',
+            'Please update the app.',
+            [
+              {text: 'Exit', onPress: () => this.props.navigation.navigate('BlockAccess', {reason: 'You are using an outdated version of the app. Please update it by going to Google Play Store or Apple App Store.'})},
+              {text: 'Update', onPress: () => this.updateApp()}
+            ]
+          );
+          this.props.navigation.navigate('BlockAccess', {reason: 'You are using an outdated version of the app. Please update it by going to Google Play Store or Apple App Store.'});
+          }
+      })
+
+    }
+
     //If there is a change in blocked list while the user is on this screen, update the blockedList state
     blockedListListener = () => {
       //Currently only taking care of when the user blocks someone new. Does not work when user unblocks. S/he must reload the app in that case.
@@ -190,6 +233,15 @@ class HomeScreen extends Component {
         if(snapshot.val() != undefined){
           if(snapshot.val() === true){
             this.setState({isSoftBlocked: true});
+          }
+        }
+      })
+
+      //Check if the current user is hardBlocked
+      firebase.database().ref(`users/${uid}/isHardBlocked`).on('value', (snapshot) => {
+        if(snapshot.val() != undefined){
+          if(snapshot.val() === true){
+            this.props.navigation.navigate('BlockAccess', {reason: 'Your account has been temporarily suspended. This may happen when you violate our Terms of Use. Please email support@tagmateapp.com for queries.'})
           }
         }
       })

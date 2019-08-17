@@ -8,6 +8,7 @@ export * from './Support';
 export * from './PrivacyPolicy'
 export * from './ViewImage'
 export * from './ToS'
+export * from './BlockAccess'
 export * from './ViewURLHome'
 export * from './PostDetails'
 export RequestScreen from './Request';

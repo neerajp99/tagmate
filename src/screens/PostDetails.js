@@ -80,7 +80,7 @@ class PostDetails extends Component {
 
       const {item} = this.state;
 
-      if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) || (item.publicPost === false && item.status === 0 && item.confirmedCount > 0 && !this.state.optedOut) ){
+      if( (item.publicPost === true && item.confirmedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) || (item.publicPost === false && item.status === 0 && item.confirmedCount > 0 && !this.state.optedOut) ){
         console.log(' *********** INSIDE IF CONDITION')
         if(this._isMounted) this.setState({ showChat: true});
         this.getConfirmedGuests();
@@ -143,7 +143,7 @@ class PostDetails extends Component {
         console.log('this.state.showChat: ', this.state.showChat)
         console.log('this.state.item.publicPost: ', item.publicPost)
 
-        if( (item.publicPost === true && item.interestedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) || (item.publicPost === false && item.status === 0 && item.confirmedCount > 0 && !this.state.optedOut) ){
+        if( (item.publicPost === true && item.confirmedCount > 0 && !this.state.optedOut) || (item.publicPost === false && item.status === 1 && !this.state.optedOut) || (item.publicPost === false && item.status === 0 && item.confirmedCount > 0 && !this.state.optedOut) ){
           if(this._isMounted) this.setState({ showChat: true});
         }
 
