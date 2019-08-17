@@ -81,6 +81,7 @@ class HomeScreen extends Component {
               this.getMyTasks();
               this.blockedListListener();
               this.checkAppVersion();
+              this.remotePopups();
               //this.rewindListener();
             })
           })
@@ -92,6 +93,7 @@ class HomeScreen extends Component {
     componentWillUnmount()
     {
         this._isMounted = false;
+        clearTimeout(this.timeoutHandle);
     }
 
     async tokenFunc(uid) {
@@ -162,7 +164,7 @@ class HomeScreen extends Component {
           }
     }
 
-    updateApp = () => {
+    openAppStore = () => {
       if(Platform.OS === 'android'){
         Linking.openURL('https://play.google.com/store/apps/details?id=com.chillmate')
       }else if (Platform.OS === 'ios'){
@@ -195,12 +197,84 @@ class HomeScreen extends Component {
             'Please update the app.',
             [
               {text: 'Exit', onPress: () => this.props.navigation.navigate('BlockAccess', {reason: 'You are using an outdated version of the app. Please update it by going to Google Play Store or Apple App Store.'})},
-              {text: 'Update', onPress: () => this.updateApp()}
+              {text: 'Update', onPress: () => this.openAppStore()}
             ]
           );
           this.props.navigation.navigate('BlockAccess', {reason: 'You are using an outdated version of the app. Please update it by going to Google Play Store or Apple App Store.'});
           }
       })
+    }
+
+    userHappy = () => {
+
+      //Save metrics
+      firebase.database().ref(`users/${uid}`).update({userHappy: true}).then(res => {
+        firebase.database().ref(`admin/happyUsers`).transaction(function(happyUsers){
+          return (happyUsers || 0) + 1;
+        });
+      })
+
+      Alert.alert(
+      'Rate Us',
+      'Would you mind rating us? It will help us a lot.',
+      [
+        {text: 'Not Now', onPress: () => AsyncStorage.setItem('feedbackProvided', "false")},
+        {text: 'Sure', onPress: () => {
+          AsyncStorage.setItem('feedbackProvided', "true");
+          this.openAppStore();
+        }}
+      ]
+    );
+
+  }
+
+  sendFeedback = () => {
+      AsyncStorage.setItem('feedbackProvided', "true");
+      Linking.openURL('mailto:support@tagmateapp.com?subject=Feedback');
+  }
+
+  userUnhappy = () => {
+    //Save metrics
+    firebase.database().ref(`users/${uid}`).update({userHappy: false}).then(res => {
+      firebase.database().ref(`admin/unhappyUsers`).transaction(function(unhappyUsers){
+        return (unhappyUsers || 0) + 1;
+      });
+    })
+
+    Alert.alert(
+    'Send Us Feedback',
+    'Tell us where we went wrong. Let us know how we can fix this.',
+    [
+      {text: 'Not Now', onPress: () => AsyncStorage.setItem('feedbackProvided', "false")},
+      {text: 'Send Feedback', onPress: () => this.sendFeedback()}
+    ]
+  );
+  }
+
+    remotePopups = () => {
+
+      //REMOTE FEEDBACK START
+      this.timeoutHandle = setTimeout(()=>{
+        //Check if the user has already provided feedback
+            AsyncStorage.getItem("feedbackProvided").then(value => {
+              if(value == null || value == "false"){
+                 let ref = firebase.database().ref(`admin/requestFeedback`);
+                 ref.on('value', (snapshot) => {
+                     let requestFeedback = snapshot.val();
+                     if(requestFeedback == true){
+                       Alert.alert(
+                       'Feedback',
+                       'Do you enjoy using Tagmate?',
+                       [
+                         {text: 'No', onPress: () => this.userUnhappy()},
+                         {text: 'Yes', onPress: () => this.userHappy()}
+                       ]
+                     );
+                     }
+                 })
+            }})
+         }, 3000);
+      //REMOTE FEEDBACK END
 
     }
 
