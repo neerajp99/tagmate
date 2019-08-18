@@ -483,3 +483,36 @@ exports.sendUnreadPushNotification = functions.database
       }
 
   });
+
+  exports.onDeletePost = functions.database
+  .ref('networks/{networkId}/allPosts/{postId}')
+  .onDelete((snapshot, context) => {
+      const {postId, networkId} = context.params;
+      if (!postId || !networkId) {
+          return console.log('missing mandatory params for sending push.')
+      }
+      let post = snapshot.val();
+      //we remove it from livePosts
+      admin.database().ref(`networks/${networkId}/livePosts/${postId}`).remove();
+      //Delete the duplicate post for the host
+      return admin.database().ref(`/users/${post.hostId}/posts/host/${postId}`).remove().then(res => {
+        console.log('Deleted host post')
+        //Now update the duplicate post for all the confirmed guests
+        let guestIds = [];
+        let confGuestItems = Object.keys(post.confirmedGuests).map(function(key) {
+            return post.confirmedGuests[key];
+        });
+        confGuestItems.map(guest => {
+          guestIds.push(guest.id)
+        })
+        let promises = []
+        for(let i=0; i<guestIds.length; i++){
+          let guestId = guestIds[i];
+          promise = admin.database().ref(`/users/${guestId}/posts/guest/${post.id}`).remove();
+          promises.push(promise);
+        }
+        return Promise.all(promises).then(() => {
+          console.log('final Promise returned')
+        })
+      })
+  });
