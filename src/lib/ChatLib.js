@@ -1,5 +1,5 @@
 import firebase from "react-native-firebase";
-import {getUserThumbnail, getFullName} from './firebaseUtils'
+import {getUserThumbnail, getFullName, resetUnreadCount} from './firebaseUtils'
 
 class ChatLib {
   uid = "";
@@ -93,7 +93,16 @@ class ChatLib {
             createdAt: firebase.database.ServerValue.TIMESTAMP
           });
         }
-        this.incrementUnread(userList);
+        const incrementUnread = firebase.functions().httpsCallable('incrementUnread');
+        incrementUnread({userList: userList, taskId: this.taskId})
+        .then(({ data }) => {
+          console.log('[Client] Server successfully posted')
+        })
+        .catch(HttpsError => {
+            console.log(HttpsError.code); // invalid-argument
+        })
+
+        //this.incrementUnread(userList); //local function not using. Using cloud function instead
       }else{
         alert('Please check your internet connection and try again')
       }
@@ -104,22 +113,23 @@ class ChatLib {
   //Reset unread msg count for this user
   resetUnread(taskId){
     const {currentUser: {uid} = {}} = firebase.auth()
-    ref = firebase.database().ref(`/users/${uid}/messages/${taskId}`);
-    ref.set({taskId: taskId, unreadCount: 0});
+    resetUnreadCount(uid, taskId);
   }
 
+/*
   //Increment unread msg count for all users
   incrementUnread(userList){
 
+    //TODO: Only do this if the user has not opted out
+    //Should move this to cloud function
     for(let i = 0; i< userList.length; i++){
       console.log('I have incremented unread counts for these users: ', userList[i]);
-
       firebase.database().ref(`/users/${userList[i]}/messages/${this.taskId}/unreadCount`).transaction(function(unreadCount){
         return (unreadCount || 0) + 1;
       });
     }
-
   }
+  */
 
 
   // close the connection to the Backend

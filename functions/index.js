@@ -61,6 +61,42 @@ exports.generateThumbnail = functions.storage.object().onFinalize(async (object)
   return fs.unlinkSync(tempFilePath);
 });
 
+//When a message is sent, increment the unread count to send a notification
+exports.incrementUnread = functions.https.onCall((data, context) => {
+  if (!data.userList || !data.taskId) {
+      throw new functions.https.HttpsError(
+        'invalid-argument', // code
+        'Please ensure you have filled all the fields' // message
+      );
+  }
+  for(let i = 0; i< data.userList.length; i++){
+    console.log('I have incremented unread counts for these users: ', data.userList[i]);
+    admin.database().ref(`/users/${data.userList[i]}/messages/${data.taskId}/unreadCount`).transaction(function(unreadCount){
+      return (unreadCount || 0) + 1;
+    });
+    //Push Notification START
+    const payload = {
+        notification: {
+            title: 'You have new messages!',
+            body: `Tap to respond`
+        },
+        data: {
+            taskId: data.taskId,
+            notifType: 'OPEN_CHAT',
+        }
+    };
+    return admin.database().ref(`/users/${data.userList[i]}/deviceTokens`).once('value', (tokenSnapshot) => {
+      let deviceTokens = tokenSnapshot.val()
+      if(deviceTokens != null){
+        return admin.messaging().sendToDevice(deviceTokens, payload);
+      }else{
+        console.log('deviceTokens is null');
+        return 0;
+      }
+    })
+    //Push notification END
+  }
+})
 
 //Takes care of what happens when a user presses Mark As Done button on DashboardScreen
 exports.markRequestDone = functions.https.onCall((data, context) => {
@@ -322,6 +358,7 @@ exports.sendUnreadPushNotification = functions.database
     }
 
 });
+
 
 // TODO : Debug. Function is throwing errors
 //This function sends push notifications when there are new unread chat messages for this user. This function is not working as of now

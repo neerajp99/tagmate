@@ -701,6 +701,15 @@ export const markRequestDone = (id, uid) => new Promise((resolve, reject) => {
     }
 })
 
+export const resetUnreadCount = (uid, id) => new Promise((resolve, reject) => {
+    try {
+        ref = firebase.database().ref(`/users/${uid}/messages/${id}`);
+        ref.set({id: id, unreadCount: 0});
+    } catch (e) {
+        reject(e)
+    }
+})
+
 // Expects current user ID UID, Task id ID and whether the user is a client boolean isClient
 // Marks service request cancelled
 export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve, reject) => {
@@ -710,17 +719,22 @@ export const markRequestCancelled = (uid, id, isClient) => new Promise((resolve,
           if(isClient){
             ref.update({status:3}).then(res => {
               //incUserDarkScore(uid, 2);
-              deletePostFromUser(uid, id, 'host').then(lastRes => {
-                resolve(true)
+              deletePostFromUser(uid, id, 'host').then(resB => {
+                //Reset unread count for this blob
+                resetUnreadCount(uid, id).then(resC => {
+                  resolve(true)
+                })
               })
             })
 
           }else{
             //Guest is cancelling
-            ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3}).then(res => {
-              deletePostFromUser(uid, id, 'guest').then(secRes => {
-                incUserDarkScore(uid, 1).then(lastRes => {
-                  resolve(true)
+            ref.child(`confirmedGuests/${uid}`).update({guestStatus: 3}).then(resA => {
+              deletePostFromUser(uid, id, 'guest').then(resB => {
+                incUserDarkScore(uid, 1).then(resC => {
+                  resetUnreadCount(uid, id).then(resD => {
+                    resolve(true)
+                  })
                 })
                 //Also add it to the users decided upon list
                 //appendHiddenPosts(uid, id); no longer needed since the post was already removed from this user's livePosts object when he or she swiped right

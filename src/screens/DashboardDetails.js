@@ -281,10 +281,15 @@ class DashboardDetails extends Component {
   openChat = (item) =>
   {
     //create an array of all users involved so that we can increment their unread message count later
+    //TODO make sure guestStatus is 1 before pushing
+    //
+    //
     let usersInvolved = [];
     this.state.confirmedGuestList.map(guest =>
       {
-        usersInvolved.push(guest.id);
+        if(guest.guestStatus === 1){
+          usersInvolved.push(guest.id);
+        }
       })
     usersInvolved.push(item.hostId);
     console.log('usersInvolved', usersInvolved);
