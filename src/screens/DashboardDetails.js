@@ -507,7 +507,7 @@ class DashboardDetails extends Component {
                    titleStyle={adourStyle.btnTextSmall}
                    title="More Info" />}
 
-                   <Button
+                   {item.dtStart != '' && item.dtEnd != '' && <Button
                    icon={{
                            name: "link",
                            size: 15,
@@ -516,7 +516,7 @@ class DashboardDetails extends Component {
                    onPress={() => this.addToGoogleCalendar(item)}
                    buttonStyle={adourStyle.btnShare}
                    titleStyle={adourStyle.btnTextSmall}
-                   title="Add to My Google Calendar" />
+                   title="Add to My Google Calendar" />}
 
                    { item.status === 0 && <Button
                    icon={{

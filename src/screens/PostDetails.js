@@ -483,7 +483,7 @@ class PostDetails extends Component {
                   titleStyle={adourStyle.btnTextSmall}
                   title="More Info" />}
 
-                  <Button
+                  {item.dtStart != '' && item.dtEnd != '' && <Button
                   icon={{
                           name: "link",
                           size: 15,
@@ -492,7 +492,7 @@ class PostDetails extends Component {
                   onPress={() => this.addToGoogleCalendar(item)}
                   buttonStyle={adourStyle.btnShare}
                   titleStyle={adourStyle.btnTextSmall}
-                  title="Add to My Google Calendar" />
+                  title="Add to My Google Calendar" />}
 
                   {/* Timestamp DISABLED - throwing error
                   <View style={styles.subContent} key={item.id}>

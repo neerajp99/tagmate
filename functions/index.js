@@ -461,8 +461,7 @@ exports.sendUnreadPushNotification = functions.database
       if (!postId || !networkId) {
           return console.log('missing mandatory params for sending push.')
       }
-      console.log('change.before.val().status :', change.before.val().status);
-      console.log('change.after.val().status :', change.after.val().status);
+      console.log('change detected in post ID: ', postId);
       /*
       //if the post is no longer live, remove it from the livePosts reference object
       if(change.before.val().status == 0 && change.after.val().status != 0){
@@ -483,11 +482,8 @@ exports.sendUnreadPushNotification = functions.database
         //we remove it from livePosts
         console.log('post status > 0. Removing from livePosts')
         admin.database().ref(`networks/${networkId}/livePosts/${postId}`).remove();
-
-        console.log('Post change detected.')
         //Update the duplicate post for the host
         return admin.database().ref(`/users/${post.hostId}/posts/host/${postId}`).update(post).then(res => {
-          console.log('Updated host post')
 
           //Now update the duplicate post for all the confirmed guests
           let guestIds = [];
@@ -495,7 +491,9 @@ exports.sendUnreadPushNotification = functions.database
               return post.confirmedGuests[key];
           });
           confGuestItems.map(guest => {
-            guestIds.push(guest.id)
+            if(guest.guestStatus == 1){
+              guestIds.push(guest.id);
+            }
           })
           let promises = []
           for(let i=0; i<guestIds.length; i++){
