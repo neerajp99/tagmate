@@ -279,7 +279,6 @@ export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
     }
 })
 
-// get the list of all the task IDs that this user has rejected or accepted
 export const getBlockedList = (uid) => new Promise((resolve, reject) => {
     try {
         let blockedList = [];
@@ -643,36 +642,37 @@ export const addAcceptor = (userId, serviceId, hostId, publicPost) => new Promis
                 return (confirmedCount || 0) + 1;
               });
             }
+          }).then(mainRes => {
+              //Get first name of this particular acceptor
+              getName(userId).then(firstName=>
+              {
+                const first = firstName;
+                //Get last name of this particular acceptor
+                getLastName(userId).then(lastName=>
+                {
+                  getThumbURL(userId).then(thumbnail => {
+                    const fullName = `${firstName} ${lastName}`;
+                    ref.update({fullName: fullName, thumbnail: thumbnail}).then(upRes => {
+                      if(publicPost) confRef.update({fullName: fullName, thumbnail: thumbnail});
+                    })
+                  })
+                });
+              });
+              console.log('inside add acceptor')
+              appendHiddenPosts(userId, serviceId, true);
+
+              //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
+              //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
+
+              //Increment interested count for this task
+              firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/interestedCount`).transaction(function(interestedCount){
+                return (interestedCount || 0) + 1;
+              });
+              console.log('pushed user to acceptor list')
+              resolve(true)
+
+            })
           })
-          //Get first name of this particular acceptor
-          getName(userId).then(firstName=>
-          {
-            const first = firstName;
-            //Get last name of this particular acceptor
-            getLastName(userId).then(lastName=>
-            {
-              getThumbURL(userId).then(thumbnail => {
-                const fullName = `${firstName} ${lastName}`;
-                ref.update({fullName: fullName, thumbnail: thumbnail})
-                if(publicPost) confRef.update({fullName: fullName, thumbnail: thumbnail})
-              })
-            });
-          });
-          console.log('inside add acceptor')
-          appendHiddenPosts(userId, serviceId, true);
-
-          //Since the user has accepted this post, we won't be showing this on the user's live post screen anymore
-          //firebase.database().ref(`/users/${userId}/livePosts/${serviceId}`).remove();
-
-          //Increment interested count for this task
-          firebase.database().ref(`networks/${networkId}/allPosts/${serviceId}/interestedCount`).transaction(function(interestedCount){
-            return (interestedCount || 0) + 1;
-          });
-          console.log('pushed user to acceptor list')
-          resolve(true)
-
-        })
-
     } catch (e) {
         reject(e)
     }
@@ -705,6 +705,15 @@ export const resetUnreadCount = (uid, id) => new Promise((resolve, reject) => {
     try {
         ref = firebase.database().ref(`/users/${uid}/messages/${id}`);
         ref.set({id: id, unreadCount: 0});
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const resetUnreadCountDirect = (uid, id) => new Promise((resolve, reject) => {
+    try {
+        ref = firebase.database().ref(`/users/${uid}/directMessages/${id}`);
+        ref.set({uid: id, unreadCount: 0});
     } catch (e) {
         reject(e)
     }
@@ -801,6 +810,14 @@ export const getAvatar = (userId) => new Promise((resolve, reject) => {
 export const isVerified = (userId) => new Promise((resolve, reject) => {
     try {
         firebase.database().ref(`/users/${userId}/verified`).once("value", function(verified){resolve(verified.val());})
+    } catch (e) {
+        reject(e)
+    }
+})
+
+export const allowsDM = (userId) => new Promise((resolve, reject) => {
+    try {
+        firebase.database().ref(`/users/${userId}/dmAllow`).once("value", function(dmAllow){resolve(dmAllow.val());})
     } catch (e) {
         reject(e)
     }
@@ -990,7 +1007,7 @@ export const massJobs = () => {
   .then(function(snapshot) {
     snapshot.forEach(function(childSnapshot) {
       const uid = childSnapshot.key;
-      firebase.database().ref(`users/${uid}/messages`).remove();
+      firebase.database().ref(`users/${uid}`).update({dmAllow: true});
       //const profilePic = childSnapshot.val().profilePicture;
       //firebase.database().ref(`users/${uid}/hiddenPosts`).remove();
 

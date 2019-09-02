@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image, Alert, ScrollView} from 'react-native';
-import { ListItem, Card, Divider, Avatar, Icon as IconElements } from 'react-native-elements';
+import { ListItem, Card, Divider, Button, Avatar, Icon as IconElements } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ActionSheet from 'react-native-actionsheet'
 import AddDetails from './auth/AddDetails';
-import {getCoins, getBio, getFullName, getAvatar, isVerified, getName, listenForChange, getBlockedList} from '../lib/firebaseUtils.js';
+import {getCoins, getNetworkId, getBio, getFullName, getAvatar, allowsDM, isVerified, getName, listenForChange, getBlockedList} from '../lib/firebaseUtils.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_ONE} from './style/AdourStyle';
 
@@ -27,6 +27,7 @@ class ViewProfile extends Component{
       bio: '_____ _____ _____ ___ ______',
       photoURL: PLACEHOLDER_AVATAR,
       isVerified: false,
+      dmAllow: false,
       selectedOption: '',
       blocked: false, //if blocked is false the profile is displayed, if it is true, it means this user is blocked and hence we will not show this profile
     }; // Message to show while Adour coins are being loaded
@@ -44,6 +45,7 @@ class ViewProfile extends Component{
     let user = firebase.auth().currentUser;
     if (user != null) {
       let uid = user.uid;
+      this.uid = user.uid;
       getBlockedList(uid).then(blockedList => {
         if(blockedList.includes(profileUid)){
           if(this._isMounted) this.setState({blocked: true})
@@ -56,7 +58,9 @@ class ViewProfile extends Component{
         getAvatar(profileUid).then(photoURL => {
           getCoins(profileUid).then(coins => {
             isVerified(profileUid).then(isVerified => {
-              if(this._isMounted) this.setState({displayName, bio, coins, photoURL, isVerified, loading: false});
+              allowsDM(profileUid).then(dmAllow => {
+                if(this._isMounted) this.setState({displayName, bio, coins, photoURL, isVerified, dmAllow, loading: false});
+              })
             })
           })
         })
@@ -107,6 +111,22 @@ class ViewProfile extends Component{
       alert('Please signin')
       this.props.navigation.navigate('Login')
     }
+  }
+
+  openChat = () =>
+  {
+    let targetUid = this.state.profileUid;
+
+    getName(this.uid).then(selfName=>
+    {
+      getNetworkId(this.uid).then(networkId => {
+        this.props.navigation.navigate("DirectChat", {
+          name: selfName,
+          networkId: networkId,
+          targetUid: targetUid
+        })
+      })
+    });
   }
 
   onReportPress = () => {
@@ -187,6 +207,18 @@ class ViewProfile extends Component{
               <Text style={adourStyle.reputationText}> {this.state.coins}</Text>
               </View>
 
+              {this.state.dmAllow && (this.state.profileUid != this.uid) && <Button
+                  icon={{
+                          name: "link",
+                          size: 15,
+                          color: "white"
+                        }}
+                  onPress={() => this.openChat()}
+                  buttonStyle={adourStyle.btnShare}
+                  loading={this.state.loadingBtn}
+                  titleStyle={adourStyle.btnTextSmall}
+                  title="Direct Message" />}
+
               <View style={{marginTop: 15}}>
               <Divider style={{marginBottom: 4}} />
                 <Text style={adourStyle.cardTitleSmall}>Bio</Text>
@@ -198,7 +230,7 @@ class ViewProfile extends Component{
             }
             </Card>
 
-        <View style={{marginTop: 25}} />
+        <View style={{marginTop: 25, backgroundColor: '#eceff1'}} />
       </View>
       </ScrollView>
     )
@@ -209,7 +241,8 @@ const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
     paddingLeft: 15,
-    paddingRight: 8
+    paddingRight: 8,
+    backgroundColor: '#eceff1'
   },
   btn: {
     width: WIDTH - 20,

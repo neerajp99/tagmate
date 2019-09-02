@@ -3,6 +3,7 @@ package com.chillmate;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.sha256lib.Sha256Package;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
@@ -37,6 +38,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new Sha256Package(),
             new PickerPackage(),
             new ImagePickerPackage(),
             new AsyncStoragePackage(),

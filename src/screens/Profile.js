@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator, Linking, Image, ScrollView} from 'react-native';
-import { ListItem, Card, Divider, Avatar, Icon as IconElements } from 'react-native-elements';
+import { ListItem, Card, Divider, Avatar, CheckBox, Icon as IconElements } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -15,6 +15,7 @@ import OfflineNotice from './OfflineNotice';
 
 const { width: WIDTH } = Dimensions.get('window')
 const PLACEHOLDER_AVATAR = "https://firebasestorage.googleapis.com/v0/b/chillmate-241a3.appspot.com/o/general%2Favatar.jpg?alt=media&token=4dcdfa81-fea1-4106-9306-26d67f55d62c";
+let uid;
 
 class ProfileScreen extends Component{
   constructor(props) {
@@ -25,6 +26,7 @@ class ProfileScreen extends Component{
       displayName: '_____ _____',
       networkId: '',
       isVerified: false,
+      dmAllow: true,
       bio: '_____ _____ _____ ___ ______',
       photoURL: PLACEHOLDER_AVATAR
     }; // Message to show while Adour coins are being loaded
@@ -45,6 +47,7 @@ class ProfileScreen extends Component{
     //Fetching name and photo URL
     let user = firebase.auth().currentUser;
     if (user != null) {
+      uid = user.uid;
 
       getNetworkId(user.uid).then(networkId => {
         getFullName(user.uid).then(displayName => {
@@ -124,6 +127,12 @@ class ProfileScreen extends Component{
     });
   }
 
+  dmAllowToggle = () => {
+    firebase.database().ref(`/users/${uid}`).update({dmAllow: !this.state.dmAllow})
+    //this.setState({dmAllow: !this.state.dmAllow})
+
+  }
+
   //For Image picking
   uploadImage(image) {
     //console.log("FirebaseStorageService :: image.path ", image.path );
@@ -177,7 +186,14 @@ class ProfileScreen extends Component{
           if(this._isMounted) this.setState({bio: snapshot.val() || ""});
         }.bind(this));
 
+        //Get DM Allow
+        firebase.database().ref(`/users/${uid}/dmAllow`).on("value", function(snapshot)
+        {
+          if(this._isMounted) this.setState({dmAllow: snapshot.val()});
+        }.bind(this));
+
       }
+
 
 
 
@@ -244,13 +260,31 @@ class ProfileScreen extends Component{
             onPress={() => this.props.navigation.navigate('BlockList')}
           />
           <ListItem
-            title='Support'
+            title='Direct Messages'
+            titleStyle={adourStyle.listItemText}
+            leftIcon={{ name: 'block' }}
+            containerStyle={{borderBottomColor: '#e6e6e6'}}
+            onPress={() => this.props.navigation.navigate('DirectMessages')}
+          />
+          <ListItem
+            title='Customer Support'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'help-outline' }}
             containerStyle={{borderBottomColor: '#e6e6e6'}}
             onPress={() => this.props.navigation.navigate('SupportScreen')}
           />
 
+          </Card>
+
+          <Card>
+          <CheckBox
+            title='Allow Private Messages'
+            containerStyle={{backgroundColor: 'white'}}
+            fontFamily='OpenSans'
+            titleProps={adourStyle.listItemText}
+            checked={this.state.dmAllow}
+            onPress={() => this.dmAllowToggle()}
+          />
           </Card>
 
           <Card title="Legal" titleStyle={adourStyle.cardTitleSmall}>
@@ -306,7 +340,8 @@ const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
     paddingLeft: 15,
-    paddingRight: 8
+    paddingRight: 8,
+    backgroundColor: '#eceff1'
   },
   btn: {
     width: WIDTH - 20,

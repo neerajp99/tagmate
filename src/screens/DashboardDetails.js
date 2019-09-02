@@ -667,7 +667,8 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
     },
     mainContainer: {
-        flex: 1
+        flex: 1,
+        backgroundColor: '#eceff1'
     },
     progressContainer: {
         width: 60,

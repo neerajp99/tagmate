@@ -381,7 +381,7 @@ class DashboardScreen extends Component {
                 />
               }
               <View style={{marginBottom:15, marginLeft: 20, marginRight: 20}}>
-              <Button title="Host A Gathering" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
+              <Button title="Host A Meetup" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
               </View>
 
               {
@@ -407,13 +407,15 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: '#eceff1'
     },
     buttonContainer: {
       flex: 1,
       flexDirection: 'row',
     },
     mainContainer: {
-        flex: 1
+        flex: 1,
+        backgroundColor: '#eceff1',
     },
     progressContainer: {
         width: 60,

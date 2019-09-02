@@ -59,6 +59,12 @@ class App extends Component {
         				NavigationActions.navigate({ routeName: 'Chat', params: {taskId: notifData.taskId}})
       					);
                 }
+                else if(notifType == 'OPEN_CHAT_DIRECT')
+                {
+                    this.navigator.dispatch(
+        				NavigationActions.navigate({ routeName: 'ChatDirect', params: {targetUid: notifData.targetUid}})
+      					);
+                }
             }
         }, 1000)
     }

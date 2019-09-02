@@ -4,22 +4,22 @@ import firebase from "react-native-firebase";
 import {connect} from 'react-redux';
 import {chatScreenMounted, chatScreenUnmounted} from '../actions';
 import {getAvatar} from '../lib/firebaseUtils'
-import ChatLib from "../lib/ChatLib";
+import ChatLibDirect from "../lib/ChatLibDirect";
 import ChatMessage from '../lib/ChatMessage';
 import OfflineNotice from './OfflineNotice';
 
 import emojiUtils from 'emoji-utils';
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
-class ActivityChat extends React.Component {
+class DirectChat extends React.Component {
   selfAvatar = "";
 
   constructor(props){
     super(props);
     this.state = {
       name: this.props.navigation.state.params.name,
-      taskId: this.props.navigation.state.params.taskId,
-      userList: this.props.navigation.state.params.userList,
+      networkId: this.props.navigation.state.params.networkId,
+      targetUid: this.props.navigation.state.params.targetUid
     };
   }
   state = {
@@ -27,15 +27,16 @@ class ActivityChat extends React.Component {
   };
 
   componentWillMount() {
-    //ChatLib.resetUnread(this.state.taskId);
+    //ChatLibDirect.resetUnread(this.state.taskId);
   }
 
   componentDidMount() {
-    ChatLib.setTaskId(this.state.taskId);
-    ChatLib.resetUnread(this.state.taskId);
+    ChatLibDirect.setTargetUid(this.state.targetUid);
+    ChatLibDirect.setNetworkId(this.state.networkId);
+    ChatLibDirect.resetUnread(this.state.targetUid);
     this.props.chatScreenMounted();
 
-    firebase.analytics().setCurrentScreen('ActivityChat');
+    firebase.analytics().setCurrentScreen('DirectChat');
     /*
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -48,7 +49,7 @@ class ActivityChat extends React.Component {
     });
     */
 
-    ChatLib.loadMessages(message => {
+    ChatLibDirect.loadMessages(message => {
       this.setState(previousState => {
         return {
           messages: GiftedChat.append(previousState.messages, message)
@@ -99,21 +100,21 @@ class ActivityChat extends React.Component {
           renderAvatarOnTop={true}
           onPressAvatar={(user) => this.props.navigation.navigate('ViewProfile',{profileUid: user._id})}
           onSend={message => {
-            ChatLib.sendMessage(message, this.state.userList);
+            ChatLibDirect.sendMessage(message, this.state.targetUid);
           }}
           user={{
-            _id: ChatLib.getUid(),
-            name: ChatLib.getName(),
-            avatar: ChatLib.getAvatar()
+            _id: ChatLibDirect.getUid(),
+            name: ChatLibDirect.getName(),
+            avatar: ChatLibDirect.getAvatar()
           }}
         />
       </View>
     );
   }
   componentWillUnmount() {
-    ChatLib.resetUnread(this.state.taskId);
+    ChatLibDirect.resetUnread(this.state.targetUid);
     this.props.chatScreenUnmounted();
-    ChatLib.closeChat();
+    ChatLibDirect.closeChat();
   }
 }
 const styles = StyleSheet.create({
@@ -126,4 +127,4 @@ const styles = StyleSheet.create({
 
 //mapStateToProps not needed yet
 
-export default connect(null, {chatScreenMounted, chatScreenUnmounted})(ActivityChat);
+export default connect(null, {chatScreenMounted, chatScreenUnmounted})(DirectChat);

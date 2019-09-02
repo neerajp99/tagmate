@@ -111,12 +111,12 @@ class HomeScreen extends Component {
 
     onShare = (postTitle) => {
     Share.share({
-      message: `Hey, I think you\'ll be interested in attending this gathering: ${postTitle}. RSVP Here: https://tagmateapp.com`,
+      message: `Hey, I think you\'ll be interested in attending this meetup: ${postTitle}. RSVP Here: https://tagmateapp.com`,
       url: 'https://tagmateapp.com',
       title: `${postTitle}`
     }, {
       // Android only:
-      dialogTitle: 'Share this gathering',
+      dialogTitle: 'Share this meetup',
     })
     }
 
@@ -773,7 +773,7 @@ class HomeScreen extends Component {
             <View style={styles.mainContainer}>
             <OfflineNotice />
             <View style={{marginLeft: 20, marginRight: 20}}>
-              <Button title="Host A Gathering" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
+              <Button title="Host A Meetup" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
             </View>
             <CardStack
                 renderNoMoreCards={() => <View style={{marginTop: 50}}>
@@ -828,7 +828,8 @@ export default HomeScreen;
 * */
 const styles = StyleSheet.create({
     mainContainer: {
-        flex: 1
+        flex: 1,
+        backgroundColor: '#eceff1'
     },
     progressContainer: {
         alignItems: 'center',

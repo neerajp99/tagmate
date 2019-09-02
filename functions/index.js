@@ -62,6 +62,40 @@ exports.generateThumbnail = functions.storage.object().onFinalize(async (object)
 });
 
 //When a message is sent, increment the unread count to send a notification
+exports.manualPushNotif = functions.database
+.ref('/admin/manualPush/{postId}/{userId}')
+.onCreate((snapshot, context) => {
+    const postId = context.params.postId;
+    const userId = context.params.userId;
+    if (!userId || !postId) {
+        console.log('missing mandatory params for sending push.')
+        return;
+    }
+    //Push Notification START
+    const payload = {
+        notification: {
+            title: 'You have new messages!',
+            body: `Tap to respond`
+        },
+        data: {
+            taskId: postId,
+            notifType: 'OPEN_CHAT',
+        }
+    };
+    return admin.database().ref(`/users/${userId}/deviceTokens`).once('value', (tokenSnapshot) => {
+      let deviceTokens = tokenSnapshot.val()
+      if(deviceTokens != null){
+        return admin.messaging().sendToDevice(deviceTokens, payload);
+      }else{
+        console.log('deviceTokens is null');
+        return 0;
+      }
+    })
+    //Push notification END
+})
+
+
+//When a message is sent, increment the unread count to send a notification
 exports.incrementUnread = functions.https.onCall((data, context) => {
   if (!data.userList || !data.taskId) {
       throw new functions.https.HttpsError(
@@ -69,10 +103,14 @@ exports.incrementUnread = functions.https.onCall((data, context) => {
         'Please ensure you have filled all the fields' // message
       );
   }
+  console.log('Sending push notifications to: ', data.userList);
   for(let i = 0; i< data.userList.length; i++){
-    console.log('I have incremented unread counts for these users: ', data.userList[i]);
-    admin.database().ref(`/users/${data.userList[i]}/messages/${data.taskId}/unreadCount`).transaction(function(unreadCount){
-      return (unreadCount || 0) + 1;
+
+    admin.database().ref(`/users/${data.userList[i]}/messages/${data.taskId}/unreadCount`).once('value', (unreadSnapshot) => {
+      if(unreadSnapshot != null){
+        let newCount = unreadSnapshot.val() + 1;
+        admin.database().ref(`/users/${data.userList[i]}/messages/${data.taskId}`).update({unreadCount: newCount});
+      }
     });
     //Push Notification START
     const payload = {
@@ -85,7 +123,7 @@ exports.incrementUnread = functions.https.onCall((data, context) => {
             notifType: 'OPEN_CHAT',
         }
     };
-    return admin.database().ref(`/users/${data.userList[i]}/deviceTokens`).once('value', (tokenSnapshot) => {
+    admin.database().ref(`/users/${data.userList[i]}/deviceTokens`).once('value', (tokenSnapshot) => {
       let deviceTokens = tokenSnapshot.val()
       if(deviceTokens != null){
         return admin.messaging().sendToDevice(deviceTokens, payload);
@@ -97,6 +135,46 @@ exports.incrementUnread = functions.https.onCall((data, context) => {
     //Push notification END
   }
 })
+
+//When a message is sent, increment the unread count to send a notification
+exports.incrementUnreadDirect = functions.https.onCall((data, context) => {
+  if (!data.uid || !data.targetUid) {
+      throw new functions.https.HttpsError(
+        'invalid-argument', // code
+        'Please ensure you have filled all the fields' // message
+      );
+  }
+
+    admin.database().ref(`/users/${data.targetUid}/directMessages/${data.uid}/unreadCount`).once('value', (unreadSnapshot) => {
+      if(unreadSnapshot != null){
+        let newCount = unreadSnapshot.val() + 1;
+        admin.database().ref(`/users/${data.targetUid}/directMessages/${data.uid}`).update({unreadCount: newCount, uid: data.uid});
+      }
+    });
+    //Push Notification START
+    const payload = {
+        notification: {
+            title: 'You a new private message!',
+            body: `Tap to respond`
+        },
+        data: {
+            targetUid: data.targetUid,
+            notifType: 'OPEN_CHAT_DIRECT',
+        }
+    };
+    admin.database().ref(`/users/${data.targetUid}/deviceTokens`).once('value', (tokenSnapshot) => {
+      let deviceTokens = tokenSnapshot.val()
+      if(deviceTokens != null){
+        return admin.messaging().sendToDevice(deviceTokens, payload);
+      }else{
+        console.log('deviceTokens is null');
+        return 0;
+      }
+    })
+    //Push notification END
+
+})
+
 
 //Takes care of what happens when a user presses Mark As Done button on DashboardScreen
 exports.markRequestDone = functions.https.onCall((data, context) => {
@@ -275,6 +353,35 @@ exports.notifyHostOnNewGuest = functions.database
   })
 })
 
+exports.onNewDirectMsgConv = functions.database
+.ref('/directMessages/{convId}/')
+.onCreate((snapshot, context) => {
+  const {convId} = context.params;
+  if (!convId) {
+      return console.log('missing mandatory params')
+  }
+
+  let uids = convId.split('_');
+
+  return admin.database().ref(`users/${uids[0]}/directMessages/${uids[1]}`).update({uid: uids[1], unreadCount: 1}).then(res => {
+    return admin.database().ref(`users/${uids[1]}/directMessages/${uids[0]}`).update({uid: uids[0], unreadCount: 1});
+  })
+})
+
+exports.onDirectMsgDelete = functions.database
+.ref('/directMessages/{convId}/')
+.onDelete((snapshot, context) => {
+  const {convId} = context.params;
+  if (!convId) {
+      return console.log('missing mandatory params')
+  }
+
+  let uids = convId.split('_');
+
+  return admin.database().ref(`users/${uids[0]}/directMessages/${uids[1]}`).remove().then(res => {
+    return admin.database().ref(`users/${uids[1]}/directMessages/${uids[0]}`).remove();
+  })
+})
 
 // Send push notification to the host of a livePost whenever interestedCount increments in a multiple of 3
   exports.sendPushNotificationToHost = functions.database
@@ -363,6 +470,7 @@ exports.sendUnreadPushNotification = functions.database
 // TODO : Debug. Function is throwing errors
 //This function sends push notifications when there are new unread chat messages for this user. This function is not working as of now
 // NEW NOTE : only sending to the first user. probably a problem with an extra return. Check history.
+// TODO: Only do this for private posts
   exports.sendFinalizedListNotification = functions.database
   .ref('/networks/{networkId}/allPosts/{pushId}/confirmedGuests/{userId}')
   .onCreate((snapshot, context) => {

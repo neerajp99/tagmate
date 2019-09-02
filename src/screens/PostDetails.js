@@ -544,6 +544,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: '#eceff1'
     },
     subContent: {
       marginTop: 2,
@@ -562,7 +563,8 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
     },
     mainContainer: {
-        flex: 1
+        flex: 1,
+        backgroundColor: '#eceff1'
     },
     progressContainer: {
         width: 60,

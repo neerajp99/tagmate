@@ -1,15 +1,16 @@
 import React from 'react';
-import {Image, View} from 'react-native';
+import {Image, View, Button} from 'react-native';
 import { Icon, Badge } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import firebase from 'react-native-firebase';
 import { createBottomTabNavigator, createSwitchNavigator, createAppContainer, createStackNavigator} from 'react-navigation';
 import IconWithBadge from "./screens/IconWithBadge";
-import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, NewUserSetProfile, ViewURLHome, SupportScreen, PostDetails, ViewGuestList, ViewImage, PrivacyPolicyScreen, ToS, BlockAccess, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
+import {ProfileScreen, EditProfileDetails, ViewProfile, EditBio, NewUserSetProfile, ViewURLHome, SupportScreen, DirectMessages, PostDetails, ViewGuestList, ViewImage, PrivacyPolicyScreen, ToS, BlockAccess, RequestScreen, CreatePost, HomeScreen, BlockList, GuestList, DashboardScreen, DashboardDetails, Loading, Onboarding, OnboardingSplash} from './screens';
 import Login from './screens/auth/Login';
 import SignUp from './screens/auth/SignUp';
 import EmailLogin from './screens/auth/EmailLogin';
 import ActivityChat from './screens/ActivityChat';
+import DirectChat from './screens/DirectChat';
 import {routerStyle, BRAND_COLOR_TWO} from './screens/style/RouterStyle';
 
 
@@ -105,6 +106,17 @@ export const HomeStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: (<Image source={require('./img/logo_black.png')}/>),
+          headerRight: (
+                        <View style={{marginRight: 18}}>
+                        <Icon
+                          name="ios-send"
+                          size={26}
+                          type='ionicon'
+                          onPress={() => navigation.navigate('DirectMessages')}
+                          color="grey"
+                        />
+                        </View>
+                      ),
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -113,7 +125,7 @@ export const HomeStack = createStackNavigator(
       screen: CreatePost,
       navigationOptions: ({navigation}) => {
         return{
-          headerTitle: 'Host A Gathering',
+          headerTitle: 'Host A Meetup',
           headerTitleStyle: routerStyle.headerText
         }
       }
@@ -141,6 +153,24 @@ export const HomeStack = createStackNavigator(
       navigationOptions: ({navigation}) => {
         return{
           headerTitle: 'Website',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    DirectMessages: {
+      screen: DirectMessages,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Direct Messages',
+          headerTitleStyle: routerStyle.headerText
+        }
+      }
+    },
+    DirectChat: {
+      screen: DirectChat,
+      navigationOptions: ({navigation}) => {
+        return{
+          headerTitle: 'Direct Chat',
           headerTitleStyle: routerStyle.headerText
         }
       }

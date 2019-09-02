@@ -204,7 +204,8 @@ const styles = StyleSheet.create({
   backgroundContainer: {
     flex: 1,
     paddingLeft: 15,
-    paddingRight: 8
+    paddingRight: 8,
+    backgroundColor: '#eceff1'
   },
   btn: {
     width: WIDTH - 20,

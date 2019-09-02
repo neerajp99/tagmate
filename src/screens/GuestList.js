@@ -276,6 +276,7 @@ export default GuestList;
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
+        backgroundColor: '#eceff1',
     },
     btnAccept:{
         width: 45,
