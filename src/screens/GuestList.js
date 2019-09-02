@@ -74,6 +74,13 @@ class GuestList extends Component {
     this.props.navigation.navigate('ViewProfile',{profileUid: uid})
   }
 
+  acceptAllGuests = () => {
+      this.state.guestList.map(guest => {
+        console.log(guest);
+        this.acceptGuest(guest.id, guest.guestStatus, guest.fullName, guest.thumbnail);
+      })
+    }
+
     // Home to all the listeners for the guest list object for this serviceRequest ID
     getGuestList = () => {
       if(this._isMounted)
@@ -228,7 +235,7 @@ class GuestList extends Component {
       const {fetching, guestList} = this.state
 
         return (
-          <View style={{flex: 2, marginBottom: 8}}>
+          <View style={{flex: 2, marginBottom: 8, backgroundColor: '#eceff1'}}>
           <ScrollView>
             <View style={styles.mainContainer}>
                 {(guestList.length == 0) && <Text style={adourStyle.defaultText}>No potential guests. Please check back later.</Text>}
@@ -244,6 +251,14 @@ class GuestList extends Component {
                     </View>
                 }
             </View>
+            <Card>
+              <Button
+                onPress={() => { this.acceptAllGuests() }}
+                buttonStyle={{ name: 'info-outline'}}
+                titleStyle={adourStyle.btnTextSmall}
+                title="Accept All Guests"
+              />
+              </Card>
             </ScrollView>
 
             {/* Finalize List button Disabled. Logic changed to allow guests on rolling basis

@@ -250,7 +250,16 @@ class DashboardScreen extends Component {
     // Open Dashboard Details screen for the task the user has tapped.
     openDetails = (item) =>
     {
-      this.props.navigation.navigate('DashboardDetails',{taskId: item.id})
+      getNetworkId(uid)
+        .then(networkId => {
+          firebase
+            .database()
+            .ref(`networks/${networkId}/allPosts/${item.id}`).once("value", (snapshot) => {
+              if (snapshot.val() !== null) {
+                this.props.navigation.navigate('DashboardDetails',{taskId: item.id})
+              }
+            })
+          })
     }
 
     userGuideContainer = (active) =>

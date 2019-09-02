@@ -173,7 +173,7 @@ class ProfileScreen extends Component{
         //Get profile picture
         firebase.database().ref(`/users/${uid}/profilePicture`).on("value", function(snapshot)
         {
-          if(this._isMounted) this.setState({photoURL: snapshot.val() || PLACEHOLDER_AVATAR});
+          if(this._isMounted) this.setState({photoURL: snapshot.val() || PLACEHOLDER_AVATAR, loading: false});
         }.bind(this));
         //Get Reputation
         firebase.database().ref(`/users/${uid}/coins`).on("value", function(snapshot)
@@ -208,17 +208,31 @@ class ProfileScreen extends Component{
       <ScrollView>
       <View style={styles.backgroundContainer}>
             <Card>
-                <View style={{alignItems: 'center', justifyContent: 'center', marginBottom: 8}} >
+              <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 8
+              }}
+            >
+              {this.state.loading ? (
+                <ActivityIndicator />
+              ) : (
                 <Avatar
-                size="xlarge"
-                rounded
-                onPress={() => this.props.navigation.navigate('ViewImage',{imgURL: this.state.photoURL})}
-                editButton={{onPress: this.pickImage.bind(this) }}
-                showEditButton
-                source={{uri: this.state.photoURL}}
-                activeOpacity={0.7}
+                  size="xlarge"
+                  rounded
+                  onPress={() =>
+                    this.props.navigation.navigate("ViewImage", {
+                      imgURL: this.state.photoURL
+                    })
+                  }
+                  editButton={{ onPress: this.pickImage.bind(this) }}
+                  showEditButton
+                  source={{ uri: this.state.photoURL }}
+                  activeOpacity={0.7}
                 />
-                </View>
+              )}
+            </View>
               <View style={{flex: 2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}><Text style={adourStyle.titleTextCenter}>{this.state.displayName}</Text>{this.state.isVerified ? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} style={{marginLeft: 3}} /> : null}</View>
               <View style={{flex:2, flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
               <IconElements name="star-border" type="material" color='grey' />

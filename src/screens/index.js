@@ -9,6 +9,7 @@ export * from './PrivacyPolicy'
 export * from './ViewImage'
 export * from './ToS'
 export * from './BlockAccess'
+export EditEvent from './EditEvent'
 export * from './ViewURLHome'
 export * from './PostDetails'
 export RequestScreen from './Request';

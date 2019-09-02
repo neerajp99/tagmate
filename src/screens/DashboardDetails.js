@@ -481,6 +481,16 @@ class DashboardDetails extends Component {
                           />
                   }
 
+                  {
+                    item.isClient &&
+                    <Button
+                      onPress={() => this.props.navigation.navigate('EditEvent', { item: item })}
+                      buttonStyle={{ name: 'info-outline'}}
+                      titleStyle={adourStyle.btnTextSmall}
+                      title="Edit Event"
+                    />
+                }
+
 
                   {/* Timestamp DISABLED - throwing error
                   <View style={styles.subContent} key={item.id}>
