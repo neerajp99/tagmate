@@ -274,13 +274,6 @@ class ProfileScreen extends Component{
             onPress={() => this.props.navigation.navigate('BlockList')}
           />
           <ListItem
-            title='Direct Messages'
-            titleStyle={adourStyle.listItemText}
-            leftIcon={{ name: 'block' }}
-            containerStyle={{borderBottomColor: '#e6e6e6'}}
-            onPress={() => this.props.navigation.navigate('DirectMessages')}
-          />
-          <ListItem
             title='Customer Support'
             titleStyle={adourStyle.listItemText}
             leftIcon={{ name: 'help-outline' }}

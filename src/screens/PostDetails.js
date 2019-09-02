@@ -422,7 +422,7 @@ class PostDetails extends Component {
     if(item.publicPost === false) eventTypeText = 'Private'
 
     return (
-      <ScrollView>
+      <ScrollView style={{backgroundColor: '#eceff1'}}>
       <View style={styles.mainContainer}>
       <OfflineNotice />
       <Card featuredTitle={item.customTitle} featuredTitleStyle={adourStyle.listItemText} image={{uri: item.bgImage}}>

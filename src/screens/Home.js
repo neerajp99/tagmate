@@ -657,16 +657,16 @@ class HomeScreen extends Component {
           </View>
 
               <ListItem
-              title={anonymous? "Anonymous": hostName}
-              titleStyle={adourStyle.listItemText}
-              subtitle="Host"
-              subtitleStyle={adourStyle.listItemText}
-              leftAvatar={{ source: { uri: hostThumb } }}
-              rightIcon={verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
-              chevron={false}
-              onPress={anonymous? () => alert('The host is anonymous. Can\'t open profile.') : () => this.openProfile(hostId)}
-              containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
-            />
+                title={anonymous? "Anonymous": hostName}
+                titleStyle={adourStyle.listItemText}
+                subtitle="Host"
+                subtitleStyle={adourStyle.listItemText}
+                leftAvatar={{ source: { uri: hostThumb }, onPress: anonymous? () => alert('The host is anonymous. Can\'t open profile.') : () => this.openProfile(hostId)}}
+                rightIcon={verified? <MaterialComIcon name={'check-circle'} size={25} color={'#5C7AFF'} /> : null}
+                onPress={() => this.openInfo(item)}
+                chevron={false}
+                containerStyle={{borderBottomColor: 'transparent', borderBottomWidth: 0}}
+              />
 
 
             {

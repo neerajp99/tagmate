@@ -163,7 +163,7 @@ class ViewProfile extends Component{
 
   render(){
     return(
-      <ScrollView>
+      <ScrollView style={{backgroundColor: '#eceff1'}}>
       <View style={styles.backgroundContainer}>
             <Card>
                 {this.state.blocked? <Text style={adourStyle.defaultText}>Sorry, there was a problem displaying this profile.</Text> :
