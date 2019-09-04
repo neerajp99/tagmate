@@ -549,6 +549,34 @@ exports.sendUnreadPushNotification = functions.database
 
     });
 
+    //HOTFIX
+    exports.onPublicPostAccept = functions.database
+    .ref('/networks/{networkId}/allPosts/{postId}/acceptorIds/{userId}')
+    .onCreate((snapshot, context) => {
+        const postId = context.params.pushId;
+        const userId = context.params.userId;
+        const networkId = context.params.networkId;
+        if (!pushId || !userId || !networkId) {
+            return console.log('missing mandatory param pushId for sending push.')
+        }
+
+        admin.database().ref(`networks/${networkId}/allPosts/${postId}`).once('value', (postSnapshot) => {
+          let post = postSnapshot.val()
+          if(post.publicPost == true){
+            admin.database().ref(`networks/${networkId}/allPosts/${postId}/acceptorIds/${userId}`).once('value', (userSnapshot) => {
+              let {fullName, thumbnail} = userSnapshot.val();
+              return admin.database().ref(`networks/${networkId}/allPosts/${postId}/confirmedGuests/${userId}`).update({
+                id: userId,
+                guestStatus: 1,
+                fullName:fullName,
+                thumbnail: thumbnail
+              })
+            })
+          }
+        })
+
+      });
+
   exports.addLivePosts = functions.database
   .ref('/networks/{networkId}/allPosts/{postId}/')
   .onCreate((snapshot, context) => {
@@ -560,6 +588,18 @@ exports.sendUnreadPushNotification = functions.database
         if(postData.status == 0){
           return admin.database().ref(`networks/${networkId}/livePosts/${postId}`).update(postData)
         }
+  });
+
+  //HOT FIX
+  //When new users join, set their dmAllow to true by default. Rest of the variables are being set locally from Login.js
+  exports.setDirectMsgTrue = functions.database
+  .ref('/users/{userId}/')
+  .onCreate((snapshot, context) => {
+      const {userId} = context.params;
+      if (!userId) {
+          return console.log('missing mandatory params for sending push.')
+      }
+        return admin.database().ref(`users/${userId}`).update({dmAllow: true});
   });
 
   exports.manageLivePosts = functions.database
@@ -606,11 +646,26 @@ exports.sendUnreadPushNotification = functions.database
           let promises = []
           for(let i=0; i<guestIds.length; i++){
             let guestId = guestIds[i];
-            promise = admin.database().ref(`/users/${guestId}/posts/guest/${post.id}`).update(post);
+            promise = admin.database().ref(`/users/${guestId}/posts/guest/${postId}`).update(post);
             promises.push(promise);
           }
+
+          if(post.status > 1){
+            let promisesDel = [];
+            //Update the duplicate post for the host
+            return admin.database().ref(`/networks/${networkId}/allPosts/${postId}/confirmedGuests`).once("value", (snapshot) => {
+               snapshot.forEach(function(childSnapshot) {
+                 promise = admin.database().ref(`/users/${childSnapshot.key}/posts/guest/${postId}`).set(null);
+                 promisesDel.push(promise);
+               })
+               return Promise.all(promisesDel).then(() => {
+                 console.log('Promises DEL returned')
+               })
+            })
+          }
+
           return Promise.all(promises).then(() => {
-            console.log('final Promise returned')
+            console.log('Final Promise returned')
           })
 
         })
@@ -625,6 +680,35 @@ exports.sendUnreadPushNotification = functions.database
         })
       }
 
+  });
+
+//When a post is Marked As Done aka the status is 2, remove it from all guest's dashboard
+  exports.manageDonePosts = functions.database
+  .ref('networks/{networkId}/allPosts/{postId}')
+  .onUpdate((change, context) => {
+      const {postId, networkId} = context.params;
+      if (!postId || !networkId) {
+          return console.log('missing mandatory params for sending push.')
+      }
+      console.log('change detected in post ID: ', postId);
+
+      let post = change.after.val();
+
+      if(post.status > 1){
+        let promises = [];
+        //Update the duplicate post for the host
+        return admin.database().ref(`/networks/${networkId}/allPosts/${postId}/confirmedGuests`).once("value", (snapshot) => {
+           snapshot.forEach(function(childSnapshot) {
+             promise = admin.database().ref(`/users/${childSnapshot.key}/posts/guest/${postId}`).set(null);
+             promises.push(promise);
+           })
+           return Promise.all(promises).then(() => {
+             console.log('final Promise returned')
+           })
+        })
+      }else{
+        return 0;
+      }
   });
 
   exports.onDeletePost = functions.database
@@ -651,7 +735,7 @@ exports.sendUnreadPushNotification = functions.database
         let promises = []
         for(let i=0; i<guestIds.length; i++){
           let guestId = guestIds[i];
-          promise = admin.database().ref(`/users/${guestId}/posts/guest/${post.id}`).remove();
+          promise = admin.database().ref(`/users/${guestId}/posts/guest/${post.id}`).set(null);
           promises.push(promise);
         }
         return Promise.all(promises).then(() => {

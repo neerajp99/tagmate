@@ -616,24 +616,13 @@ class DashboardDetails extends Component {
                   />
           }
 
-          {
-           item.status < 2 &&
                 <Button
                     onPress={()=>this.confirmCancel(item)}
                     buttonStyle={adourStyle.btnCancel}
                     titleStyle={adourStyle.btnText}
                     title={(item.isClient)?"Remove":"Opt Out"}
                 />
-          }
-          {
-           item.status == 3 &&
-                <Button
-                    onPress={()=>this.confirmCancel(item)}
-                    buttonStyle={adourStyle.btnCancel}
-                    titleStyle={adourStyle.btnText}
-                    title={"Remove"}
-                />
-          }
+
         </Card>}
         {
             !item.isClient && !this.state.fetching && <View style={{alignItems: 'center', justifyContent: 'center'}}>

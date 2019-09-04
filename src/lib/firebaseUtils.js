@@ -234,6 +234,7 @@ export const addNetworkDetails = (currentUser) => new Promise((resolve, reject) 
 })
 
 
+
 // get the list of all the task IDs that this user has rejected or accepted
 export const getHiddenPosts = (uid) => new Promise((resolve, reject) => {
     try {
