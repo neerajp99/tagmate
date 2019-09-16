@@ -1,7 +1,7 @@
 // This screen shows tasks hosting and attending by the user.
 
 import React, {Component} from 'react';
-import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, RefreshControl} from 'react-native';
+import {FlatList, View, Text, ActivityIndicator, StyleSheet, TouchableOpacity, RefreshControl, TextInput} from 'react-native';
 import {countallPosts, isConfirmedAcceptor, deleteForever, getNetworkId} from "../lib/firebaseUtils";
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 import {adourStyle, BRAND_COLOR_ONE} from './style/AdourStyle';
 import TimeAgo from 'react-native-timeago';
 import OfflineNotice from './OfflineNotice';
+import escapeRegExp from 'escape-string-regexp'
 
 let uid;
 
@@ -24,6 +25,7 @@ class DashboardScreen extends Component {
         refreshing: false,
         hosting:[], // Array of hosting services
         attending:[], // Array of attending tasks
+        query: ''
       }
       this.runFirebaseListeners = this.runFirebaseListeners.bind(this);
       this.updateIndex = this.updateIndex.bind(this);
@@ -359,10 +361,31 @@ class DashboardScreen extends Component {
     render() {
         const {fetching, attending, hosting, active, attendingBadge, hostingBadge} = this.state
         const buttons = ['Attending', 'Hosting']
+        const { query } = this.state;
+
+        let showingEvents;
+        if (query) {
+          const match = new RegExp(escapeRegExp(query), "i");
+          showingEvents = attending.filter(event => match.test(event.customTitle));
+        } else {
+          showingEvents = attending;
+        }
+        let showingHostedEvents;
+        if (query) {
+          const match = new RegExp(escapeRegExp(query), "i");
+          showingHostedEvents = hosting.filter(event => match.test(event.customTitle));
+        } else {
+          showingHostedEvents = hosting;
+        }
+
+        console.log(this.state.query)
+        console.log(showingHostedEvents);
+
 
         return (
           <View style={styles.mainContainer}>
               <View>
+
                 <ButtonGroup
                   onPress={this.updateIndex}
                   selectedIndex={active}
@@ -375,9 +398,19 @@ class DashboardScreen extends Component {
               <OfflineNotice />
               {!fetching && this.userGuideContainer(active)}
 
+              <TextInput
+              style={adourStyle.textInputForFilter}
+              autoCapitalize="none"
+              placeholder="Search"
+              placeholderStyle={adourStyle.placeholderStyle}
+              placeholderTextColor={'rgba(0, 0, 0, 0.65)'}
+              underlineColorAndroid='transparent'
+              onChangeText={query => this.setState({ query: query })}
+              />
+              
               {
                 !fetching &&  <FlatList
-                    data={(active == 0)?attending:hosting}
+                    data={(active == 0)?showingEvents:showingHostedEvents}
                     extraData={(active == 0)?attending:hosting}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => item.id}
@@ -389,6 +422,7 @@ class DashboardScreen extends Component {
                                 }
                 />
               }
+
               <View style={{marginBottom:15, marginLeft: 20, marginRight: 20}}>
               <Button title="Host A Meetup" titleStyle={adourStyle.buttonTextBold} buttonStyle={adourStyle.btnHomeHost} disabled={this.state.disabledBtn} onPress={() => {this.props.navigation.navigate('CreatePost')}}/>
               </View>
