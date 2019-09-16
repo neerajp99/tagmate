@@ -21,6 +21,8 @@ class GuestList extends Component {
           disabledBtn: false,
           item:{id:this.props.navigation.state.params.taskId, hostId:this.props.navigation.state.params.hostId}, // Loading service request's ID which was passed on
           fetching: false,
+          allGuestsTrue: false,
+          counter: 0,
       };
   }
 
@@ -37,7 +39,11 @@ class GuestList extends Component {
       })
       this.blockedListener();
 
+
+
+
   }
+
 
   componentWillUnmount()
   {
@@ -74,12 +80,25 @@ class GuestList extends Component {
     this.props.navigation.navigate('ViewProfile',{profileUid: uid})
   }
 
-  acceptAllGuests = () => {
-      this.state.guestList.map(guest => {
-        console.log(guest);
-        this.acceptGuest(guest.id, guest.guestStatus, guest.fullName, guest.thumbnail);
-      })
+acceptAllGuests = () => {
+  this.state.guestList.map(guest => {
+    if (guest.guestStatus == 0) {
+      console.log(guest);
+      this.acceptGuest(
+        guest.id,
+        guest.guestStatus,
+        guest.fullName,
+        guest.thumbnail
+      );
     }
+    this.setState({
+      allGuestsTrue: false
+    });
+    this.forceUpdate();
+  });
+};
+
+
 
     // Home to all the listeners for the guest list object for this serviceRequest ID
     getGuestList = () => {
@@ -122,7 +141,11 @@ class GuestList extends Component {
       //Increment confirmed count
       firebase.database().ref(`networks/${networkId}/allPosts/${this.state.item.id}/confirmedCount`).transaction(function(confirmedCount){
         return (confirmedCount || 0) + 1;
-      });
+      })
+      this.setState({
+        counter: this.state.counter + 1
+      })
+
 
     }
 
@@ -194,6 +217,13 @@ class GuestList extends Component {
     * */
     renderItem = ({item}) => {
         const {id, guestStatus, fullName, thumbnail} = item;
+        this.state.guestList.map(guest => {
+          if (guest.guestStatus === 0) {
+              this.setState({
+                allGuestsTrue: true
+              })
+          }
+        })
 
         return (
           <View key={id}>
@@ -233,6 +263,7 @@ class GuestList extends Component {
 
     render() {
       const {fetching, guestList} = this.state
+      console.log(guestList)
 
         return (
           <View style={{flex: 2, marginBottom: 8, backgroundColor: '#eceff1'}}>
@@ -251,14 +282,19 @@ class GuestList extends Component {
                     </View>
                 }
             </View>
+            {this.state.guestList && this.state.allGuestsTrue === true &&
             <Card>
+
               <Button
                 onPress={() => { this.acceptAllGuests() }}
                 buttonStyle={{ name: 'info-outline'}}
                 titleStyle={adourStyle.btnTextSmall}
                 title="Accept All Guests"
               />
+
               </Card>
+            }
+
             </ScrollView>
 
             {/* Finalize List button Disabled. Logic changed to allow guests on rolling basis
