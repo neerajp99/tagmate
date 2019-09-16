@@ -403,6 +403,27 @@ export const adourStyle = StyleSheet.create({
     color: 'rgba(255, 255, 255, 1)',
     fontSize: 14,
     textAlign: 'center'
+  },
+  textInputForFilter: {
+    height: 45,
+    width: WIDTH -30,
+    marginLeft: 15,
+    marginBottom: 10,
+    marginTop: 5,
+    fontSize: 14,
+    fontFamily:'OpenSans',
+    paddingLeft: 25,
+    backgroundColor: 'rgb(255, 255, 255)',
+    color: 'rgba(0, 0, 0, 0.75)',
+  },
+  moreInfoButton: {
+    borderRadius: 5,
+    height: 35,
+    backgroundColor: BRAND_COLOR_SIX,
+    justifyContent: 'center',
+    marginTop: 10,
+    width: WIDTH -110,
+    alignSelf: 'center',
   }
 
 })
