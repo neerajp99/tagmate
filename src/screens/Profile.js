@@ -28,7 +28,8 @@ class ProfileScreen extends Component{
       isVerified: false,
       dmAllow: true,
       bio: '_____ _____ _____ ___ ______',
-      photoURL: PLACEHOLDER_AVATAR
+      photoURL: PLACEHOLDER_AVATAR,
+      photoTag: '',
     }; // Message to show while Adour coins are being loaded
     this.firebaseListeners = this.firebaseListeners.bind(this);
   }
@@ -138,12 +139,26 @@ class ProfileScreen extends Component{
     //console.log("FirebaseStorageService :: image.path ", image.path );
     const imageId = uuid.v4();
 
+    // retrieve image id
+    firebase.database().ref(`/users/${uid}/profileImageId`).once('value', (snapshot) => {
+      console.log('Before if conditon', snapshot.val())
+      if (snapshot.val() != null) {
+        let profileImageId = snapshot.val()
+        firebase.storage().ref(`${this.state.networkId}/imgs`).child(profileImageId + ".jpeg").delete()
+        firebase.storage().ref(`${this.state.networkId}/imgs`).child("thumb_" + profileImageId + ".jpeg").delete()
+        console.log('After if conditon', snapshot.val())
+      }
+      // save image id to database
+      firebase.database().ref(`/users/${uid}`).update({profileImageId: imageId})
+    })
+
+
+
     var firebaseStorageRef = firebase.storage().ref(`${this.state.networkId}/imgs`);
     const imageRef = firebaseStorageRef.child(imageId + ".jpeg");
 
     //A thumbnail is created for any image created with thumb_NAME.jpeg. This is done on the cloud.
     const thumbRef = firebaseStorageRef.child("thumb_" + imageId + ".jpeg");
-
     //console.log("FirebaseStorageService :: imageRef ", imageRef);
 
 
@@ -202,6 +217,7 @@ class ProfileScreen extends Component{
 
 
   render(){
+    console.log(this.state.photoURL)
     return(
       <View>
       <OfflineNotice />
