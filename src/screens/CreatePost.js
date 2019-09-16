@@ -9,6 +9,7 @@ import moment from 'moment'
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {adourStyle, BRAND_COLOR_TWO, BRAND_COLOR_FOUR} from './style/AdourStyle';
+import { Icon } from 'react-native-elements'
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -40,6 +41,7 @@ class CreatePost extends Component{
             dtEndPlaceholder: 'End Date & Time',
             isDateTimeStartPickerVisible: false,
             isDateTimeEndPickerVisible: false,
+            displayExtraInputs: false
         }
 
         this.inputRefs = {
@@ -56,6 +58,7 @@ class CreatePost extends Component{
     }
 
     componentDidMount() {
+      console.log(this.state.displayExtraInputs)
       this._isMounted = true;
       let user = firebase.auth().currentUser;
       if (user != null) {
@@ -295,6 +298,7 @@ class CreatePost extends Component{
       value: 'custom',
       key: 'custom'
     })
+    console.log(servicesArray)
 
     //Get the service item of the selected service ID so that we can update the title and image in realtime
 
@@ -312,6 +316,13 @@ class CreatePost extends Component{
 
     var today = new Date();
     date=today.getDate() + "/"+ parseInt(today.getMonth()+1) +"/"+ today.getFullYear();
+
+    // Extra Input goes here
+    const { displayExtraInputs } = this.state;
+    let extraInputs;
+
+
+
 
     return(
       <ScrollView>
@@ -385,46 +396,74 @@ class CreatePost extends Component{
                 onChangeText={details => this.setState({ details: details })}
               />
 
-              <TextInput
-              style={adourStyle.textInputLeft}
-              autoCapitalize="none"
-              placeholder="Venue"
-              placeholderStyle={adourStyle.placeholderStyle}
-              placeholderTextColor={'rgba(0, 0, 0, 0.65)'}
-              underlineColorAndroid='transparent'
-              onChangeText={venue => this.setState({ venue: venue })}
+              <Button
+              onPress={() => {
+                    this.setState(prevState => ({
+                      displayExtraInputs: !prevState.displayExtraInputs
+                    }))
+                  }}
+                buttonStyle={adourStyle.moreInfoButton}
+                titleStyle={adourStyle.btnTextSmall}
+                title="Add more details"
+                icon={{
+                        name: "ios-arrow-down",
+                        type: "ionicon",
+                        size: 15,
+                        color: "white",
+                        marginLeft: 5,
+                        marginTop: 2
+                      }}
+                iconRight={true}
               />
 
-              <Button title={dtStartPlaceholder} buttonStyle={styles.dateTimeStyleLeft} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showStartDateTimePicker()}}/>
-              <DateTimePicker
-                isVisible={isDateTimeStartPickerVisible}
-                mode='datetime'
-                date={today}
-                minimumDate={today}
-                is24Hour={false}
-                onConfirm={this._handleStartDatePicked}
-                onCancel={this._hideStartDateTimePicker}
-              />
+              {displayExtraInputs &&
+                <View style = {{marginTop: 15}}>
+                <TextInput
+                style={adourStyle.textInputLeft}
+                autoCapitalize="none"
+                placeholder="Venue"
+                placeholderStyle={adourStyle.placeholderStyle}
+                placeholderTextColor={'rgba(0, 0, 0, 0.65)'}
+                underlineColorAndroid='transparent'
+                onChangeText={venue => this.setState({ venue: venue })}
+                />
 
-              <Button title={dtEndPlaceholder} buttonStyle={styles.dateTimeStyleLeft} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showEndDateTimePicker()}}/>
-              <DateTimePicker
-                isVisible={isDateTimeEndPickerVisible}
-                mode='datetime'
-                date={today}
-                minimumDate={today}
-                is24Hour={false}
-                onConfirm={this._handleEndDatePicked}
-                onCancel={this._hideEndDateTimePicker}
-              />
+                <Button title={dtStartPlaceholder} buttonStyle={styles.dateTimeStyleLeft} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showStartDateTimePicker()}} />
 
-              <CheckBox
-                title='Public'
-                checked={this.state.publicPost}
-                onPress={() => this.setState({ publicPost: !this.state.publicPost})}
-              />
+                <DateTimePicker
+                  isVisible={isDateTimeStartPickerVisible}
+                  mode='datetime'
+                  date={today}
+                  minimumDate={today}
+                  is24Hour={false}
+                  onConfirm={this._handleStartDatePicked}
+                  onCancel={this._hideStartDateTimePicker}
+                />
 
-              <Text onPress={this.publicInfo} style={adourStyle.defaultTextSmall}>What are public events?</Text>
-              {/* DISABLED TEMPORARILY
+                <Button title={dtEndPlaceholder} buttonStyle={styles.dateTimeStyleLeft} titleStyle={styles.buttonTextStyle} disabled={this.state.disabledBtn} onPress={() => {this._showEndDateTimePicker()}}/>
+                <DateTimePicker
+                  isVisible={isDateTimeEndPickerVisible}
+                  mode='datetime'
+                  date={today}
+                  minimumDate={today}
+                  is24Hour={false}
+                  onConfirm={this._handleEndDatePicked}
+                  onCancel={this._hideEndDateTimePicker}
+                />
+
+                <CheckBox
+                  title='Public'
+                  checked={this.state.publicPost}
+                  onPress={() => this.setState({ publicPost: !this.state.publicPost})}
+                />
+                <Text onPress={this.publicInfo} style={adourStyle.defaultTextSmall}>What are public events?</Text>
+                </View>
+
+            }
+
+
+
+                {/* DISABLED TEMPORARILY
               <CheckBox
                 title='Post As Anonymous'
                 checked={this.state.anonymous}
