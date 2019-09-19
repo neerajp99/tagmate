@@ -252,6 +252,8 @@ class DashboardScreen extends Component {
     // Open Dashboard Details screen for the task the user has tapped.
     openDetails = (item) =>
     {
+      this.props.navigation.navigate('DashboardDetails',{taskId: item.id})
+      /* NULL Corner case check disabled because it was causing latency
       getNetworkId(uid)
         .then(networkId => {
           firebase
@@ -262,6 +264,7 @@ class DashboardScreen extends Component {
               }
             })
           })
+          */
     }
 
     userGuideContainer = (active) =>
@@ -407,7 +410,7 @@ class DashboardScreen extends Component {
               underlineColorAndroid='transparent'
               onChangeText={query => this.setState({ query: query })}
               />
-              
+
               {
                 !fetching &&  <FlatList
                     data={(active == 0)?showingEvents:showingHostedEvents}
